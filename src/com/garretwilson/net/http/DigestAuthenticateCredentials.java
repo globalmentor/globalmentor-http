@@ -6,13 +6,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.garretwilson.lang.ByteUtilities.*;
 import static com.garretwilson.lang.LongUtilities.*;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
-import static com.garretwilson.util.Base64.*;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
 
@@ -39,14 +39,14 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 		/**@return The username.*/
 		public String getUsername() {return username;}
 
-	/**The un-hashed server-specific data unique for each challenge.*/
+	/**The hashed server-specific data unique for each challenge.*/
 	private final String nonce;
 
-		/**@return The un-hashed server-specific data unique for each challenge.*/
+		/**@return The hashed server-specific data unique for each challenge.*/
 		public String getNonce() {return nonce;}
 
 	/**The digest URI.*/
-	private final URI uri;
+	private final URI uri;	//TODO convert to a string so that we can recognize "*"
 
 		/**@return The digest URI.*/
 		public URI getURI() {return uri;}
@@ -85,11 +85,17 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 		*/
 		public long getNonceCount() {return nonceCount;}
 
+	/**@return The ID of the principal for which the credentials purport to provide authentication.*/
+	public String getPrincipalID()
+	{
+		return getUsername();	//return the username
+	}
+
 	/**Constructs digest authentication credentials.
 	This implementation only supports the MD5 algorithm.
 	@param username The username of the principal submitting the credentials
 	@param realm The realm for which authentication is requested.
-	@param nonce The un-hashed server-specific data unique for each challenge.
+	@param nonce The hashed server-specific data unique for each challenge.
 	@param digestURI The digest URI.
 	@param response The response appropriate for these credentials.
 	@param cnonce The cnonce value, or <code>null</code> for no value.
@@ -152,9 +158,6 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 	*/
 	public boolean isValid(final String method, final String password)
 	{
-Debug.trace("checking validity with method", method, "password", password);
-Debug.trace("our response", getResponse());
-Debug.trace("expected response", getRequestDigest(method, password));
 		return getRequestDigest(method, password).equals(getResponse());	//see if what we calculate matches what we already have
 	}
 		
@@ -170,27 +173,28 @@ Debug.trace("expected response", getRequestDigest(method, password));
 		final QOP qop=getQOP();	//get the quality of protection
 		assert qop!=QOP.AUTH_INT : "Quality of Protection "+getQOP()+" not supported.";	//TODO complete for auth-int
 		final String a2=method+DIGEST_DELIMITER+getURI();	//constuct the A2 value to be hashed
+		final String nonce=getNonce();	//get the nonce
 		final String token;	//determine the token to hash
 		if(qop==QOP.AUTH || qop==QOP.AUTH_INT)	//if the quality of protection is given
 		{
-			token=encodeBytes(digest(getMessageDigest(), getNonce()))	//H(A1)
-					+DIGEST_DELIMITER+getNonce()	//nonce-value
+			token=toHexString(digest(getMessageDigest(), a1))	//H(A1)
+					+DIGEST_DELIMITER+nonce	//nonce-value
 					+DIGEST_DELIMITER+toHexString(getNonceCount(), NONCE_COUNT_LENGTH)	//nc-value: nonce-count, eight characters
 					+DIGEST_DELIMITER+getCNonce()	//cnonce-value
 					+DIGEST_DELIMITER+getQOP()	//qop-value
-					+DIGEST_DELIMITER+encodeBytes(digest(getMessageDigest(), a2));	//H(A2)
+					+DIGEST_DELIMITER+toHexString(digest(getMessageDigest(), a2));	//H(A2)
 		}
 		else if(qop==null)	//if the quality of protection is not present
 		{
-			token=encodeBytes(digest(getMessageDigest(), getNonce()))	//H(A1)
-					+DIGEST_DELIMITER+getNonce()	//nonce-value
-					+DIGEST_DELIMITER+encodeBytes(digest(getMessageDigest(), a2));	//H(A2)
+			token=toHexString(digest(getMessageDigest(), a1))	//H(A1)
+					+DIGEST_DELIMITER+nonce	//nonce-value
+					+DIGEST_DELIMITER+toHexString(digest(getMessageDigest(), a2));	//H(A2)
 		}
 		else	//if an unrecognized value is present (this is not possible unless the QOP enum is enlarged)
 		{
 			throw new AssertionError("Unknown QOP.");
 		}
-		return encodeBytes(digest(getMessageDigest(), token));	//hash the token to get the request digest
+		return toHexString(digest(getMessageDigest(), token));	//hash the token to get the request digest
 	}
 		
 	/**@return The authorization parameters for this challenge.

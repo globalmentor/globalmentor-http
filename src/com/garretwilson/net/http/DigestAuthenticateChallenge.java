@@ -3,13 +3,13 @@ package com.garretwilson.net.http;
 import java.security.*;
 import java.util.*;
 
+import static com.garretwilson.lang.ByteUtilities.*;
 import static com.garretwilson.lang.CharacterUtilities.*;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
-import static com.garretwilson.util.Base64.*;
 import com.garretwilson.util.NameValuePair;
 
 /**An encapsulation of a digest authenticate challenge of HTTP Digest Access Authentication,
@@ -113,9 +113,8 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 	{
 		final List<NameValuePair<String, String>> parameterList=super.getParameters();	//get the default parameters
 			//TODO implement domain
-		final byte[] nonceDigest=digest(getMessageDigest(), getNonce());	//calculate the nonce digest
-		final String nonceDigestBase64=encodeBytes(nonceDigest);	//base64-encode the nonce
-		parameterList.add(new NameValuePair<String, String>(NONCE_PARAMETER, nonceDigestBase64));	//nonce
+		final String nonceDigest=toHexString(digest(getMessageDigest(), getNonce()));	//calculate the nonce digest
+		parameterList.add(new NameValuePair<String, String>(NONCE_PARAMETER, nonceDigest));	//nonce
 		final String opaque=getOpaque();	//get the opaque value
 		if(opaque!=null)	//if we have an opaque value
 		{

@@ -5,4 +5,7 @@ package com.garretwilson.net.http;
 */
 public interface AuthenticateCredentials extends Authentication
 {
+
+	/**@return The ID of the principal for which the credentials purport to provide authentication.*/
+	public String getPrincipalID();
 }

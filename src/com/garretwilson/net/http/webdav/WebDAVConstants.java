@@ -13,23 +13,20 @@ public class WebDAVConstants
 {
 
 	/**The WebDAV COPY method.*/
-//G***del if not needed	public final static String COPY_METHOD="COPY";
+	public final static String COPY_METHOD="COPY";
 	/**The WebDAV LOCk method.*/
-//G***del if not needed	public final static String LOC_METHOD="LOCK";
+	public final static String LOC_METHOD="LOCK";
 	/**The WebDAV MKCOL method.*/
-//G***del if not needed	public final static String MKCOL_METHOD="MKCOL";
+	public final static String MKCOL_METHOD="MKCOL";
 	/**The WebDAV MOVE method.*/
-//G***del if not needed	public final static String MOVE_METHOD="MOVE";
+	public final static String MOVE_METHOD="MOVE";
 	/**The WebDAV PROPFIND method.*/
-//G***del if not needed	public final static String PROPFIND_METHOD="PROPFIND";
+	public final static String PROPFIND_METHOD="PROPFIND";
 	/**The WebDAV PROPPATCH method.*/
-//G***del if not needed	public final static String PROPPATCH_METHOD="PROPPATCH";
+	public final static String PROPPATCH_METHOD="PROPPATCH";
 	/**The WebDAV UNLOCK method.*/
-//G***del if not needed	public final static String UNLOCK_METHOD="UNLOCK";
+	public final static String UNLOCK_METHOD="UNLOCK";
 
-	public enum WebDAVMethod{COPY, DELETE, GET, HEAD, LOCK, MKCOL, MOVE, OPTIONS, PUT, POST, PROPFIND, PROPPATCH, TRACE, UNLOCK};
-
-	
 	/**The recommended prefix to the WebDAV namespace.*/
 	public final static String WEBDAV_NAMESPACE_PREFIX="D";
 	/**The WebDAV namespace identifier, which is not a true URI.*/
