@@ -28,11 +28,11 @@ public abstract class HTTPRedirectException extends HTTPException
 		{
 			throw new IllegalArgumentException("Invalid redirect status code "+statusCode);
 		}
-		this.location=location;	//save the location
 		if(location==null)	//if the location is null
 		{
-			throw new NullPointerException("Location must not be null.");
+			throw new NullPointerException("Location must be provided.");
 		}
+		this.location=location;	//save the location
 	}
 
 }
