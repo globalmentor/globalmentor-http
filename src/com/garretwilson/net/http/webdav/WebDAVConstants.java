@@ -2,8 +2,11 @@ package com.garretwilson.net.http.webdav;
 
 import java.net.URI;
 
+import static com.garretwilson.text.xml.QualifiedName.*;
+
 /**Constant values for WebDAV as defined by
-<a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>,	"HTTP Extensions for Distributed Authoring -- WEBDAV". 
+<a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>,	"HTTP Extensions for Distributed Authoring -- WEBDAV".
+<p>Status code declarations and comments used from Tomcat org.apache.catalina.servlets.WebdavServlet by Remy Maucherat Revision: 1.19 $ $Date: 2004/09/19 01:20:10.</p>  
 @author Garret Wilson
 */
 public class WebDAVConstants
@@ -14,8 +17,8 @@ public class WebDAVConstants
 	
 	/**The recommended prefix to the WebDAV namespace.*/
 	public final static String WEBDAV_NAMESPACE_PREFIX="D";
-	/**The URI to the WebDAV namespace.*/
-	public final static URI WEBDAV_NAMESPACE_URI=URI.create("DAV:");
+	/**The WebDAV namespace identifier, which is not a true URI.*/
+	public final static String WEBDAV_NAMESPACE="DAV:";
 
 	/**The header indicating the allowed methods.*/
 	public final static String ALLOW_HEADER="allow";	//TODO is this an HTTP method or a WebDAV method
@@ -34,13 +37,89 @@ public class WebDAVConstants
 		/**The header indicating Microsoft authoring via DAV.*/
 		public final static String MS_AUTHOR_VIA_DAV="DAV";
 
+		//property names
+	public final static String CREATION_DATE_PROPERTY_NAME="creationdate";
+	public final static String DISPLAY_NAME_PROPERTY_NAME="displayname";
+	public final static String GET_CONTENT_LANGUAGE_PROPERTY_NAME="getcontentlanguage";
+	public final static String GET_CONTENT_LENGTH_PROPERTY_NAME="getcontentlength";
+	public final static String GET_CONTENT_TYPE_PROPERTY_NAME="getcontenttype";
+	public final static String GET_ETAG_PROPERTY_NAME="getetag";
+	public final static String GET_LAST_MODIFIED_PROPERTY_NAME="getlastmodified";
+	public final static String LOCK_DISCOVERY_PROPERTY_NAME="lockdiscovery";
+
+	//properties
+	public final static URI CREATION_DATE_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, CREATION_DATE_PROPERTY_NAME);
+	public final static URI DISPLAY_NAME_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, DISPLAY_NAME_PROPERTY_NAME);
+	public final static URI GET_CONTENT_LANGUAGE_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_CONTENT_LANGUAGE_PROPERTY_NAME);
+	public final static URI GET_CONTENT_LENGTH_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_CONTENT_LENGTH_PROPERTY_NAME);
+	public final static URI GET_CONTENT_TYPE_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_CONTENT_TYPE_PROPERTY_NAME);
+	public final static URI GET_ETAG_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_ETAG_PROPERTY_NAME);
+	public final static URI GET_LAST_MODIFIED_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_LAST_MODIFIED_PROPERTY_NAME);
+	public final static URI LOCK_DISCOVERY_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, LOCK_DISCOVERY_PROPERTY_NAME);
+
 		//XML names
 	/**The all properties element name.*/
 	public final static String ELEMENT_ALLPROP="allprop";
+	/**The href element name.*/
+	public final static String ELEMENT_HREF="href";
+	/**The multiple status container element name.*/
+	public final static String ELEMENT_MULTISTATUS="multistatus";
 	/**The property element name.*/
 	public final static String ELEMENT_PROP="prop";
 	/**The property name element name.*/
 	public final static String ELEMENT_PROPNAME="propname";
 	/**The propfind element name.*/
 	public final static String ELEMENT_PROPFIND="propfind";
+	/**The propstat element name.*/
+	public final static String ELEMENT_PROPSTAT="propstat";
+	/**The response element name.*/
+	public final static String ELEMENT_RESPONSE="response";
+	/**The status element name.*/
+	public final static String ELEMENT_STATUS="status";
+
+  /**
+   * Status code (207) indicating that the response requires
+   * providing status for multiple independent operations.
+   */
+  public static final int SC_MULTI_STATUS = 207;
+  // This one colides with HTTP 1.1
+  // "207 Parital Update OK"
+
+
+  /**
+   * Status code (418) indicating the entity body submitted with
+   * the PATCH method was not understood by the resource.
+   */
+  public static final int SC_UNPROCESSABLE_ENTITY = 418;
+  // This one colides with HTTP 1.1
+  // "418 Reauthentication Required"
+
+
+  /**
+   * Status code (419) indicating that the resource does not have
+   * sufficient space to record the state of the resource after the
+   * execution of this method.
+   */
+  public static final int SC_INSUFFICIENT_SPACE_ON_RESOURCE = 419;
+  // This one colides with HTTP 1.1
+  // "419 Proxy Reauthentication Required"
+
+
+  /**
+   * Status code (420) indicating the method was not executed on
+   * a particular resource within its scope because some part of
+   * the method's execution failed causing the entire method to be
+   * aborted.
+   */
+  public static final int SC_METHOD_FAILURE = 420;
+
+
+  /**
+   * Status code (423) indicating the destination resource of a
+   * method is locked, and either the request did not contain a
+   * valid Lock-Info header, or the Lock-Info header identifies
+   * a lock held by another principal.
+   */
+  public static final int SC_LOCKED = 423;
+
 }
