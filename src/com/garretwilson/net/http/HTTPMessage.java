@@ -1,6 +1,5 @@
 package com.garretwilson.net.http;
 
-
 import java.io.IOException;
 
 import org.w3c.dom.Document;
@@ -114,11 +113,16 @@ public interface HTTPMessage
 
 		//content
 	
-	/**Retrieves an XML document from the body of an HTTP request.
-	@param request The request from which to get the XML document.
+	/**Retrieves an XML document from the body of the HTTP message.
 	@return A document representing the XML information, or <code>null</code> if there is no content.
 	@exception IOException if there is an error reading the XML.
 	*/
 	public Document getXML() throws IOException;
-	
+
+	/**Places an XML document into the body of the HTTP message.
+	@param document The XML document to place into the message.
+	@exception IOException if there is an error writing the XML.
+	*/
+	public void setXML(final Document document) throws IOException;
+
 }

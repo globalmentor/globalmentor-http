@@ -1,23 +1,20 @@
 package com.garretwilson.net.http;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.w3c.dom.Document;
 
-import com.garretwilson.io.InputStreamUtilities;
 import com.garretwilson.io.ParseReader;
-import com.garretwilson.lang.CharacterUtilities;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPParser.*;
+import static com.garretwilson.text.CharacterEncodingConstants.*;
 
+import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.xml.XMLProcessor;
+import com.garretwilson.text.xml.XMLSerializer;
 import com.garretwilson.util.*;
 
 /**An abstract implementation of an HTTP request or response as defined by
@@ -278,8 +275,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 		setHeader(CONTENT_LENGTH_HEADER, Long.toString(contentLength));	//set the content length
 	}
 
-	/**Retrieves an XML document from the body of an HTTP request.
-	@param request The request from which to get the XML document.
+	/**Retrieves an XML document from the body of the HTTP message.
 	@return A document representing the XML information, or <code>null</code> if there is no content.
 	@exception IOException if there is an error reading the XML.
 	*/
@@ -293,6 +289,25 @@ public class AbstractHTTPMessage implements HTTPMessage
 			return xmlProcessor.parseDocument(xmlInputStream, null);	//parse the document				
 		}
 		return null;	//show that there is no content to return
+	}
+
+	/**Places an XML document into the body of the HTTP message.
+	@param document The XML document to place into the message.
+	@exception IOException if there is an error writing the XML.
+	*/
+	public void setXML(final Document document) throws IOException
+	{
+		final ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();	//create a byte array output stream to hold our outgoing data
+		try
+		{
+			new XMLSerializer(true).serialize(document, byteArrayOutputStream, new CharacterEncoding(UTF_8, null, NO_BOM));	//serialize the document to the byte array with no byte order mark
+			final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the bytes we serialized
+			setBody(bytes);	//set the bytes of the XML document into the body of the message
+		}
+		finally
+		{
+			byteArrayOutputStream.close();	//always close the stream as good practice			
+		}
 	}
 
 }

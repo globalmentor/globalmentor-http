@@ -20,13 +20,10 @@ public interface HTTPResponse extends HTTPMessage
 	*/
 	public HTTPResponseClass getResponseClass();
 
-	/**Checks the response code.
-	<p>If the response code represents an error condition for which an HTTP exception
-		is available, an HTTP exception is thrown.</p>
-	<p>This method calls <code>checkStatus(int, String)</code>, and most subclasses
-		should override that method instead of this one.</p>
-	@exception HTTPException if the response code represents a known error condition
-		for which an HTTP exception class is available.
+	/**Checks the response code and throws an exception on an error condition.
+	@exception HTTPException if the response code represents an error condition.
+	@see #getStatusCode()
+	@see #getReasonPhrase()
 	*/
 	public void checkStatus() throws HTTPException;
 

@@ -60,19 +60,30 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 		return HTTPResponseClass.fromStatusCode(getStatusCode());	//get the response class from the status code
 	}
 
-	/**Checks the response code.
+	/**Checks the response code and throws an exception on an error condition.
 	<p>If the response code represents an error condition for which an HTTP exception
 		is available, an HTTP exception is thrown.</p>
 	<p>This method calls <code>checkStatus(int, String)</code>, and most subclasses
 		should override that method instead of this one.</p>
-	@exception HTTPException if the response code represents a known error condition
-		for which an HTTP exception class is available.
+	<p>This version provides specialzed exceptions for the following status codes:</p>
+	<dl>
+		<dt>401</dt> <dd><code>HTTPUnauthorizedException</code></dd>
+		<dt>403</dt> <dd><code>HTTPForbiddenException</code></dd>
+		<dt>404</dt> <dd><code>HTTPNotFoundException</code></dd>
+		<dt>409</dt> <dd><code>HTTPConflictException</code></dd>
+		<dt>410</dt> <dd><code>HTTPGoneException</code></dd>
+	</dl>
+	<p>All other client or server error codes will be sent back as
+	@exception HTTPException if the response code represents an error condition.
+	@see #getStatusCode()
+	@see #getReasonPhrase()
 	*/
 	public void checkStatus() throws HTTPException
 	{
 //G***del if not needed		checkStatus(getStatusCode(), getReasonPhrase());	//check the status code and reason phrase
 		try
 		{
+			final int statusCode=getStatusCode();	//get the status code
 			switch(statusCode)	//see which response code this is
 			{
 				case SC_UNAUTHORIZED:	//401 Forbidden
@@ -93,6 +104,11 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 				   space to record the state of the resource after the execution of this
 				   method.
 	*/
+				default:	//if we don't recognize the status
+					if(getResponseClass().isError())	//if the status is an error
+					{
+						throw new HTTPException(statusCode, getReasonPhrase());	//create a generic exception class TODO create a specific client or server error exception
+					}
 	
 			}
 		}

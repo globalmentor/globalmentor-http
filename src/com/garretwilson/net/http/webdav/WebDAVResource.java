@@ -134,10 +134,9 @@ Debug.trace("making collection for segment URI", segmentURI);
 	{
 		final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, getReferenceURI());	//create a MKCOL request
 		request.setDepth(depth);	//set the requested depth
-		
-		//TODO set the body of the request
-		//TODO fix the server not to fail if there is no body in the request
-		
+		final Document propfindDocument=createPropfindDocument(getDOMImplementation());	//create a multistatus document	//TODO check DOM exceptions here
+		addProperties(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
+		request.setXML(propfindDocument);	//set the XML in the body of our request
 		final HTTPResponse response=sendRequest(request);	//get the response
 		final Document document=response.getXML();	//get the XML from the response body
 		if(document!=null)	//if there was an XML document in the request
