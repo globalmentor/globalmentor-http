@@ -2,16 +2,16 @@ package com.garretwilson.net.http;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
 
-/**Indicates that the request could not be completed due to a conflict with the current
- 	state of the resource. 
-Corresponds to HTTP status code 409.
+/**Indicates that the requested resource is no longer available at the server and no
+ 	forwarding address is known. 
+Corresponds to HTTP status code 410.
 @author Garret Wilson
 */
-public class HTTPConflictException extends HTTPClientErrorException
+public class HTTPGoneException extends HTTPClientErrorException
 {
 
 	/**Constructs a new exception.*/
-	public HTTPConflictException()
+	public HTTPGoneException()
 	{
 		this((String)null);	//construct the exception with no message
 	}
@@ -19,7 +19,7 @@ public class HTTPConflictException extends HTTPClientErrorException
 	/**Constructs a new exception with the specified detail message.
 	@param message The detail message.
 	*/
-	public HTTPConflictException(final String message)
+	public HTTPGoneException(final String message)
 	{
 		this(message, null);	//construct the class with no cause
 	}
@@ -27,7 +27,7 @@ public class HTTPConflictException extends HTTPClientErrorException
 	/**Constructs a new exception with the specified cause, along with a detail message derived from the cause.
 	@param cause The cause, or <code>null</code> to indicate the cause is nonexistent or unknown.
 	*/
-	public HTTPConflictException(final Throwable cause)
+	public HTTPGoneException(final Throwable cause)
 	{
 		this(cause!=null ? cause.toString() : null, cause);	//create an exception with a generated detail message
 	}
@@ -36,8 +36,8 @@ public class HTTPConflictException extends HTTPClientErrorException
 	@param message The detail message.
 	@param cause The cause, or <code>null</code> to indicate the cause is nonexistent or unknown.
 	*/
-	public HTTPConflictException(final String message, final Throwable cause)
+	public HTTPGoneException(final String message, final Throwable cause)
 	{
-		super(SC_CONFLICT, message, cause);	//construct the parent class
+		super(SC_GONE, message, cause);	//construct the parent class
 	}
 }

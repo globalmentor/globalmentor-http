@@ -1,11 +1,11 @@
 package com.garretwilson.net.http;
 
-import javax.servlet.ServletException;
+import java.io.IOException;
 
 /**A base class for HTTP-related errors.
 @author Garret Wilson
 */
-public class HTTPException extends ServletException
+public class HTTPException extends IOException
 {
 	/**The HTTP status code to return in the request.*/
 	private final int statusCode;
@@ -45,7 +45,8 @@ public class HTTPException extends ServletException
 	*/
 	public HTTPException(final int statusCode, final String message, final Throwable cause)
 	{
-		super(message, cause);	//construct the parent class
+		super(message);	//construct the parent class
+		initCause(cause);	//indicate the source of this exception
 		this.statusCode=statusCode;	//save the status code
 	}
 

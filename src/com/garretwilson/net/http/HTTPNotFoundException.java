@@ -2,16 +2,15 @@ package com.garretwilson.net.http;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
 
-/**Indicates that the request could not be completed due to a conflict with the current
- 	state of the resource. 
-Corresponds to HTTP status code 409.
+/**Indicates that the server has not found anything matching the Request-URI. 
+Corresponds to HTTP status code 404.
 @author Garret Wilson
 */
-public class HTTPConflictException extends HTTPClientErrorException
+public class HTTPNotFoundException extends HTTPClientErrorException
 {
 
 	/**Constructs a new exception.*/
-	public HTTPConflictException()
+	public HTTPNotFoundException()
 	{
 		this((String)null);	//construct the exception with no message
 	}
@@ -19,7 +18,7 @@ public class HTTPConflictException extends HTTPClientErrorException
 	/**Constructs a new exception with the specified detail message.
 	@param message The detail message.
 	*/
-	public HTTPConflictException(final String message)
+	public HTTPNotFoundException(final String message)
 	{
 		this(message, null);	//construct the class with no cause
 	}
@@ -27,7 +26,7 @@ public class HTTPConflictException extends HTTPClientErrorException
 	/**Constructs a new exception with the specified cause, along with a detail message derived from the cause.
 	@param cause The cause, or <code>null</code> to indicate the cause is nonexistent or unknown.
 	*/
-	public HTTPConflictException(final Throwable cause)
+	public HTTPNotFoundException(final Throwable cause)
 	{
 		this(cause!=null ? cause.toString() : null, cause);	//create an exception with a generated detail message
 	}
@@ -36,8 +35,8 @@ public class HTTPConflictException extends HTTPClientErrorException
 	@param message The detail message.
 	@param cause The cause, or <code>null</code> to indicate the cause is nonexistent or unknown.
 	*/
-	public HTTPConflictException(final String message, final Throwable cause)
+	public HTTPNotFoundException(final String message, final Throwable cause)
 	{
-		super(SC_CONFLICT, message, cause);	//construct the parent class
+		super(SC_NOT_FOUND, message, cause);	//construct the parent class
 	}
 }
