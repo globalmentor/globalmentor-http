@@ -3,9 +3,12 @@ package com.garretwilson.net.http;
 import java.io.*;
 import java.util.*;
 
+import com.garretwilson.io.ParseIOException;
 import com.garretwilson.io.ParseReader;
+import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.CharacterEncodingConstants.*;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.MapUtilities.*;
 
@@ -14,6 +17,66 @@ import static com.garretwilson.util.MapUtilities.*;
 */
 public class HTTPParser
 {
+
+	
+//TODO parse the header lines and fold them if they start with LWS
+	
+	/**Parses a line of text from a message header, assuming each line ends
+	 	in CRLF and the content is encoded in UTF-8.
+	All spaces and horizontal tabs are folded into a single space.
+	@param inputStream The source of the HTTP message.
+	@return A line of text without the ending CRLF.
+	@exception ParseIOException if the line is not properly formatted.
+	@exception EOFException If the end of the data string was unexpected reached
+		while searching for the end of the line.
+	@exception IOException if there is an error reading the content.
+	*/
+	public static String parseLine(final InputStream inputStream) throws ParseIOException, EOFException, IOException	//TODO make sure our byte-level processing doesn't interfere with any UTF-8 encoding
+	{
+		final ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();	//create a dynamic byte array
+//G***del		byte b;	//we'll keep track of each byte we read
+		int value;	//we'll keep track of each value we read
+		boolean foldingLWS=false;	//whether we are currently folding linear whitespace
+		while((value=inputStream.read())>=0)	//read another value; while we haven't reached the end of the data stream
+		{
+			final byte b=(byte)value;	//cast the value to a byte
+			if(b==CR)	//if this is the first half of a CRLF sequence
+			{
+				final int lfValue=inputStream.read();	//read the LF value
+				if(lfValue==LF)	//if we found the LF
+				{
+					final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the bytes we collected
+					return new String(bytes, UTF_8);	//return a string from the UTF-8-encoded bytes
+				}
+				else if(lfValue<0)	//if we reached the end of the file
+				{
+					throw new EOFException("Unexpectedly reached end of stream while reading line looking for second half of CRLF.");						
+				}
+				else	//if we found an unknown value
+				{
+					throw new ParseIOException("Unexpected character "+(char)lfValue+" following CR.");
+				}
+			}
+			else if(b==LF)	//if we get a bare LF
+			{
+				throw new ParseIOException("Unexpected LF.");					
+			}
+			if(contains(LWS_CHARS, (char)b))	//if this byte is linear white space
+			{
+				if(!foldingLWS)	//if we haven't started folding linear whitespace, yet
+				{
+					foldingLWS=true;	//we'll start folding linear whitespace now
+					byteArrayOutputStream.write(SP);	//folder all linearwhitespace into a single space; future runs of whitespace will be ignored
+				}
+			}
+			else	//if this is not linear whitespace
+			{
+				byteArrayOutputStream.write(b);	//write the byte normally
+				foldingLWS=false;	//we're not folding linear whitespace, whether we were before or not
+			}			
+		}
+		throw new EOFException("Unexpectedly reached end of stream while reading line looking for CRLF.");
+	}
 
 	/**Parses a list of attribute name/value pairs.*/
 /*G***fix
@@ -90,7 +153,7 @@ public class HTTPParser
 		reader.readExpectedChar(EQUALS_SIGN_CHAR);	//=
 		reader.skipChars(WHITESPACE_CHARS);	//skip whitespace
 		final String value;
-		if(reader.peekChar()==QUOTE_CHAR)	//if this value is quoted
+		if(reader.peekChar()==QUOTE)	//if this value is quoted
 		{
 			value=parseQuotedString(reader);	//parse the quoted string value
 		}
@@ -109,22 +172,22 @@ public class HTTPParser
 	public static String parseQuotedString(final ParseReader reader) throws IOException
 	{
 		final StringBuilder stringBuilder=new StringBuilder();
-		reader.readExpectedChar(QUOTE_CHAR);	//"
+		reader.readExpectedChar(QUOTE);	//"
 		char nextChar;	//this will be a quote when we finish 
 		do
 		{
-			stringBuilder.append(reader.readStringUntilChar(""+QUOTE_CHAR+ESCAPE_CHAR));	//find the end of the quoted value or an escape character
+			stringBuilder.append(reader.readStringUntilChar(""+QUOTE+ESCAPE_CHAR));	//find the end of the quoted value or an escape character
 			nextChar=reader.peekChar();	//see what the next character is
 			if(nextChar==ESCAPE_CHAR)	//if we've run ino an escape character
 			{
-				if(reader.peek()==QUOTE_CHAR)	//if this is a quoted pair (\")
+				if(reader.peek()==QUOTE)	//if this is a quoted pair (\")
 				{
 					reader.skip(1);	//skip the escape character and continue on
 				}
 			}
 		}
-		while(nextChar!=QUOTE_CHAR);	//keep reading until we reach the ending quote
-		reader.readExpectedChar(QUOTE_CHAR);	//"		
+		while(nextChar!=QUOTE);	//keep reading until we reach the ending quote
+		reader.readExpectedChar(QUOTE);	//"		
 		return stringBuilder.toString();	//return the value we parsed
 	}
 	

@@ -232,7 +232,7 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 	public final String toString()
 	{
 		final StringBuilder stringBuilder=new StringBuilder();
-		stringBuilder.append(getScheme()).append(SP_CHAR);	//authentication scheme
+		stringBuilder.append(getScheme()).append(SP);	//authentication scheme
 		final List<NameValuePair<String, String>> parameters=getParameters();	//get the challenge parameters
 		formatAttributes(stringBuilder, parameters.toArray(new NameValuePair[parameters.size()]));	//parameters
 		return stringBuilder.toString();
