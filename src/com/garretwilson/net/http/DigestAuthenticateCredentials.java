@@ -24,7 +24,7 @@ import com.garretwilson.util.NameValuePair;
 	"An Extension to HTTP : Digest Access Authentication".
 @author Garret Wilson
 */
-public class DigestAuthenticateCredentials extends AbstractAuthentication implements AuthenticateCredentials
+public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication implements AuthenticateCredentials
 {
 
 	/**The object used to create message digests.*/

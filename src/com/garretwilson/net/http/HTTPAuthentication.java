@@ -3,7 +3,7 @@ package com.garretwilson.net.http;
 /**An authentication challenge or response.
 @author Garret Wilson
 */
-public interface Authentication
+public interface HTTPAuthentication
 {
 
 	/**@return The authentication scheme.*/ 

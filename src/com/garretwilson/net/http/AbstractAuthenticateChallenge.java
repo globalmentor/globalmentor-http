@@ -9,7 +9,7 @@ import static com.garretwilson.text.FormatUtilities.*;
 /**An abstract encapsulation of a challenge to be sent back to client.
 @author Garret Wilson
 */
-public abstract class AbstractAuthenticateChallenge extends AbstractAuthentication implements AuthenticateChallenge
+public abstract class AbstractAuthenticateChallenge extends AbstractHTTPAuthentication implements AuthenticateChallenge
 {
 
 	/**Constructs a authentication challenge.

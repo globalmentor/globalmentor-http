@@ -15,6 +15,11 @@ public interface HTTPResponse extends HTTPMessage
 	/**@return The provided textual representation of the status code.*/
 	public String getReasonPhrase();
 
+	/**@return The class of the response.
+	@see #getResponseCode()
+	*/
+	public HTTPResponseClass getResponseClass();
+
 	/**Checks the response code.
 	<p>If the response code represents an error condition for which an HTTP exception
 		is available, an HTTP exception is thrown.</p>

@@ -12,16 +12,17 @@ import java.util.concurrent.*;
 import com.garretwilson.io.InputStreamUtilities;
 import com.garretwilson.io.ParseIOException;
 import static com.garretwilson.io.InputStreamUtilities.*;
-import com.garretwilson.net.Host;
-import com.garretwilson.net.URIUtilities;
+import com.garretwilson.net.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPFormatter.*;
 import static com.garretwilson.net.http.HTTPParser.*;
 import static com.garretwilson.net.URIUtilities.*;
+import com.garretwilson.security.DefaultNonce;
+import com.garretwilson.security.Nonce;
+import com.garretwilson.swing.BasicOptionPane;
+import com.garretwilson.swing.PasswordPanel;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.NameValuePair;
-import com.garretwilson.util.SyntaxException;
+import com.garretwilson.util.*;
 
 /**Represents a connection from a client to a server using HTTP over TCP as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
@@ -235,6 +236,7 @@ Debug.trace("reading response");
 Debug.trace("response connection header:", response.getConnection());
 			while(response.getStatusCode()==SC_UNAUTHORIZED)	//if the request requires authorization
 			{
+				disconnect();	//disconnect from the server so that the server won't time out while we look for credentials and throw a SocketException TODO improve
 Debug.trace("unauthorized; looking for challenge");
 				final AuthenticateChallenge challenge=response.getWWWAuthenticate();	//get the challenge
 				if(challenge!=null)	//if there is a challenge
@@ -245,37 +247,50 @@ Debug.trace("found a challenge");
 					{
 Debug.trace("found a digest challenge");
 						final DigestAuthenticateChallenge digestChallenge=(DigestAuthenticateChallenge)challenge;	//get the challenge as a digest challenge
-
-						final Host host=request.getHost();	//get the host of the request, as we may have been redirected
-						final int port=host.getPort()>=0 ? host.getPort() : DEFAULT_PORT;	//TODO maybe force host to have a port
-Debug.trace("getting password authentication");
-/*G***fix
-						final PasswordAuthentication passwordAuthentication=Authenticator.requestPasswordAuthentication(host.getName(), getInetAddress(), port,
-								response.getVersion().toString(), "You must enter a username and password to access this resource at \""+digestChallenge.getRealm()+"\".", digestChallenge.getScheme().toString());
-Debug.trace("got password authentication", passwordAuthentication);
+						PasswordAuthentication passwordAuthentication=null;	//we'll try to get password authentication from somewhere
+						final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
+						final String realm=digestChallenge.getRealm();	//get the
+						final HTTPClient client=HTTPClient.getInstance();	//get the client with which we're associated TODO later store the client locally
+						final Set<String> usernames=client.getUsernames(rootURI, realm);	//get users that are cached for this domain and realm
+						if(usernames.size()==1)	//if we have exactly one user's authentication information
+						{
+							final String username=usernames.iterator().next();	//get the username
+							final char[] password=client.getPassword(rootURI, realm, username);	//get the password for this user
+							if(password!=null)	//if we found a cached password
+							{
+								passwordAuthentication=new PasswordAuthentication(username, password);	//create new password authentication
+							}
+						}
+						if(passwordAuthentication==null)	//if we have no password authentication, yet
+						{
+							passwordAuthentication=askPasswordAuthentication(request, response, challenge);	//ask for a password
+						}
 						if(passwordAuthentication!=null)	//if we got authentication
 						{
-						//TODO make sure that QOP.AUTH is allowed in the challenge
-//G***del						final String username="user1";	//TODO get these from somewhere else
-//					G***del						final char[] password={'1'};
-						if(++nonceCount>3)	//increase our nonce count; only allow three attempts
-						{
-							break;	//G***testing
-						}
-							//generate credentials for the client
-						final DigestAuthenticateCredentials digestCredentials=new DigestAuthenticateCredentials(request.getMethod(),
-								passwordAuthentication.getUserName(), digestChallenge.getRealm(), passwordAuthentication.getPassword(),
-								digestChallenge.getNonce(), request.getRequestURI(), "cnonce", digestChallenge.getOpaque(), QOP.AUTH, nonceCount,
-								digestChallenge.getMessageDigest().getAlgorithm());	//TODO fix cnonce
-						request.setAuthorization(digestCredentials);	//store the credentials in the request 
-Debug.trace("writing request again");
-						writeRequest(request);	//write the modified request
-Debug.trace("getting response again");
-						response=readResponse(request);	//read the new response
-Debug.trace("response connection header:", response.getConnection());
+							//TODO make sure that QOP.AUTH is allowed in the challenge
+							if(++nonceCount>3)	//increase our nonce count; only allow three attempts
+							{
+								break;	//G***testing
+							}
+							final Nonce cnonce=new DefaultNonce(getClass().getName());	//create our own nonce value to send back
+								//generate credentials for the client
+							final DigestAuthenticateCredentials digestCredentials=new DigestAuthenticateCredentials(request.getMethod(),
+									passwordAuthentication.getUserName(), digestChallenge.getRealm(), passwordAuthentication.getPassword(),
+									digestChallenge.getNonce(), request.getRequestURI(), "cnonce", digestChallenge.getOpaque(), QOP.AUTH, nonceCount,
+									digestChallenge.getMessageDigest().getAlgorithm());	//TODO fix cnonce
+							request.setAuthorization(digestCredentials);	//store the credentials in the request
+							writeRequest(request);	//write the modified request
+							response=readResponse(request);	//read the new response
+							if(response.getResponseClass()==HTTPResponseClass.SUCCESS)	//if we succeeded
+							{
+								client.putPassword(rootURI, realm, passwordAuthentication.getUserName(), passwordAuthentication.getPassword());	//cache the username and password in the client
+							}
+							else if(response.getStatusCode()==SC_UNAUTHORIZED)	//if we're still unauthorized
+							{
+								client.removePassword(rootURI, realm, passwordAuthentication.getUserName());	//make sure there is no password cached for this user
+							}
 						}
 						else	//if we can't get a password
-*/
 						{
 							break;	//we can't authenticate without a password
 						}
@@ -299,20 +314,13 @@ Debug.trace("ready to send back response");
 		{
 			throw (IOException)new IOException(illegalArgumentException.getMessage()).initCause(illegalArgumentException);
 		}
-/*TODO bring back
 		catch(final NoSuchAlgorithmException noSuchAlgorithmException)
 		{
 			throw (IOException)new IOException(noSuchAlgorithmException.getMessage()).initCause(noSuchAlgorithmException);	//TODO decide if this is the best thing to do here
 		}
-*/
 		catch(final SyntaxException syntaxException)
 		{
 			throw (IOException)new IOException(syntaxException.getMessage()).initCause(syntaxException);
-		}
-		catch(final Throwable throwable)
-		{
-			Debug.error(throwable);
-			throw (IOException)new IOException(throwable.getMessage()).initCause(throwable);	//G***del; testing
 		}
 	}
 
@@ -501,4 +509,34 @@ Debug.trace(headerBuilder);
 		getChannel().close();	//close the channel
 	}
 */
+
+	
+	public PasswordAuthentication askPasswordAuthentication(final HTTPRequest request, final HTTPResponse reseponse, final AuthenticateChallenge challenge)
+	{
+		final StringBuilder promptBuilder=new StringBuilder("Please enter a username and password");	//TODO i18n
+		final String realm=challenge.getRealm();	//get the realm
+		if(realm!=null)	//if we know the realm
+		{
+			promptBuilder.append(" for \""+realm+"\"");	//indicate the realm TODO i18n
+		}
+		promptBuilder.append('.');		
+		final Authenticable authenticator=HTTPClient.getInstance().getAuthenticator();	//see if an authenticator has been specified TODO later keep a copy of which HTTPClient created this connection
+		if(authenticator!=null)	//if we have an authenticator
+		{
+			return authenticator.getPasswordAuthentication(request.getURI(), promptBuilder.toString()); 
+		}
+		else
+		{
+			/*G***fix
+			final DigestAuthenticateChallenge digestChallenge=(DigestAuthenticateChallenge)challenge;	//get the challenge as a digest challenge
+		final Host host=request.getHost();	//get the host of the request, as we may have been redirected
+		final int port=host.getPort()>=0 ? host.getPort() : DEFAULT_PORT;	//TODO maybe force host to have a port
+Debug.trace("getting password authentication");
+final PasswordAuthentication passwordAuthentication=Authenticator.requestPasswordAuthentication(host.getName(), getInetAddress(), port,
+response.getVersion().toString(), "You must enter a username and password to access this resource at \""+digestChallenge.getRealm()+"\".", digestChallenge.getScheme().toString());
+Debug.trace("got password authentication", passwordAuthentication);
+*/
+		}
+		return null;	//we could not determine password authentication
+	}
 }

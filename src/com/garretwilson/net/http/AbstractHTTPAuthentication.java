@@ -10,7 +10,7 @@ import com.garretwilson.util.NameValuePair;
 /**An authentication challenge or response.
 @author Garret Wilson
 */
-public abstract class AbstractAuthentication implements Authentication
+public abstract class AbstractHTTPAuthentication implements HTTPAuthentication
 {
 
 	/**The authentication scheme.*/ 
@@ -30,7 +30,7 @@ public abstract class AbstractAuthentication implements Authentication
 	@param realm The authentication realm, or <code>null</code> if not known.
 	@exception NullPointerException if the authentication scheme is <code>null</code>.
 	*/
-	public AbstractAuthentication(final AuthenticationScheme scheme, final String realm)
+	public AbstractHTTPAuthentication(final AuthenticationScheme scheme, final String realm)
 	{
 		if(scheme==null)	//if the authentication scheme is null
 		{

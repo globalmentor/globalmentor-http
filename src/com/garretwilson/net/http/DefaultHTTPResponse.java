@@ -52,6 +52,14 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 		this.reasonPhrase=reasonPhrase;
 	}
 
+	/**@return The class of the response.
+	@see #getResponseCode()
+	*/
+	public HTTPResponseClass getResponseClass()
+	{
+		return HTTPResponseClass.fromStatusCode(getStatusCode());	//get the response class from the status code
+	}
+
 	/**Checks the response code.
 	<p>If the response code represents an error condition for which an HTTP exception
 		is available, an HTTP exception is thrown.</p>
