@@ -89,7 +89,7 @@ public class HTTPFormatter
 			parameterList.add(new NameValuePair<String, String>(REALM_PARAMETER, digestCredentials.getRealm()));	//add the realm parameter
 			parameterList.add(new NameValuePair<String, String>(NONCE_PARAMETER, digestCredentials.getNonce()));	//nonce
 			parameterList.add(new NameValuePair<String, String>(DIGEST_URI_PARAMETER, digestCredentials.getURI().toString()));	//digest-uri	TODO remove toString() when changed from URI to String
-			parameterList.add(new NameValuePair<String, String>(RESPONSE_PARAMETER, digestCredentials.getNonce()));	//response
+			parameterList.add(new NameValuePair<String, String>(RESPONSE_PARAMETER, digestCredentials.getResponse()));	//response
 			parameterList.add(new NameValuePair<String, String>(ALGORITHM_PARAMETER, digestCredentials.getMessageDigest().getAlgorithm()));	//algorithm
 			final String cnonce=digestCredentials.getCNonce();	//get the cnonce value
 			if(cnonce!=null)	//if we have a cnonce value
@@ -112,9 +112,10 @@ public class HTTPFormatter
 				parameterList.add(new NameValuePair<String, String>(NONCE_COUNT_PARAMETER, nonceCount));	//nonce-count				
 			}
 //TODO implement auth-param
-			final Set<String> unquotedWWWAuthenticateParameters=new HashSet<String>();	//create a set of parameters that should not be quoted
-			unquotedWWWAuthenticateParameters.add(DIGEST_URI_PARAMETER);	//digest-uri
+			final Set<String> unquotedWWWAuthenticateParameters=new HashSet<String>();	//create a set of parameters that should not be quoted, as per RFC 2617
+			unquotedWWWAuthenticateParameters.add(ALGORITHM_PARAMETER);	//algorithm
 			unquotedWWWAuthenticateParameters.add(NONCE_COUNT_PARAMETER);	//nonce-count
+			unquotedWWWAuthenticateParameters.add(QOP_PARAMETER);	//qop
 			formatAttributeList(stringBuilder, unquotedWWWAuthenticateParameters, parameterList.toArray(new NameValuePair[parameterList.size()]));	//parameters
 		}
 		else	//if this is an unsupported challenge TODO implement BASIC challenge
@@ -157,7 +158,10 @@ public class HTTPFormatter
 			{
 				parameterList.add(new NameValuePair<String, String>(QOP_PARAMETER, formatList(new StringBuilder(), LIST_DELIMITER, qopOptions).toString()));	//qop
 			}
-			formatAttributeList(stringBuilder, parameterList.toArray(new NameValuePair[parameterList.size()]));	//parameters
+			final Set<String> unquotedAuthorizationParameters=new HashSet<String>();	//create a set of parameters that should not be quoted, as per RFC 2617
+			unquotedAuthorizationParameters.add(ALGORITHM_PARAMETER);	//algorithm
+			unquotedAuthorizationParameters.add(STALE_PARAMETER);	//stale
+			formatAttributeList(stringBuilder, unquotedAuthorizationParameters, parameterList.toArray(new NameValuePair[parameterList.size()]));	//parameters
 		}
 		else	//if this is an unsupported challenge TODO implement BASIC challenge
 		{

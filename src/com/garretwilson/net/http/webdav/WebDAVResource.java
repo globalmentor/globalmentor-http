@@ -37,11 +37,8 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public void mkCol() throws IOException
 	{
-/*G***fix
-		final HttpURLConnection connection=createConnection(MKCOL_METHOD, false);	//create a MKCOL connection to the server
-		connection.connect();	//make the request
-		checkResponse(connection);	//check the response
-*/
+		final HTTPRequest request=new DefaultHTTPRequest(MKCOL_METHOD, getReferenceURI());	//create a MKCOL request
+		final HTTPResponse response=sendRequest(request);	//get the response
 	}
 
 	/**Creates the collection path of the URI as needed.
@@ -75,15 +72,6 @@ public class WebDAVResource extends HTTPResource
 		{
 			throw new IllegalArgumentException("Resource URI "+referenceURIString+" does not begin with base URI "+baseURIString);
 		}
-		/*G***del
-		final String remainingPath=referenceURIString.substring(baseURIString.length());	//get the remaining path to examine
-		final URI baseURI=changePath(uri, basePath);	//get the base URI
-		final WebdavResource baseWebdavResource=new WebdavResource(new HttpURL(baseURI.toString()), WebdavResource.NOACTION, 0);	//create a WebDAV resource representing the base URI
-		if(username!=null && password!=null)		//if a username and password is given
-		{
-			baseWebdavResource.setUserInfo(username, new String(password));	//set the username and password for the WebDAV resource
-		}
-*/
 		final String remainingPath=referenceURIString.substring(baseURIString.length());	//get the remaining path to examine
 		final StringBuilder uriBuilder=new StringBuilder(baseURIString);	//we'll check each component of the reconstructed path as we add it to the URI builder
 		final String delimiter=String.valueOf(PATH_SEPARATOR);	//determine the path delimiter

@@ -1,5 +1,6 @@
 package com.garretwilson.net.http;
 
+
 import com.garretwilson.util.NameValuePair;
 import com.garretwilson.util.SyntaxException;
 
@@ -9,6 +10,9 @@ import com.garretwilson.util.SyntaxException;
 */
 public interface HTTPMessage
 {
+
+	/**A constant byte array indicating no body.*/
+	public final static byte[] NO_BODY=new byte[0];
 
 	/**@return The HTTP version.*/
 	public HTTPVersion getVersion();
@@ -49,26 +53,60 @@ public interface HTTPMessage
 	*/
 	public void removeHeaders(final String name);
 
-	/**@return The bytes making up the body of the message, or <code>null</code>
-	 	if there is no body and there will consequently be no content length indication.
-	*/
+	/**@return The bytes making up the body of the message.*/
 	public byte[] getBody();
-	
+
 	/**Sets the bytes to make up the body of the message.
-	@param body The body content, or <code>null</code>
-		if there is no body and there will consequently be no content length indication.
-		*/
+	Updates the Content-Length header.
+	@param body The body content.
+	@exception NullPointerException if the given body is <code>null</code>.
+	@see HTTPConstants#CONTENT_LENGTH_HEADER
+	*/
 	public void setBody(final byte[] body);
+
+	//Connection header
+
+	/**@return An array of connection tokens indicating whether the connection should be persistent,
+	 	or <code>null</code> if there is no connection header.
+	@see HTTPConstants#CONNECTION_HEADER
+	*/
+	public String[] getConnection();
+
+	/**Determines whether the Connection header is present with the token "close".
+	@return	<code>true</code> if the Connection header contains the "close" token.
+	@see #getConnection()
+	@see HTTPConstants#CONNECTION_HEADER
+	@see HTTPConstants#CONNECTION_CLOSE
+	*/
+	public boolean isConnectionClose();
+
+	/**Sets the Connection header with the given connection token.
+	@param connection The connection token such as "close".
+	@see HTTPConstants#CONNECTION_HEADER
+	@see HTTPConstants#CONNECTION_CLOSE
+	*/
+	public void setConnection(final String connection);
+
+	/**Sets whether the connection should be closed after the response.
+	@param close <code>true</code> if the connection flagged to be closed after the response.
+	@see #setConnection(String)
+	@see HTTPConstants#CONNECTION_HEADER
+	@see HTTPConstants#CONNECTION_CLOSE
+	*/
+	public void setConnectionClose(final boolean close);
+
+	//Content-Length header
+
+	
+	/**@return The content length, or <code>-1</code> if no content length is given.
+	@exception SyntaxException if the content length is given but in an invalid format.
+	*/
+	public long getContentLength() throws SyntaxException;
 
 	/**Sets the content length header.
 	@param contentLength The length of the body content.
 	@exception IllegalArgumentException if the given content length is less than zero.
 	*/
 	public void setContentLength(final long contentLength);
-
-	/**@return The content length, or <code>-1</code> if no content length is given.
-	@exception SyntaxException if the content length is given but in an invalid format.
-	*/
-	public long getContentLength() throws SyntaxException;
 
 }

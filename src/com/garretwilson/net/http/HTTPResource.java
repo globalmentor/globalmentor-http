@@ -65,45 +65,52 @@ public class HTTPResource extends DefaultResource
 	@return An input stream to the server.
 	@exception IOException if there was an error invoking the method.
 	*/
-/*G***fix
+/*G***del if not needed
 	public InputStream get() throws IOException
 	{
-		final HttpURLConnection connection=createConnection(GET_METHOD, false);	//create a GET connection to the server
-		connection.connect();	//make the request
-		checkResponse(connection);	//check the response
-		return connection.getInputStream();	//return the input stream
+		final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getReferenceURI());	//create a GET request
+		final HTTPResponse response=sendRequest(request);	//get the response
+		final byte[] body=response.getBody();	//get the body of the response
+		return new ByteArrayInputStream(body);	//return an input stream to the response body
 	}
 */
+
+	/**Retrieves the contents of a resource using the GET method.
+	@return The content received from the server.
+	@exception IOException if there was an error invoking the method.
+	*/
+	public byte[] get() throws IOException
+	{
+		final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getReferenceURI());	//create a GET request
+		final HTTPResponse response=sendRequest(request);	//get the response
+		return response.getBody();	//return the bytes received from the server
+	}
 
 	/**Accesses a resource using the HEAD method.
 	@exception IOException if there was an error invoking the method.
 	*/
 	public void head() throws IOException
 	{
-		final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getReferenceURI());	//create a head request
+		final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getReferenceURI());	//create a HEAD request
 		final HTTPResponse response=sendRequest(request);	//get the response
-Debug.trace("got back response with status:", response.getStatusCode(), response.getReasonPhrase());
 	}
 
 	/**Stores the contents of a resource using the PUT method.
-	@param content The bytes to put store at the resource location. 
+	@param content The bytes to store at the resource location. 
 	@return An output stream to the server.
 	@exception IOException if there was an error invoking the method.
 	*/
 	public void put(final byte[] content) throws IOException
 	{
-/*TODO fix
-		final HttpURLConnection connection=createConnection(PUT_METHOD, true);	//create a PUT connection to the server
-		connection.connect();	//make the request
-		checkResponse(connection);	//check the response
-		return connection.getOutputStream();	//return the output stream
-*/
+		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getReferenceURI());	//create a PUT request
+		request.setBody(content);	//set the content of the request 
+		final HTTPResponse response=sendRequest(request);	//get the response
 	}
 
 	/**Sends a request to the server.
 	@exception IOException if there was an error sending the request or receiving the response.
 	*/
-	protected HTTPResponse sendRequest(final HTTPRequest request) throws IOException
+	protected HTTPResponse sendRequest(final HTTPRequest request) throws IOException	//TODO add connection peristence
 	{
 		final HTTPClientTCPConnection connection=new HTTPClientTCPConnection(getReferenceURI());	//get a connection to the URI
 		try
@@ -112,7 +119,7 @@ Debug.trace("got back response with status:", response.getStatusCode(), response
 		}
 		finally
 		{
-			connection.close();	//always close the connection
+			connection.disconnect();	//always close the connection
 		}
 	}
 

@@ -17,7 +17,6 @@ import static com.garretwilson.text.FormatUtilities.*;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
 
-
 /**An encapsulation of digest authenticate credentials of HTTP Digest Access Authentication,
 <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,
 	"HTTP Authentication: Basic and Digest Access Authentication", which obsoletes
@@ -47,10 +46,10 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 		public String getNonce() {return nonce;}
 
 	/**The digest URI.*/
-	private final URI uri;	//TODO convert to a string so that we can recognize "*"
+	private final String uri;
 
 		/**@return The digest URI.*/
-		public URI getURI() {return uri;}
+		public String getURI() {return uri;}
 
 	/**The response appropriate for these credentials.*/
 	private String response;
@@ -128,7 +127,7 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 		is not provided.
 	@exception NullPointerException if the realm, nonoce, username, digest URI, or response is <code>null</code>.
 	*/
-	public DigestAuthenticateCredentials(final String username, final String realm, final String nonce, final URI digestURI, final String response,
+	public DigestAuthenticateCredentials(final String username, final String realm, final String nonce, final String digestURI, final String response,
 			final String cnonce, final String opaque, final QOP qop, final long nonceCount, final String algorithm) throws NoSuchAlgorithmException
 	{
 		this(null, username, realm, null, nonce, digestURI, response, cnonce, opaque, qop, nonceCount, algorithm);	//construct the class with the pre-calculated response
@@ -154,13 +153,13 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 		is not provided.
 	@exception NullPointerException if the method, realm, nonoce, username, or digest URI is <code>null</code>.
 	*/
-	public DigestAuthenticateCredentials(final String method, final String username, final String realm, final char[] password, final String nonce, final URI digestURI,
+	public DigestAuthenticateCredentials(final String method, final String username, final String realm, final char[] password, final String nonce, final String digestURI,
 			final String cnonce, final String opaque, final QOP qop, final long nonceCount, final String algorithm) throws NoSuchAlgorithmException
 	{
 		this(method, username, realm, password, nonce, digestURI, null, cnonce, opaque, qop, nonceCount, algorithm);	//construct the class, allowing the response to be calculated
 	}
 
-	/**Constructs digest authentication credentials from user information.
+	/**Full credential constructor.
 	This implementation only supports the MD5 algorithm.
 	@param method The case-sensitive HTTP method used for the corresponding request, or <code>null</code> if a response is provided.
 	@param username The username of the principal submitting the credentials
@@ -180,14 +179,10 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 		is not provided.
 	@exception NullPointerException if the realm, nonoce, username, digest URI, or response is <code>null</code>, and cannot be calculated by the given information.
 	*/
-	protected DigestAuthenticateCredentials(final String method, final String username, final String realm, final char[] password, final String nonce, final URI digestURI, final String response,
+	protected DigestAuthenticateCredentials(final String method, final String username, final String realm, final char[] password, final String nonce, final String digestURI, final String response,
 			final String cnonce, final String opaque, final QOP qop, final long nonceCount, final String algorithm) throws NoSuchAlgorithmException
 	{
 		super(AuthenticationScheme.DIGEST, realm);	//construct the parent class
-		if(method==null)	//if the method is null
-		{
-			throw new NullPointerException("Method must be provided.");
-		}
 		if(nonce==null)	//if the nonce is null
 		{
 			throw new NullPointerException("Nonce must be provided.");
@@ -240,6 +235,7 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 	*/
 	public boolean isValid(final String method, final char[] password)
 	{
+//G***del Debug.trace("comparing digest", getRequestDigest(method, password), "with received response", getResponse());
 		return getRequestDigest(method, password).equals(getResponse());	//see if what we calculate matches what we already have
 	}
 		
@@ -268,7 +264,7 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 			messageDigest.reset();	//reset the message digest for calculating H(A2)
 			update(messageDigest, method);	//method
 			update(messageDigest, DIGEST_DELIMITER_CHARS);	//:
-			update(messageDigest, getURI().toString());	//digest-uri	//TODO remove toString() when we demote digest-uri to a string
+			update(messageDigest, getURI());	//digest-uri
 			final String hashA2=toHexString(messageDigest.digest());	//calculate H(A2)
 				//request-digest
 			messageDigest.reset();	//reset the message digest for calculating request-digest
@@ -325,7 +321,7 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 			messageDigest.reset();	//reset the message digest for calculating H(A2)
 			update(messageDigest, method);	//method
 			update(messageDigest, DIGEST_DELIMITER_CHARS);	//:
-			update(messageDigest, getURI().toString());	//digest-uri	//TODO remove toString() when we demote digest-uri to a string
+			update(messageDigest, getURI());	//digest-uri
 			final String hashA2=toHexString(messageDigest.digest());	//calculate H(A2)
 				//request-digest
 			messageDigest.reset();	//reset the message digest for calculating request-digest

@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import com.garretwilson.net.Host;
+import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPFormatter.*;
 import static com.garretwilson.net.http.HTTPParser.*;
@@ -28,10 +29,33 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 
 		/**@return The request URI.*/
 		public URI getURI() {return uri;}
-	
+
+	/**The actual string used to make the request; either an absolute URI or an absolute path, depending on the circumstances.*/
+	private String requestURI;
+
+		/**@return The actual string used to make the request; either an absolute URI or an absolute path, depending on the circumstances.*/
+		public String getRequestURI() {return requestURI;}
+
+		/**Sets the actual string used to make the request.
+		@param requestURI Either an absolute URI or an absolute path, depending on the circumstances.
+		@exception IllegalArgumentException if the given URI does not represent
+			an absolute URI or an absolute path.
+		*/
+		public void setRequestURI(final String requestURI)
+		{
+			final URI uri=URI.create(requestURI);	//create a URI from the request URI TODO check for "*"
+			if(!uri.isAbsolute() && !isAbsolutePath(uri))	//if the URI is not absolute, and it doesn't represent an absolute path
+			{
+				throw new IllegalArgumentException("Request URI "+uri+" does represent neither an absolute URI nor an absolute path.");
+			}
+			this.requestURI=requestURI;	//save the request URI
+		}
+
 	/**Constructs a request with a method, address, and the default HTTP version, 1.1.
 	@param method The HTTP method.
-	@param uri The absolute URI or absolute path of the request.
+	@param uri The absolute URI of the request.
+	@exception IllegalArgumentException if the given URI does not represent
+		an absolute URI with an absolute path.
 	@see #DEFAULT_VERSION
 	*/
 	public DefaultHTTPRequest(final String method, final URI uri)
@@ -41,20 +65,21 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 
 	/**Constructs a request with a method, address, and version.
 	@param method The HTTP method.
-	@param uri The absolute URI or absolute path of the request.
+	@param uri The absolute URI of the request.
 	@param version The HTTP version being used.
 	@exception IllegalArgumentException if the given URI does not represent
-		an absolute URI or an absolute path.
+		an absolute URI with an absolute path.
 	*/
 	public DefaultHTTPRequest(final String method, final URI uri, final HTTPVersion version)
 	{
 		super(version);	//construct the parent class
-		if(!uri.isAbsolute() && !isAbsolutePath(uri))	//if the URI is not absolute, and it doesn't represent an absolute path
+		if(!uri.isAbsolute())	//if the URI is not absolute
 		{
-			throw new IllegalArgumentException("Request URI "+uri+" does represent neither an absolute URI nor an absolute path.");
+			throw new IllegalArgumentException("Request URI "+uri+" does represent neither an absolute URI.");
 		}
 		this.method=method;
 		this.uri=uri;
+		setRequestURI(getRawPathQueryFragment(uri));	//default to the unencoded path?query#fragment as the HTTP request URI
 	}
 
 	/**Gets the host information from the header.

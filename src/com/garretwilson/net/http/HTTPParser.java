@@ -40,6 +40,7 @@ public class HTTPParser
 		int value;	//we'll keep track of each value we read
 		while((value=inputStream.read())>=0)	//read another value; while we haven't reached the end of the data stream
 		{
+//G***del Debug.trace("read value", value, "character", (char)value);
 			if(version==null)	//if we're parsing the version
 			{
 				if(value==CR)	//ignore beginning CRLF sequences to compensate for buggy HTTP 1.0 implementations, as per the HTTP 1.1 specifications
@@ -416,6 +417,7 @@ public class HTTPParser
 	*/
 	public static AuthenticateCredentials parseAuthorizationHeader(final CharSequence header) throws SyntaxException, IllegalArgumentException
 	{
+Debug.trace("parsing authorization header", header);
 		try
 		{
 			final int schemeDelimiterIndex=indexOf(header, SP);	//find the space between the scheme and the rest of the credentials
@@ -449,7 +451,7 @@ public class HTTPParser
 							{
 								throw new SyntaxException(header.toString(), AUTHORIZATION_HEADER+" missing parameter "+DIGEST_URI_PARAMETER);
 							}
-							final URI digestURI=URI.create(digestURIString);	//create a URI from the digest URI string; this will reject the wildcard request URI ('*')
+//TODO del when works							final URI digestURI=URI.create(digestURIString);	//create a URI from the digest URI string; this will reject the wildcard request URI ('*')
 							final String response=parameterMap.get(RESPONSE_PARAMETER);	//get the response
 							if(response==null)	//if no response is present
 							{
@@ -466,7 +468,7 @@ public class HTTPParser
 								throw new SyntaxException(header.toString(), AUTHORIZATION_HEADER+' '+NONCE_COUNT_PARAMETER+" does not have length "+NONCE_COUNT_LENGTH+".");
 							}
 							final long nonceCount=Long.parseLong(nonceCountString, 16);	//parse the hex nonce count string to a long
-							return new DigestAuthenticateCredentials(username, realm, nonce, digestURI, response, cnonce, opaque, messageQOP, nonceCount, algorithm!=null ? algorithm : MD5_ALGORITHM);
+							return new DigestAuthenticateCredentials(username, realm, nonce, digestURIString, response, cnonce, opaque, messageQOP, nonceCount, algorithm!=null ? algorithm : MD5_ALGORITHM);
 						}
 					default:	//if we don't support this authentication scheme
 						return null;	//show that we don't support this authentication scheme TODO fix for BASIC and other schemes

@@ -18,6 +18,16 @@ public interface HTTPRequest extends HTTPMessage
 	/**@return The request URI.*/
 	public URI getURI();
 
+	/**@return The actual string used to make the request; either an absolute URI or an absolute path, depending on the circumstances.*/
+	public String getRequestURI();
+
+	/**Sets the actual string used to make the request.
+	@param requestURI Either an absolute URI or an absolute path, depending on the circumstances.
+	@exception IllegalArgumentException if the given URI does not represent
+		an absolute URI or an absolute path.
+	*/
+	public void setRequestURI(final String requestURI);
+
 	/**Gets the host information from the header.
 	@return The host name and optional port of the requested resource, or <code>null</code> if there is no host header.
 	@exception SyntaxException if the host header does not contain valid host information. 

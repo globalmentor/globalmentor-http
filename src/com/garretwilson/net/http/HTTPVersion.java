@@ -30,10 +30,10 @@ public class HTTPVersion
 		minor=newMinor;
 	}
 
-	/**@return The version as a string in the form <code><var>major</var>.<var>minor</var></code>.*/
+	/**@return The version as a string in a form indicating the protocol and the version, such as <code><var>major</var>.<var>minor</var></code>.*/
 	public String toString()
 	{
-		return Integer.toString(getMajor())+VERSION_DELIMITER+Integer.toString(getMinor());	//return major.minor
+		return new StringBuilder().append(VERSION_IDENTIFIER).append(VERSION_SEPARATOR).append(getMajor()).append(VERSION_DELIMITER).append(getMinor()).toString();	//HTTP/major.minor
 	}
 
 }

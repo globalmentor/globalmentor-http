@@ -37,4 +37,9 @@ public class HTTPStatus
 		this.reasonPhrase=reasonPhrase;
 	}
 
+	/**@return A string representation of the status useful for debugging.*/
+	public String toString()
+	{
+		return new StringBuilder(getVersion().toString()).append(' ').append(getStatusCode()).append(' ').append(getReasonPhrase()).toString();	//version statusCode reasonPhrase
+	}
 }

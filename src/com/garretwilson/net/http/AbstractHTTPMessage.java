@@ -1,8 +1,12 @@
 package com.garretwilson.net.http;
 
+import java.io.IOException;
 import java.util.*;
 
-import static com.garretwilson.net.http.HTTPConstants.CONTENT_LENGTH_HEADER;
+import com.garretwilson.io.ParseReader;
+import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.net.http.HTTPConstants.*;
+import static com.garretwilson.net.http.HTTPParser.*;
 import com.garretwilson.util.*;
 
 /**An abstract implementation of an HTTP request or response as defined by
@@ -136,34 +140,96 @@ public class AbstractHTTPMessage implements HTTPMessage
 		headerMappedList.removeKey(name.toLowerCase());	//remove any mapping of this header from the mapped list
 	}
 
-	/**The bytes making up the body of the message, or <code>null</code>
-	 	if there is no body and will be no content-length indication.
-	*/
+//TODO create a normalizeHeaders() method that converts all multiple headers to single headers
+
+	/**The bytes making up the body of the message.*/
 	private byte[] body=null;
 
-		/**@return The bytes making up the body of the message, or <code>null</code>
-		 	if there is no body and there will consequently be no content length indication.
-		*/
+		/**@return The bytes making up the body of the message.*/
 		public byte[] getBody() {return body;}
 	
 		/**Sets the bytes to make up the body of the message.
-		@param body The body content, or <code>null</code>
-			if there is no body and there will consequently be no content length indication.
-			*/
-		public void setBody(final byte[] body) {this.body=body;}
-
-	/**Sets the content length header.
-	@param contentLength The length of the body content.
-	@exception IllegalArgumentException if the given content length is less than zero.
-	*/
-	public void setContentLength(final long contentLength)
-	{
-		if(contentLength<0)	//if the content length is less than zero
+		Updates the Content-Length header.
+		@param body The body content.
+		@exception NullPointerException if the given body is <code>null</code>.
+		@see HTTPConstants#CONTENT_LENGTH_HEADER
+		*/
+		public void setBody(final byte[] body)
 		{
-			throw new IllegalArgumentException("Invalid content length "+contentLength);
+			this.body=checkNull(body, "Body is null.");	//save the body
+			if(body.length>0)	//if there is a request body
+			{
+				setContentLength(body.length);	//set the content length
+			}
+			else	//if there is no request body
+			{
+				removeHeaders(CONTENT_LENGTH_HEADER);	//remove the content length header
+			}
 		}
-		setHeader(CONTENT_LENGTH_HEADER, Long.toString(contentLength));	//set the content length
+
+	//Connection header
+
+	/**@return An array of connection tokens indicating whether the connection should be persistent,
+	 	or <code>null</code> if there is no connection header.
+	@see HTTPConstants#CONNECTION_HEADER
+	*/
+	public String[] getConnection()
+	{
+		final String connectionHeader=getHeader(CONNECTION_HEADER);	//get the connection header
+		try
+		{
+			return connectionHeader!=null ? parseList(new ParseReader(connectionHeader)) : null;	//return the list of connection tokens, if there is a connection header
+		}
+		catch(final IOException ioException)	//we shouldn't have I/O errors parsing a list
+		{
+			throw new AssertionError(ioException);
+		}		
 	}
+
+	/**Determines whether the Connection header is present with the token "close".
+	@return	<code>true</code> if the Connection header contains the "close" token.
+	@see #getConnection()
+	@see HTTPConstants#CONNECTION_HEADER
+	@see HTTPConstants#CONNECTION_CLOSE
+	*/
+	public boolean isConnectionClose()
+	{
+		final String[] connectionTokens=getConnection();	//get the connection tokens
+		if(connectionTokens!=null)	//if connection tokens are present
+		{
+			for(final String token:connectionTokens)	//for each connection token
+			{
+				if(CONNECTION_CLOSE.equals(token))	//if this token is "close"
+				{
+					return true;	//indicate that the connection is marked to be closed
+				}
+			}
+		}
+		return false;	//with no "close" connection indication, this connection should be persistent
+	}
+
+	/**Sets the Connection header with the given connection token.
+	@param connection The connection token such as "close".
+	@see HTTPConstants#CONNECTION_HEADER
+	@see HTTPConstants#CONNECTION_CLOSE
+	*/
+	public void setConnection(final String connection)
+	{
+		setHeader(CONNECTION_HEADER, connection);	//set the connection header with the given token
+	}
+
+	/**Sets whether the connection should be closed after the response.
+	@param close <code>true</code> if the connection flagged to be closed after the response.
+	@see #setConnection(String)
+	@see HTTPConstants#CONNECTION_HEADER
+	@see HTTPConstants#CONNECTION_CLOSE
+	*/
+	public void setConnectionClose(final boolean close)
+	{
+		setConnection(CONNECTION_CLOSE);	//set the connection to "close"
+	}
+
+	//Content-Length header
 
 	/**@return The content length, or <code>-1</code> if no content length is given.
 	@exception SyntaxException if the content length is given but in an invalid format.
@@ -186,6 +252,19 @@ public class AbstractHTTPMessage implements HTTPMessage
 		{
 			return -1;	//show that there is no content length specified
 		}
+	}
+
+	/**Sets the content length header.
+	@param contentLength The length of the body content.
+	@exception IllegalArgumentException if the given content length is less than zero.
+	*/
+	public void setContentLength(final long contentLength)
+	{
+		if(contentLength<0)	//if the content length is less than zero
+		{
+			throw new IllegalArgumentException("Invalid content length "+contentLength);
+		}
+		setHeader(CONTENT_LENGTH_HEADER, Long.toString(contentLength));	//set the content length
 	}
 
 }
