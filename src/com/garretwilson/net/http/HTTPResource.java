@@ -3,6 +3,7 @@ package com.garretwilson.net.http;
 import java.io.*;
 import java.net.*;
 
+import com.garretwilson.io.OutputStreamDecorator;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
@@ -90,15 +91,10 @@ public class HTTPResource extends DefaultResource
 	@return An input stream to the server.
 	@exception IOException if there was an error invoking the method.
 	*/
-/*G***del if not needed
-	public InputStream get() throws IOException
+	public InputStream getInputStream() throws IOException
 	{
-		final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getReferenceURI());	//create a GET request
-		final HTTPResponse response=sendRequest(request);	//get the response
-		final byte[] body=response.getBody();	//get the body of the response
-		return new ByteArrayInputStream(body);	//return an input stream to the response body
+		return new ByteArrayInputStream(get());	//return an input stream to the result of the GET method
 	}
-*/
 
 	/**Retrieves the contents of a resource using the GET method.
 	@return The content received from the server.
@@ -122,7 +118,6 @@ public class HTTPResource extends DefaultResource
 
 	/**Stores the contents of a resource using the PUT method.
 	@param content The bytes to store at the resource location. 
-	@return An output stream to the server.
 	@exception IOException if there was an error invoking the method.
 	*/
 	public void put(final byte[] content) throws IOException
@@ -130,6 +125,15 @@ public class HTTPResource extends DefaultResource
 		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getReferenceURI());	//create a PUT request
 		request.setBody(content);	//set the content of the request 
 		final HTTPResponse response=sendRequest(request);	//get the response
+	}
+
+	/**Retrieves an output stream which, upon closing, will store the contents of a resource using the PUT method.
+	@return An output stream to the resource.
+	@exception IOException if there was an error invoking the method.
+	*/
+	public OutputStream getOutputStream() throws IOException
+	{
+		return new OutputStreamAdapter();	//create and return a new output stream adapter which will accumulate bytes and send them when closed
 	}
 
 	/**Sends a request to the server.
@@ -146,6 +150,45 @@ public class HTTPResource extends DefaultResource
 		{
 			connection.disconnect();	//always close the connection
 		}
+	}
+
+	/**Creates an output stream that simply collects bytes until closed,
+	 	at which point the data is written to the HTTP resource using the PUT method.
+	@author Garret Wilson
+	@see HTTPResource#put(byte[])
+	*/
+	protected class OutputStreamAdapter extends OutputStreamDecorator<ByteArrayOutputStream>
+	{
+	
+		/**Default constructor.*/
+		public OutputStreamAdapter()
+		{
+			super(new ByteArrayOutputStream());	//collect bytes in a decorated byte array output stream
+		}
+	
+		//TODO maybe improve flush() at some point to actually send data to the HTTP Resource
+	
+	  /**Closes this output stream and releases any system resources associated with this stream.
+	  This version writes the accumulated data to the HTTP resource, and unconditionally
+	  	releases the accumulated bytes.
+	  @exception IOException if an I/O error occurs.
+	  */
+		public void close() throws IOException	//TODO what if there is an error writing to the stream, and the client tries to close the stream out of an attempt for consistency?
+		{
+			final ByteArrayOutputStream byteArrayOutputStream=getOutputStream();	//get the decorated output stream, if there still is one
+			if(byteArrayOutputStream!=null)	//if we had a byte array output stream before closing, this adapter was still open
+			{
+				final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the collected bytes
+				try
+				{
+					put(bytes);	//put the bytes to the HTTP resource
+				}
+				finally
+				{
+					super.close();	//do the default closing, releasing the decorated output stream from the decorator
+				}
+			}
+  	}
 	}
 
 }
