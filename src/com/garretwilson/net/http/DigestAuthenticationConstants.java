@@ -9,10 +9,18 @@ package com.garretwilson.net.http;
 */
 public class DigestAuthenticationConstants
 {
+	/**The parameter for digest URI.*/
+	public final static String DIGEST_URI_PARAMETER="uri";
+	/**The parameter for the cnonce.*/
+	public final static String CNONCE_PARAMETER="cnonce";
 	/**The parameter for domain.*/
 	public final static String DOMAIN_PARAMETER="domain";
 	/**The parameter for the nonce.*/
 	public final static String NONCE_PARAMETER="nonce";
+		/**The length of the nonce count hex string.*/
+		public final static int NONCE_COUNT_LENGTH=8;
+	/**The parameter for the nonce count.*/
+	public final static String NONCE_COUNT_PARAMETER="nc";
 	/**The parameter for opaque.*/
 	public final static String OPAQUE_PARAMETER="opaque";
 	/**The parameter for stale.*/
@@ -25,4 +33,13 @@ public class DigestAuthenticationConstants
 		public final static String AUTH_QOP="auth";
 		/**Authentication with integerity protection quality of protection.*/	
 		public final static String AUTH_INT_QOP="auth-int";
+	/**The parameter for response.*/
+	public final static String RESPONSE_PARAMETER="response";
+	/**The parameter for username.*/
+	public final static String USERNAME_PARAMETER="username";
+
+
+	/**The delimiter used when concatenating multiple strings before hashing.*/
+	public final static char DIGEST_DELIMITER=':';
+
 }

@@ -6,8 +6,8 @@ import java.util.*;
 import com.garretwilson.io.ParseReader;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.text.CharacterConstants.*;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.NameValuePair;
+import com.garretwilson.util.*;
+import static com.garretwilson.util.MapUtilities.*;
 
 /**Parses HTTP content. 
 @author Garret Wilson
@@ -35,6 +35,25 @@ public class HTTPParser
 		
 	}
 */
+
+	/**Parses a list of attribute name/value pair from the given reader, reading until the end of the reader is reached.
+	Quotes are removed from quoted values.
+	The parameters are mapped by name and returned.
+	@param reader The source of the data.
+	@exception IOException if there is an error reading the data.
+	@exception IllegalArgumentException if more than one parameter with the same
+		name was exists.
+	*/
+	public static Map<String, String> parseParameterMap(final ParseReader reader) throws IOException, IllegalArgumentException
+	{
+		final List<NameValuePair<String, String>> parameterList=parseParameters(reader);	//parse the parameters
+		final Map<String, String> parameterMap=new HashMap<String, String>();	//create a map for the parameters
+		if(addAllValues(parameterMap, parameterList))	//add the values to the map; if we have duplicate values
+		{
+			throw new IllegalArgumentException("Encountered duplicate parameter names.");
+		}
+		return parameterMap;	//return the parameter map
+	}
 
 	/**Parses a list of attribute name/value pair from the given reader, reading until the end of the reader is reached.
 	Quotes are removed from quoted values. 

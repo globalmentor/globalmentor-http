@@ -6,8 +6,8 @@ import java.util.*;
 import static com.garretwilson.lang.CharacterUtilities.*;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
+import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
-import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.util.Base64.*;
 import com.garretwilson.util.NameValuePair;
@@ -19,7 +19,7 @@ import com.garretwilson.util.NameValuePair;
 	"An Extension to HTTP : Digest Access Authentication".
 @author Garret Wilson
 */
-public class DigestAuthenticateChallenge extends AuthenticateChallenge
+public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 {
 	
 	/**The object used to create message digests.*/
@@ -51,16 +51,16 @@ public class DigestAuthenticateChallenge extends AuthenticateChallenge
 		*/
 		public void setStale(final boolean stale) {this.stale=stale;}
 
-	/**The array of quality of protection options, such as such as <code>AUTH_QOP</code>.*/
-	private String[] qopOptions=new String[]{AUTH_QOP};	//default to authentication quality of protection
+	/**The array of quality of protection options.*/
+	private QOP[] qopOptions=new QOP[]{QOP.AUTH};	//default to authentication quality of protection
 
-		/**@return The array of quality of protection options, such as such as <code>AUTH_QOP</code>.*/
-		public String[] getQOPOptions() {return qopOptions;}
+		/**@return The array of quality of protection options.*/
+		public QOP[] getQOPOptions() {return qopOptions;}
 		
 		/**Sets the quality of protection.
 		@param qopOptions The quality of protection options.
 		*/
-		public void setQOPOptions(final String... qopOptions) {this.qopOptions=qopOptions;}
+		public void setQOPOptions(final QOP... qopOptions) {this.qopOptions=qopOptions;}
 
 	/**Constructs a digest authentication challenge with the MD5 algorithm and no opaque data.
 	Defaults to authentication quality of protection.
@@ -113,8 +113,7 @@ public class DigestAuthenticateChallenge extends AuthenticateChallenge
 	{
 		final List<NameValuePair<String, String>> parameterList=super.getParameters();	//get the default parameters
 			//TODO implement domain
-		final byte[] nonceBytes=toByteArray(getNonce().toCharArray());	//convert the nonce to bytes
-		final byte[] nonceDigest=getMessageDigest().digest(nonceBytes);	//calculate the nonce digest
+		final byte[] nonceDigest=digest(getMessageDigest(), getNonce());	//calculate the nonce digest
 		final String nonceDigestBase64=encodeBytes(nonceDigest);	//base64-encode the nonce
 		parameterList.add(new NameValuePair<String, String>(NONCE_PARAMETER, nonceDigestBase64));	//nonce
 		final String opaque=getOpaque();	//get the opaque value
@@ -128,10 +127,10 @@ public class DigestAuthenticateChallenge extends AuthenticateChallenge
 			parameterList.add(new NameValuePair<String, String>(STALE_PARAMETER, Boolean.toString(stale)));	//stale				
 		}
 		parameterList.add(new NameValuePair<String, String>(ALGORITHM_PARAMETER, getMessageDigest().getAlgorithm()));	//algorithm
-		final String[] qop=getQOPOptions();	//get the quality of protection options
-		if(qop!=null)	//if quality of protection was specified
+		final QOP[] qopOptions=getQOPOptions();	//get the quality of protection options
+		if(qopOptions!=null)	//if quality of protection was specified
 		{
-			parameterList.add(new NameValuePair<String, String>(QOP_PARAMETER, formatList(new StringBuilder(), COMMA_CHAR, qop).toString()));	//qop
+			parameterList.add(new NameValuePair<String, String>(QOP_PARAMETER, formatList(new StringBuilder(), LIST_DELIMITER, qopOptions).toString()));	//qop
 		}
 		return parameterList;	//return the list of parameters 
 	}
