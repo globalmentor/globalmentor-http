@@ -20,15 +20,27 @@ For many error conditions, a subclass of <code>HTTPException</code>
 public class WebDAVResource extends HTTPResource
 {
 
-	/**Constructs a WebDAV resource at a particular URI.
+	/**Constructs a WebDAV resource at a particular URI using the default client.
 	@param referenceURI The URI of the WebDAV resource this object represents.
 	@exception IllegalArgumentException if the given reference URI is not absolute,
-		or the scheme is not an HTTP scheme.
-	@exception NullPointerException if the given reference URI is <code>null</code>.
+		the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception NullPointerException if the given reference URI or client is <code>null</code>.
 	*/
 	public WebDAVResource(final URI referenceURI) throws IllegalArgumentException, NullPointerException
 	{
 		super(referenceURI);	//construct the parent class
+	}
+
+	/**Constructs a WebDAV resource at a particular URI using a particular client.
+	@param referenceURI The URI of the WebDAV resource this object represents.
+	@param client The client used to create a connection to this resource.
+	@exception IllegalArgumentException if the given reference URI is not absolute,
+		the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception NullPointerException if the given reference URI or client is <code>null</code>.
+	*/
+	public WebDAVResource(final URI referenceURI, final HTTPClient client) throws IllegalArgumentException, NullPointerException
+	{
+		super(referenceURI, client);	//construct the parent class
 	}
 
 	/**Creates a collection using the MKCOL method.
@@ -86,7 +98,7 @@ public class WebDAVResource extends HTTPResource
 				{
 					final URI segmentURI=new URI(uriBuilder.toString());	//create a URI for this segment of the path
 Debug.trace("looking at segment URI", segmentURI);
-					final WebDAVResource segmentWebDAVResource=new WebDAVResource(segmentURI);	//create a WebDAV resource for this segment of the path
+					final WebDAVResource segmentWebDAVResource=new WebDAVResource(segmentURI, getClient());	//create a WebDAV resource for this segment of the path, using the same client
 					if(!segmentWebDAVResource.exists())	//if this segment collection doesn't exist //TODO later use an isCollection() or something
 					{
 Debug.trace("making collection for segment URI", segmentURI);

@@ -12,11 +12,12 @@ import java.util.concurrent.*;
 import com.garretwilson.io.InputStreamUtilities;
 import com.garretwilson.io.ParseIOException;
 import static com.garretwilson.io.InputStreamUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.net.*;
+import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPFormatter.*;
 import static com.garretwilson.net.http.HTTPParser.*;
-import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.security.DefaultNonce;
 import com.garretwilson.security.Nonce;
 import com.garretwilson.swing.BasicOptionPane;
@@ -27,9 +28,16 @@ import com.garretwilson.util.*;
 /**Represents a connection from a client to a server using HTTP over TCP as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
 @author Garret Wilson
+@see HTTPClient
 */
 public class HTTPClientTCPConnection
 {
+
+	/**The client with which this connection is associated.*/
+	private final HTTPClient client;
+
+		/**@return The client with which this connection is associated.*/
+		protected HTTPClient getClient() {return client;}
 
 	/**The URI to connect to, or to which the connection has been permanently directed.*/
 //G***del	private URI uri;
@@ -175,26 +183,33 @@ public class HTTPClientTCPConnection
 //	G***fix		protected ByteBuffer getReadBuffer() {return writeBuffer;}
 
 	/**URI constructor.
+	@param client The client with which this connection is associated.
 	@param uri The URI indicating the host to which to connect.
+	@exception NullPointerException if the given client is <code>null</code>.
 	@exception IllegalArgumentException if the given URI does not contain a valid host.
 	*/
-	public HTTPClientTCPConnection(final URI uri)
+/*G***del if not needed
+	HTTPClientTCPConnection(final HTTPClient client, final URI uri)
 	{
+		this.client=client;	//save the client
 		final String host=uri.getHost();	//get the URI's specified host
 		if(host==null)	//if no host is specified
 		{
 			throw new IllegalArgumentException("URI "+uri+" contains no host.");
 		}
-		final int port=uri.getPort();	//get the URI's specified port
-		this.host=new Host(host, uri.getPort());	//create a new host
+		this.host=URIUtilities.getHost(uri);	//save the host host
 	}
+*/
 
 	/**Host constructor.
+	@param client The client with which this connection is associated.
 	@param host The host to which to connect.
+	@exception NullPointerException if the given client or host is <code>null</code>.
 	*/
-	public HTTPClientTCPConnection(final Host host)
+	HTTPClientTCPConnection(final HTTPClient client, final Host host)
 	{
-		this.host=host;	//save the host
+		this.client=checkNull(client, "Client cannot be null");	//save the client
+		this.host=checkNull(host, "Host cannot be null");	//save the host
 	}
 
 	/**Convenience method to sends a request and get a response.
@@ -250,7 +265,7 @@ Debug.trace("found a digest challenge");
 						PasswordAuthentication passwordAuthentication=null;	//we'll try to get password authentication from somewhere
 						final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
 						final String realm=digestChallenge.getRealm();	//get the
-						final HTTPClient client=HTTPClient.getInstance();	//get the client with which we're associated TODO later store the client locally
+						final HTTPClient client=getClient();	//get the client with which we're associated
 						final Set<String> usernames=client.getUsernames(rootURI, realm);	//get users that are cached for this domain and realm
 						if(usernames.size()==1)	//if we have exactly one user's authentication information
 						{
@@ -510,8 +525,13 @@ Debug.trace(headerBuilder);
 	}
 */
 
-	
-	public PasswordAuthentication askPasswordAuthentication(final HTTPRequest request, final HTTPResponse reseponse, final AuthenticateChallenge challenge)
+	/**Asks a user for password authentication information, using the client's registered authenticator, if any.
+	@param request The request for which authentication is required.
+	@param reseponse The response indicating authentication is required.
+	@param challenge The challenge describing the needed authentication.
+	@return Password authentication information from the user, or <code>null</code> if no information was given.
+	*/ 
+	protected PasswordAuthentication askPasswordAuthentication(final HTTPRequest request, final HTTPResponse reseponse, final AuthenticateChallenge challenge)
 	{
 		final StringBuilder promptBuilder=new StringBuilder("Please enter a username and password");	//TODO i18n
 		final String realm=challenge.getRealm();	//get the realm
@@ -519,24 +539,8 @@ Debug.trace(headerBuilder);
 		{
 			promptBuilder.append(" for \""+realm+"\"");	//indicate the realm TODO i18n
 		}
-		promptBuilder.append('.');		
-		final Authenticable authenticator=HTTPClient.getInstance().getAuthenticator();	//see if an authenticator has been specified TODO later keep a copy of which HTTPClient created this connection
-		if(authenticator!=null)	//if we have an authenticator
-		{
-			return authenticator.getPasswordAuthentication(request.getURI(), promptBuilder.toString()); 
-		}
-		else
-		{
-			/*G***fix
-			final DigestAuthenticateChallenge digestChallenge=(DigestAuthenticateChallenge)challenge;	//get the challenge as a digest challenge
-		final Host host=request.getHost();	//get the host of the request, as we may have been redirected
-		final int port=host.getPort()>=0 ? host.getPort() : DEFAULT_PORT;	//TODO maybe force host to have a port
-Debug.trace("getting password authentication");
-final PasswordAuthentication passwordAuthentication=Authenticator.requestPasswordAuthentication(host.getName(), getInetAddress(), port,
-response.getVersion().toString(), "You must enter a username and password to access this resource at \""+digestChallenge.getRealm()+"\".", digestChallenge.getScheme().toString());
-Debug.trace("got password authentication", passwordAuthentication);
-*/
-		}
-		return null;	//we could not determine password authentication
+		promptBuilder.append('.');
+		return getClient().getPasswordAuthentication(request.getURI(), promptBuilder.toString());	//ask the client to ask the user for a password
 	}
+
 }

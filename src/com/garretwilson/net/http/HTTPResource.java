@@ -3,7 +3,9 @@ package com.garretwilson.net.http;
 import java.io.*;
 import java.net.*;
 
+import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
+import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
@@ -19,24 +21,47 @@ For many error conditions, a subclass of <code>HTTPException</code>
 public class HTTPResource extends DefaultResource
 {
 
-	/**Constructs an HTTP resource at a particular URI.
+	/**The client used to create a connection to this resource.*/
+	private final HTTPClient client;
+
+		/**@return The client used to create a connection to this resource.*/
+		protected HTTPClient getClient() {return client;}
+
+	/**Constructs an HTTP resource at a particular URI using the default client.
 	@param referenceURI The URI of the HTTP resource this object represents.
 	@exception IllegalArgumentException if the given reference URI is not absolute,
-		or the scheme is not an HTTP scheme.
+		the reference URI has no host, or the scheme is not an HTTP scheme.
 	@exception NullPointerException if the given reference URI is <code>null</code>.
 	*/
 	public HTTPResource(final URI referenceURI) throws IllegalArgumentException, NullPointerException
+	{
+		this(referenceURI, HTTPClient.getInstance());	//construct the resource with the default client
+	}
+
+	/**Constructs an HTTP resource at a particular URI using a particular client.
+	@param referenceURI The URI of the HTTP resource this object represents.
+	@param client The client used to create a connection to this resource.
+	@exception IllegalArgumentException if the given reference URI is not absolute,
+		the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception NullPointerException if the given reference URI or client is <code>null</code>.
+	*/
+	public HTTPResource(final URI referenceURI, final HTTPClient client) throws IllegalArgumentException, NullPointerException
 	{
 		super(referenceURI);	//construct the parent class
 		if(!referenceURI.isAbsolute())	//if the URI is not absolute
 		{
 			throw new IllegalArgumentException("URI "+referenceURI+" is not absolute.");
 		}
+		if(referenceURI.getHost()==null)	//if the URI has no host
+		{
+			throw new IllegalArgumentException("URI "+referenceURI+" has no host specified.");
+		}
 		final String scheme=referenceURI.getScheme();	//get the URI scheme
 		if(!HTTP_SCHEME.equals(scheme) && !HTTPS_SCHEME.equals(scheme))	//if this isn't a HTTP or HTTPS resource
 		{
 			throw new IllegalArgumentException("Invalid HTTP scheme "+scheme);
 		}
+		this.client=checkNull(client, "Client cannot be null.");	//save the client
 	}
 
 	/**Determines if a resource exists.
@@ -112,7 +137,7 @@ public class HTTPResource extends DefaultResource
 	*/
 	protected HTTPResponse sendRequest(final HTTPRequest request) throws IOException	//TODO add connection peristence
 	{
-		final HTTPClientTCPConnection connection=new HTTPClientTCPConnection(getReferenceURI());	//get a connection to the URI
+		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getReferenceURI()));	//get a connection to the URI
 		try
 		{
 			return connection.sendRequest(request);	//send the request and return the response
