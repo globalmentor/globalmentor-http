@@ -2,14 +2,24 @@ package com.garretwilson.net.http.webdav;
 
 import java.io.*;
 import java.net.*;
-import java.util.StringTokenizer;
+import java.util.*;
+import static java.util.Collections.*;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
+import static com.garretwilson.net.http.webdav.WebDAVUtilities.*;
+
+import com.garretwilson.text.xml.QualifiedName;
+import com.garretwilson.text.xml.XMLUtilities;
 import com.garretwilson.util.Debug;
+import com.garretwilson.util.IDMappedList;
+import com.garretwilson.util.NameValuePair;
 
 /**A client's view of a WebDAV resource on the server.
 For many error conditions, a subclass of <code>HTTPException</code>
@@ -49,7 +59,7 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public void mkCol() throws IOException
 	{
-		final HTTPRequest request=new DefaultHTTPRequest(MKCOL_METHOD, getReferenceURI());	//create a MKCOL request
+		final WebDAVRequest request=new DefaultWebDAVRequest(MKCOL_METHOD, getReferenceURI());	//create a MKCOL request
 		final HTTPResponse response=sendRequest(request);	//get the response
 	}
 
@@ -111,6 +121,52 @@ Debug.trace("making collection for segment URI", segmentURI);
 				}
 			}
 		}
+	}
+
+	/**Retrieves properties using the PROPFIND method.
+	This is a convenience method for <code>propFind(Depth)</code>.
+	@param depth The requested depth.
+	@return A list of all properties of all requested resources, each representing the URI of the resource paired by a list of its
+		properties, each property representing  the qualified name of the property and the value.
+	@exception IOException if there was an error invoking the method.
+	*/
+	public List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> propFind(final Depth depth) throws IOException
+	{
+		final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, getReferenceURI());	//create a MKCOL request
+		request.setDepth(depth);	//set the requested depth
+		
+		//TODO set the body of the request
+		//TODO fix the server not to fail if there is no body in the request
+		
+		final HTTPResponse response=sendRequest(request);	//get the response
+		final Document document=response.getXML();	//get the XML from the response body
+		if(document!=null)	//if there was an XML document in the request
+		{
+			final Element documentElement=document.getDocumentElement();	//get the document element
+				//TODO check to make sure the document element is correct
+			return getMultistatusProperties(documentElement);	//get the properties from the multistatus document			
+				//TODO cache the properties
+		}
+		return emptyList();	//return an empty list
+	}
+
+	/**Retrieves properties of this resource using the PROPFIND method.
+	This is a convenience method for <code>propFind(Depth)</code>.
+	@return A list of all properties of this resource, each property representing  the qualified name of the property and the value.
+	@exception IOException if there was an error invoking the method.
+	@see #propFind(Depth)
+	*/
+	public List<NameValuePair<QualifiedName, ?>> propFind() throws IOException
+	{
+		final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> propertyLists=propFind(Depth.ZERO);	//do a propfind with no depth
+		for(final NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>> propertyList:propertyLists)	//look at each property list
+		{
+			if(getReferenceURI().equals(propertyList.getName()))	//if this property list is for this resource
+			{
+				return propertyList.getValue();	//return the list of properties for this resource
+			}
+		}
+		return emptyList();	//return an empty list; for some reason, no properties were returned		
 	}
 
 }

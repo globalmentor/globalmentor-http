@@ -1,6 +1,10 @@
 package com.garretwilson.net.http;
 
 
+import java.io.IOException;
+
+import org.w3c.dom.Document;
+
 import com.garretwilson.util.NameValuePair;
 import com.garretwilson.util.SyntaxException;
 
@@ -96,7 +100,6 @@ public interface HTTPMessage
 	public void setConnectionClose(final boolean close);
 
 	//Content-Length header
-
 	
 	/**@return The content length, or <code>-1</code> if no content length is given.
 	@exception SyntaxException if the content length is given but in an invalid format.
@@ -109,4 +112,13 @@ public interface HTTPMessage
 	*/
 	public void setContentLength(final long contentLength);
 
+		//content
+	
+	/**Retrieves an XML document from the body of an HTTP request.
+	@param request The request from which to get the XML document.
+	@return A document representing the XML information, or <code>null</code> if there is no content.
+	@exception IOException if there is an error reading the XML.
+	*/
+	public Document getXML() throws IOException;
+	
 }

@@ -1,12 +1,23 @@
 package com.garretwilson.net.http;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.w3c.dom.Document;
+
+import com.garretwilson.io.InputStreamUtilities;
 import com.garretwilson.io.ParseReader;
+import com.garretwilson.lang.CharacterUtilities;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPParser.*;
+
+import com.garretwilson.text.xml.XMLProcessor;
 import com.garretwilson.util.*;
 
 /**An abstract implementation of an HTTP request or response as defined by
@@ -265,6 +276,23 @@ public class AbstractHTTPMessage implements HTTPMessage
 			throw new IllegalArgumentException("Invalid content length "+contentLength);
 		}
 		setHeader(CONTENT_LENGTH_HEADER, Long.toString(contentLength));	//set the content length
+	}
+
+	/**Retrieves an XML document from the body of an HTTP request.
+	@param request The request from which to get the XML document.
+	@return A document representing the XML information, or <code>null</code> if there is no content.
+	@exception IOException if there is an error reading the XML.
+	*/
+	public Document getXML() throws IOException
+	{
+		final byte[] body=getBody();	//get the body of the message
+		if(body!=null)	//if a body was given
+		{
+			final InputStream xmlInputStream=new ByteArrayInputStream(body);	//create a new input stream from the body bytes
+			final XMLProcessor xmlProcessor=new XMLProcessor();	//create a new XML processor to process the information TODO use a generic way of getting the XML processor
+			return xmlProcessor.parseDocument(xmlInputStream, null);	//parse the document				
+		}
+		return null;	//show that there is no content to return
 	}
 
 }

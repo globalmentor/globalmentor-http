@@ -15,7 +15,7 @@ public class WebDAVConstants
 	/**The WebDAV COPY method.*/
 	public final static String COPY_METHOD="COPY";
 	/**The WebDAV LOCk method.*/
-	public final static String LOC_METHOD="LOCK";
+	public final static String LOCK_METHOD="LOCK";
 	/**The WebDAV MKCOL method.*/
 	public final static String MKCOL_METHOD="MKCOL";
 	/**The WebDAV MOVE method.*/

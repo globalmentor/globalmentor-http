@@ -8,8 +8,9 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
+
 import static com.garretwilson.net.http.HTTPConstants.*;
-import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
+
 import com.garretwilson.util.Debug;
 import com.garretwilson.model.DefaultResource;
 
@@ -63,6 +64,16 @@ public class HTTPResource extends DefaultResource
 			throw new IllegalArgumentException("Invalid HTTP scheme "+scheme);
 		}
 		this.client=checkNull(client, "Client cannot be null.");	//save the client
+	}
+
+	/**Deletes the resource using the DELETE method.
+	@exception IOException if there was an error invoking the method.
+	*/
+	public void delete() throws IOException
+	{
+		final HTTPRequest request=new DefaultHTTPRequest(DELETE_METHOD, getReferenceURI());	//create a DELETE request
+		final HTTPResponse response=sendRequest(request);	//get the response
+		//TODO change the cached exists() status
 	}
 
 	/**Determines if a resource exists.
