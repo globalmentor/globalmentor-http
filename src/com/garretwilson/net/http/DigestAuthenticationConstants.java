@@ -17,10 +17,10 @@ public class DigestAuthenticationConstants
 	public final static String DOMAIN_PARAMETER="domain";
 	/**The parameter for the nonce.*/
 	public final static String NONCE_PARAMETER="nonce";
-		/**The length of the nonce count hex string.*/
-		public final static int NONCE_COUNT_LENGTH=8;
 	/**The parameter for the nonce count.*/
 	public final static String NONCE_COUNT_PARAMETER="nc";
+		/**The length of the nonce count hex string.*/
+		public final static int NONCE_COUNT_LENGTH=8;
 	/**The parameter for opaque.*/
 	public final static String OPAQUE_PARAMETER="opaque";
 	/**The parameter for stale.*/

@@ -109,6 +109,7 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 	}
 
 	/**@return The authorization parameters for this challenge.*/
+/*G***del
 	public List<NameValuePair<String, String>> getParameters()
 	{
 		final List<NameValuePair<String, String>> parameterList=super.getParameters();	//get the default parameters
@@ -133,4 +134,5 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 		}
 		return parameterList;	//return the list of parameters 
 	}
+*/
 }

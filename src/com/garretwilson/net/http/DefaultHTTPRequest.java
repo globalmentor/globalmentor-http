@@ -3,7 +3,10 @@ package com.garretwilson.net.http;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.garretwilson.net.Host;
 import static com.garretwilson.net.http.HTTPConstants.*;
+import static com.garretwilson.net.http.HTTPFormatter.*;
+import static com.garretwilson.net.http.HTTPParser.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.util.SyntaxException;
 
@@ -54,40 +57,23 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 		this.uri=uri;
 	}
 
-	/**Sets the host header.
-	@param hostURI The host name and optional port of the requested resource.
-	@exception IllegalArgumentException if the given URI does not contain only a host and optional port. 
-	*/
-	public void setHost(final URI hostURI)
-	{
-		if(!isHost(hostURI))	//if this URI is not just a host and maybe a port
-		{
-			throw new IllegalArgumentException("URI "+hostURI+" must contain only a host and optional port.");
-		}
-		setHeader(HOST_HEADER, hostURI.toString());	//set the host
-	}
-
 	/**Gets the host information from the header.
 	@return The host name and optional port of the requested resource, or <code>null</code> if there is no host header.
-	@exception SyntaxException if the host header does not contain only a host and optional port. 
+	@exception SyntaxException if the host header does not contain valid host information. 
+	@see HTTPConstants#HOST_HEADER
 	*/
-	public URI getHost() throws SyntaxException
+	public Host getHost() throws SyntaxException
 	{
 		final String host=getHeader(HOST_HEADER);	//get the host header, if there is one
 		if(host!=null)	//if a host is present
 		{
 			try
 			{
-				final URI hostURI=new URI(host);	//create a URI from the host header		
-				if(!isHost(hostURI))	//if this URI is not just a host and maybe a port
-				{
-					throw new SyntaxException(host, "URI must contain only a host and optional port.");
-				}
-				return hostURI;	//return the host URI
+				return new Host(host);	//construct and return a new host
 			}
-			catch(final URISyntaxException uriSyntaxException)	//if the host is not syntactically correct
+			catch(final IllegalArgumentException illegalArgumentException)	//if the host is not syntactically correct
 			{
-				throw new SyntaxException(host, uriSyntaxException);
+				throw new SyntaxException(host, illegalArgumentException);
 			}
 		}
 		else	//if no host was given
@@ -95,4 +81,37 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 			return null;	//show that no host is present
 		}
 	}
+
+	/**Sets the host header.
+	@param host The host name and optional port of the requested resource.
+	@see HTTPConstants#HOST_HEADER
+	*/
+	public void setHost(final Host host)
+	{
+		setHeader(HOST_HEADER, host.toString());	//set the host
+	}
+
+	/**Returns the authorization credentials.
+	This method does not allow the wildcard '*' request-URI for the digest URI parameter.
+	@return The credentials from the authorization header,
+		or <code>null</code> if there is no such header.
+	@exception SyntaxException if the given header was not syntactically correct.
+	@exception IllegalArgumentException if the authorization information is not supported. 
+	@see HTTPConstants#AUTHORIZATION_HEADER
+	*/
+	public AuthenticateCredentials getAuthorization() throws SyntaxException, IllegalArgumentException
+	{
+		final String authorizationHeader=getHeader(AUTHORIZATION_HEADER); //get the authorization information
+		return authorizationHeader!=null ? parseAuthorizationHeader(authorizationHeader) : null;	//parse the authorization header, if present
+	}
+
+	/**Sets the response header containing authentication information.
+	@param credentials The authentication credentials to present to the server.
+	@see HTTPConstants#AUTHORIZATION_HEADER
+	*/
+	public void setAuthorization(final AuthenticateCredentials credentials)
+	{
+		setHeader(AUTHORIZATION_HEADER, formatAuthorizationHeader(new StringBuilder(), credentials).toString());	//set the Authenticate header
+	}
+
 }

@@ -30,14 +30,17 @@ public abstract class AbstractAuthenticateChallenge extends AbstractAuthenticati
 	This version only returns the realm parameter.
 	Child classes may override this method and append other parameters to the list before returning it.
 	*/
+/*G***del
 	public List<NameValuePair<String, String>> getParameters()
 	{
 		final List<NameValuePair<String, String>> parameterList=new ArrayList<NameValuePair<String, String>>();	//create the list of parameters
 		parameterList.add(new NameValuePair<String, String>(REALM_PARAMETER, getRealm()));	//add the realm parameter
 		return parameterList;	//return the list of parameters 
 	}
+*/
 
 	/**@return A string representation of the challenge.*/
+/*G***del
 	public final String toString()
 	{
 		final StringBuilder stringBuilder=new StringBuilder();
@@ -46,4 +49,5 @@ public abstract class AbstractAuthenticateChallenge extends AbstractAuthenticati
 		formatAttributes(stringBuilder, parameters.toArray(new NameValuePair[parameters.size()]));	//parameters
 		return stringBuilder.toString();
 	}
+*/
 }

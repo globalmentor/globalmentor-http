@@ -37,9 +37,11 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public void mkCol() throws IOException
 	{
+/*G***fix
 		final HttpURLConnection connection=createConnection(MKCOL_METHOD, false);	//create a MKCOL connection to the server
 		connection.connect();	//make the request
 		checkResponse(connection);	//check the response
+*/
 	}
 
 	/**Creates the collection path of the URI as needed.
