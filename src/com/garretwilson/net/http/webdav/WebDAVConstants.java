@@ -42,10 +42,18 @@ public class WebDAVConstants
 		public final static String DEPTH_1="1";
 		/**The depth header value indicating an infinite depth.*/
 		public final static String DEPTH_INFINITY="infinity";
+	/**The header indicating the destination of COPY or MOVE.*/
+	public final static String DESTINATION_HEADER="Destination";
 	/**The header indicating preferred Microsoft authoring.*/
 	public final static String MS_AUTHOR_VIA_HEADER="MS-Author-Via";
 		/**The header indicating Microsoft authoring via DAV.*/
 		public final static String MS_AUTHOR_VIA_DAV="DAV";
+	/**The header indicating whether an existing resource should be overwritten.*/
+	public final static String OVERWRITE_HEADER="Overwrite";
+		/**The overwrite header value indicating false.*/
+		public final static String OVERWRITE_FALSE="F";
+		/**The overwrite header value indicating true.*/
+		public final static String OVERWRITE_TRUE="T";
 
 		//property names
 	public final static String CREATION_DATE_PROPERTY_NAME="creationdate";

@@ -7,6 +7,7 @@ package com.garretwilson.net.http.webdav;
 public enum WebDAVMethod
 {
 	COPY,
+	/*TODO decide if this is properly a WebDAV method CONNECT,*/
 	DELETE,
 	GET,
 	HEAD,
