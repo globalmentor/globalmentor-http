@@ -46,8 +46,9 @@ public class WebDAVConstants
 	public final static String GET_ETAG_PROPERTY_NAME="getetag";
 	public final static String GET_LAST_MODIFIED_PROPERTY_NAME="getlastmodified";
 	public final static String LOCK_DISCOVERY_PROPERTY_NAME="lockdiscovery";
+	public final static String RESOURCE_TYPE_PROPERTY_NAME="resourcetype";
 
-	//properties
+		//properties
 	public final static URI CREATION_DATE_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, CREATION_DATE_PROPERTY_NAME);
 	public final static URI DISPLAY_NAME_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, DISPLAY_NAME_PROPERTY_NAME);
 	public final static URI GET_CONTENT_LANGUAGE_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_CONTENT_LANGUAGE_PROPERTY_NAME);
@@ -56,6 +57,13 @@ public class WebDAVConstants
 	public final static URI GET_ETAG_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_ETAG_PROPERTY_NAME);
 	public final static URI GET_LAST_MODIFIED_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_LAST_MODIFIED_PROPERTY_NAME);
 	public final static URI LOCK_DISCOVERY_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, LOCK_DISCOVERY_PROPERTY_NAME);
+	public final static URI RESOURCE_TYPE_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, RESOURCE_TYPE_PROPERTY_NAME);
+
+		//resource type names
+	public final static String COLLECTION_TYPE_NAME="collection";
+
+		//resource types
+	public final static URI COLLECTION_TYPE=createReferenceURI(WEBDAV_NAMESPACE, COLLECTION_TYPE_NAME);
 
 		//XML names
 	/**The all properties element name.*/
