@@ -32,8 +32,6 @@ public class WebDAVConstants
 	/**The WebDAV namespace identifier, which is not a true URI.*/
 	public final static String WEBDAV_NAMESPACE="DAV:";
 
-	/**The header indicating the allowed methods.*/
-	public final static String ALLOW_HEADER="allow";	//TODO is this an HTTP method or a WebDAV method
 	/**The header indicating the WevDAV versions supported.*/
 	public final static String DAV_HEADER="DAV";
 	/**The header indicating the depth of property discovery.*/
