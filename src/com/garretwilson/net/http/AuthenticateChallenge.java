@@ -3,10 +3,7 @@ package com.garretwilson.net.http;
 import java.util.*;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
-import static com.garretwilson.text.CharacterConstants.COMMA_CHAR;
-import static com.garretwilson.text.CharacterConstants.EQUALS_SIGN_CHAR;
-import static com.garretwilson.text.CharacterConstants.QUOTATION_MARK_CHAR;
-import static com.garretwilson.text.CharacterConstants.SPACE_CHAR;
+import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import com.garretwilson.util.NameValuePair;
 

@@ -117,7 +117,11 @@ public class DigestAuthenticateChallenge extends AuthenticateChallenge
 		final byte[] nonceDigest=getMessageDigest().digest(nonceBytes);	//calculate the nonce digest
 		final String nonceDigestBase64=encodeBytes(nonceDigest);	//base64-encode the nonce
 		parameterList.add(new NameValuePair<String, String>(NONCE_PARAMETER, nonceDigestBase64));	//nonce
-		parameterList.add(new NameValuePair<String, String>(OPAQUE_PARAMETER, getOpaque()));	//opaque
+		final String opaque=getOpaque();	//get the opaque value
+		if(opaque!=null)	//if we have an opaque value
+		{
+			parameterList.add(new NameValuePair<String, String>(OPAQUE_PARAMETER, getOpaque()));	//opaque
+		}
 		final boolean stale=isStale();	//see if staleness should be indicated
 		if(stale)	//if an earlier request had a stale nonce
 		{
