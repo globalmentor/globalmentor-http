@@ -41,5 +41,7 @@ public class DigestAuthenticationConstants
 
 	/**The delimiter used when concatenating multiple strings before hashing.*/
 	public final static char DIGEST_DELIMITER=':';
+	/**The characters of the delimiter used when concatenating multiple strings before hashing.*/
+	public final static char[] DIGEST_DELIMITER_CHARS=new char[]{DIGEST_DELIMITER};
 
 }

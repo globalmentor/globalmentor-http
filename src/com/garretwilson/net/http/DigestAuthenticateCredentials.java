@@ -10,6 +10,7 @@ import static com.garretwilson.lang.ByteUtilities.*;
 import static com.garretwilson.lang.LongUtilities.*;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
+import com.garretwilson.security.MessageDigestUtilities;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
@@ -156,7 +157,7 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 	@see #getResponse()
 	@see #getRequestDigest(String, String)
 	*/
-	public boolean isValid(final String method, final String password)
+	public boolean isValid(final String method, final char[] password)
 	{
 		return getRequestDigest(method, password).equals(getResponse());	//see if what we calculate matches what we already have
 	}
@@ -166,35 +167,54 @@ public class DigestAuthenticateCredentials extends AbstractAuthentication implem
 	@param password The user password.
 	@return The request digest calculated from the values of the credentials and the given method and password.
 	*/
-	protected String getRequestDigest(final String method, final String password)
+	protected String getRequestDigest(final String method, final char[] password)
 	{
-		assert MD5_ALGORITHM.equals(getMessageDigest().getAlgorithm()) : "Only the MD5 algorithm is supported.";	//TODO complete for MD5-sess
-		final String a1=getUsername()+DIGEST_DELIMITER+getRealm()+DIGEST_DELIMITER+password;	//construct the A1 value to be hashed
-		final QOP qop=getQOP();	//get the quality of protection
-		assert qop!=QOP.AUTH_INT : "Quality of Protection "+getQOP()+" not supported.";	//TODO complete for auth-int
-		final String a2=method+DIGEST_DELIMITER+getURI();	//constuct the A2 value to be hashed
-		final String nonce=getNonce();	//get the nonce
-		final String token;	//determine the token to hash
-		if(qop==QOP.AUTH || qop==QOP.AUTH_INT)	//if the quality of protection is given
+		final MessageDigest messageDigest=getMessageDigest();	//get the message digest
+		try
 		{
-			token=toHexString(digest(getMessageDigest(), a1))	//H(A1)
-					+DIGEST_DELIMITER+nonce	//nonce-value
-					+DIGEST_DELIMITER+toHexString(getNonceCount(), NONCE_COUNT_LENGTH)	//nc-value: nonce-count, eight characters
-					+DIGEST_DELIMITER+getCNonce()	//cnonce-value
-					+DIGEST_DELIMITER+getQOP()	//qop-value
-					+DIGEST_DELIMITER+toHexString(digest(getMessageDigest(), a2));	//H(A2)
+			assert MD5_ALGORITHM.equals(getMessageDigest().getAlgorithm()) : "Only the MD5 algorithm is supported.";	//TODO complete for MD5-sess
+				//H(A1)
+			messageDigest.reset();	//reset the message digest for calculating H(A1)
+			update(messageDigest, getUsername());	//username
+			update(messageDigest, DIGEST_DELIMITER_CHARS);	//:
+			update(messageDigest, getRealm());	//realm
+			update(messageDigest, DIGEST_DELIMITER_CHARS);	//:
+			update(messageDigest, password);	//password
+			final String hashA1=toHexString(messageDigest.digest());	//calculate H(A1)
+			final QOP qop=getQOP();	//get the quality of protection
+			assert qop!=QOP.AUTH_INT : "Quality of Protection "+getQOP()+" not supported.";	//TODO complete for auth-int
+				//H(A2)
+			messageDigest.reset();	//reset the message digest for calculating H(A2)
+			update(messageDigest, method);	//method
+			update(messageDigest, DIGEST_DELIMITER_CHARS);	//:
+			update(messageDigest, getURI().toString());	//digest-uri	//TODO remove toString() when we demote digest-uri to a string
+			final String hashA2=toHexString(messageDigest.digest());	//calculate H(A2)
+				//request-digest
+			messageDigest.reset();	//reset the message digest for calculating request-digest
+			update(messageDigest, hashA1);	//H(A1)
+			update(messageDigest, DIGEST_DELIMITER_CHARS);	//:
+			update(messageDigest, getNonce());	//nonce
+			if(qop==QOP.AUTH || qop==QOP.AUTH_INT)	//if we get a quality of protection we recognize
+			{
+				update(messageDigest, DIGEST_DELIMITER_CHARS);	//:
+				update(messageDigest, toHexString(getNonceCount(), NONCE_COUNT_LENGTH));	//nc-value: nonce-count, eight characters
+				update(messageDigest, DIGEST_DELIMITER_CHARS);	//:
+				update(messageDigest, getCNonce());	//cnonce-value
+				update(messageDigest, DIGEST_DELIMITER_CHARS);	//:
+				update(messageDigest, qop.toString());	//qop-value
+			}
+			else if(qop!=null)	//if an unrecognized quality of protection is present (this is not possible unless the QOP enum is enlarged)
+			{
+				throw new AssertionError("Unknown QOP.");
+			}
+			update(messageDigest, DIGEST_DELIMITER_CHARS);	//:
+			update(messageDigest, hashA2);	//H(A2)
+			return toHexString(messageDigest.digest());	//calculate request-digest			
 		}
-		else if(qop==null)	//if the quality of protection is not present
+		finally
 		{
-			token=toHexString(digest(getMessageDigest(), a1))	//H(A1)
-					+DIGEST_DELIMITER+nonce	//nonce-value
-					+DIGEST_DELIMITER+toHexString(digest(getMessageDigest(), a2));	//H(A2)
+			messageDigest.reset();	//always reset the message digest
 		}
-		else	//if an unrecognized value is present (this is not possible unless the QOP enum is enlarged)
-		{
-			throw new AssertionError("Unknown QOP.");
-		}
-		return toHexString(digest(getMessageDigest(), token));	//hash the token to get the request digest
 	}
 		
 	/**@return The authorization parameters for this challenge.
