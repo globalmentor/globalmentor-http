@@ -20,7 +20,7 @@ public enum QOP
 	/**String constructor.
 	@param string The string value of the enum.
 	*/
-	public QOP(final String string) {this.string=string;}
+	private QOP(final String string) {this.string=string;}
 	
 	/**@return The string value of the enum.*/
 	public String toString() {return string;}
