@@ -32,6 +32,34 @@ public class HTTPResource extends DefaultResource
 		/**@return The client used to create a connection to this resource.*/
 		protected HTTPClient getClient() {return client;}
 
+	/**Whether cached properties are to be returned; the default is <code>true</code>.*/
+	private boolean cached=true;
+
+		/**@return Whether cached properties are to be returned; the default is <code>true</code>.*/
+		public boolean isCached() {return cached;}
+
+		/**Sets whether cached properties should be used.
+		Properties are always cached (but not returned) even when caching is turned off.
+		@param cached Whether cached properties are to be returned.
+		@see #emptyCache()
+		*/
+		public void setCached(final boolean cached)
+		{
+			if(this.cached!=cached)	//if the caching state is changing
+			{
+				this.cached=cached;	//update the cache state
+			}
+		}
+		
+	/**Removes all cached values.*/
+	public void emptyCache()
+	{
+		cachedExists=null;	//uncache the existence state
+	}
+
+	/**The cached existence state, or <code>null</code> if existence has not yet been cached.*/
+	protected Boolean cachedExists=null;
+
 	/**The DOM implementation used as a document factory.*/
 	private final DOMImplementation domImplementation=new XMLDOMImplementation();	//TODO get this in a general way
 
@@ -86,25 +114,20 @@ public class HTTPResource extends DefaultResource
 	}
 
 	/**Determines if a resource exists.
-	This implementation checks for existence by invoking the HEAD method.
+	This implementation checks for existence by invoking the HEAD method and then looking at the cached existence value.
+	The cached existence property is updated.
 	@return <code>true</code> if the resource is present on the server.
 	@exception IOException if there was an error invoking a method.
+	@see #cachedExists
 	*/
 	public boolean exists() throws IOException
 	{
-		try
+		if(!isCached() || cachedExists==null)	//if we aren't returning cached values, or we don't have a cached existence value
 		{
-			head();	//invoke the HEAD method
+			head();	//invoke the HEAD method to update the cached existence value
+			assert cachedExists!=null : "Expected head() to cache existence value.";
 		}
-		catch(final HTTPNotFoundException notFoundException)	//404 Not Found
-		{
-			return false;	//show that the resource is not there
-		}
-		catch(final HTTPGoneException goneException)	//410 Gone
-		{
-			return false;	//show that the resource is permanently not there
-		}
-		return true;	//if no exceptions were thrown, assume the resource exists
+		return cachedExists.booleanValue();	//return the cached existence value
 	}
 
 	/**Retrieves the contents of a resource using the GET method.
@@ -117,23 +140,55 @@ public class HTTPResource extends DefaultResource
 	}
 
 	/**Retrieves the contents of a resource using the GET method.
+	The cached existence property is updated.
 	@return The content received from the server.
 	@exception IOException if there was an error invoking the method.
+	@see #cachedExists
 	*/
 	public byte[] get() throws IOException
 	{
-		final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getReferenceURI());	//create a GET request
-		final HTTPResponse response=sendRequest(request);	//get the response
-		return response.getBody();	//return the bytes received from the server
+		try
+		{
+			final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getReferenceURI());	//create a GET request
+			final HTTPResponse response=sendRequest(request);	//get the response
+			cachedExists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists
+			return response.getBody();	//return the bytes received from the server
+		}
+		catch(final HTTPNotFoundException notFoundException)	//404 Not Found
+		{
+			cachedExists=Boolean.FALSE;	//show that the resource is not there
+			throw notFoundException;	//rethrow the exception
+		}
+		catch(final HTTPGoneException goneException)	//410 Gone
+		{
+			cachedExists=Boolean.FALSE;	//show that the resource is permanently not there
+			throw goneException;	//rethrow the exception
+		}
 	}
 
 	/**Accesses a resource using the HEAD method.
+	The cached existence property is updated.
 	@exception IOException if there was an error invoking the method.
+	@see #cachedExists
 	*/
 	public void head() throws IOException
 	{
-		final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getReferenceURI());	//create a HEAD request
-		final HTTPResponse response=sendRequest(request);	//get the response
+		try
+		{
+			final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getReferenceURI());	//create a HEAD request
+			final HTTPResponse response=sendRequest(request);	//get the response
+			cachedExists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists
+		}
+		catch(final HTTPNotFoundException notFoundException)	//404 Not Found
+		{
+			cachedExists=Boolean.FALSE;	//show that the resource is not there
+			throw notFoundException;	//rethrow the exception
+		}
+		catch(final HTTPGoneException goneException)	//410 Gone
+		{
+			cachedExists=Boolean.FALSE;	//show that the resource is permanently not there
+			throw goneException;	//rethrow the exception
+		}
 	}
 
 	/**Stores the contents of a resource using the PUT method.
@@ -145,6 +200,7 @@ public class HTTPResource extends DefaultResource
 		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getReferenceURI());	//create a PUT request
 		request.setBody(content);	//set the content of the request 
 		final HTTPResponse response=sendRequest(request);	//get the response
+		cachedExists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists because we just created it
 	}
 
 	/**Retrieves an output stream which, upon closing, will store the contents of a resource using the PUT method.
