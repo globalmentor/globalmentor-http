@@ -156,7 +156,7 @@ public class HTTPFormatter
 			final QOP[] qopOptions=digestChallenge.getQOPOptions();	//get the quality of protection options
 			if(qopOptions!=null)	//if quality of protection was specified
 			{
-				parameterList.add(new NameValuePair<String, String>(QOP_PARAMETER, formatList(new StringBuilder(), LIST_DELIMITER, qopOptions).toString()));	//qop
+				parameterList.add(new NameValuePair<String, String>(QOP_PARAMETER, formatList(new StringBuilder(), LIST_DELIMITER, (Object[])qopOptions).toString()));	//qop
 			}
 			final Set<String> unquotedAuthorizationParameters=new HashSet<String>();	//create a set of parameters that should not be quoted, as per RFC 2617
 			unquotedAuthorizationParameters.add(ALGORITHM_PARAMETER);	//algorithm
