@@ -1,11 +1,13 @@
 package com.garretwilson.net.http;
 
 import java.util.*;
+
 import static java.util.Collections.*;
 
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
+import com.garretwilson.text.FormatUtilities;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.text.CharacterConstants.*;
 import com.garretwilson.util.NameValuePair;
@@ -156,7 +158,7 @@ public class HTTPFormatter
 			final QOP[] qopOptions=digestChallenge.getQOPOptions();	//get the quality of protection options
 			if(qopOptions!=null)	//if quality of protection was specified
 			{
-				parameterList.add(new NameValuePair<String, String>(QOP_PARAMETER, formatList(new StringBuilder(), LIST_DELIMITER, (Object[])qopOptions).toString()));	//qop
+				parameterList.add(new NameValuePair<String, String>(QOP_PARAMETER, formatList(new StringBuilder(), (Object[])qopOptions).toString()));	//qop
 			}
 			final Set<String> unquotedAuthorizationParameters=new HashSet<String>();	//create a set of parameters that should not be quoted, as per RFC 2617
 			unquotedAuthorizationParameters.add(ALGORITHM_PARAMETER);	//algorithm
@@ -168,6 +170,30 @@ public class HTTPFormatter
 			throw new IllegalArgumentException(scheme.toString());
 		}
 		return stringBuilder;	//return the string builder we used
+	}
+
+	/**Appends the string representations of the given objects separated by a the HTTP list delimiter character.
+	@param stringBuilder The string builder into which the result should be placed.
+	@param items The objects to be formatted.
+	@return The string buffer containing the new information.
+	@see FormatUtilities#formatList(StringBuilder, char, Object[])
+	@see Object#toString
+	*/
+	public static StringBuilder formatList(final StringBuilder stringBuilder, final Object... items)
+	{
+		return FormatUtilities.formatList(stringBuilder, LIST_DELIMITER, items);	//format the items as a list
+	}
+
+	/**Appends the string representations of the given objects separated by the HTTP list delimiter character.
+	@param stringBuilder The string builder into which the result should be placed.
+	@param delimiter The separator character to be inserted between the object strings. 
+	@param iterable The objects to be formatted.
+	@return The string buffer containing the new information.
+	@see Object#toString
+	*/
+	public static StringBuilder formatList(final StringBuilder stringBuilder, final Iterable<?> iterable)
+	{
+		return FormatUtilities.formatList(stringBuilder, LIST_DELIMITER, iterable);	//format the list with a string delimiter
 	}
 
 }
