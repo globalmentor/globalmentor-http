@@ -142,8 +142,7 @@ public class HTTPFormatter
 			final List<NameValuePair<String, String>> parameterList=new ArrayList<NameValuePair<String, String>>();	//create the list of parameters
 			parameterList.add(new NameValuePair<String, String>(REALM_PARAMETER, digestChallenge.getRealm()));	//realm
 				//TODO implement domain
-			final String nonceDigest=formatHex(new StringBuilder(), digest(digestChallenge.getMessageDigest(), digestChallenge.getNonce())).toString();	//calculate the nonce digest	//TODO move this back to the challenge class
-			parameterList.add(new NameValuePair<String, String>(NONCE_PARAMETER, nonceDigest));	//nonce
+			parameterList.add(new NameValuePair<String, String>(NONCE_PARAMETER, digestChallenge.getNonceDigest()));	//nonce
 			final String opaque=digestChallenge.getOpaque();	//get the opaque value
 			if(opaque!=null)	//if we have an opaque value
 			{

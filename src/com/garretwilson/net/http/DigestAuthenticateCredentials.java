@@ -1,21 +1,13 @@
 package com.garretwilson.net.http;
 
-import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.garretwilson.lang.ByteUtilities.*;
 import static com.garretwilson.lang.LongUtilities.*;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
-import static com.garretwilson.net.http.HTTPConstants.*;
-import com.garretwilson.security.MessageDigestUtilities;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
-import static com.garretwilson.text.FormatUtilities.*;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.NameValuePair;
 
 /**An encapsulation of digest authenticate credentials of HTTP Digest Access Authentication,
 <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,
@@ -231,7 +223,7 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 	@param password The user password.
 	@return <code>true</code> if these credentials are valid for the given method and password.
 	@see #getResponse()
-	@see #getRequestDigest(String, String)
+	@see #getRequestDigest(String, char[])
 	*/
 	public boolean isValid(final String method, final char[] password)
 	{
