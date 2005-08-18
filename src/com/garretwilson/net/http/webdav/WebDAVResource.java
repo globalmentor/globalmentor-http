@@ -17,6 +17,7 @@ import static com.garretwilson.net.http.webdav.WebDAVUtilities.*;
 
 import com.garretwilson.text.xml.QualifiedName;
 import com.garretwilson.text.xml.XMLUtilities;
+import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.IDMappedList;
 import com.garretwilson.util.NameValuePair;
@@ -173,7 +174,7 @@ Debug.trace("making collection for segment URI", segmentURI);
 			}
 			return propertyLists;	//return all the properties requested
 		}
-		return emptyList();	//return an empty list, because there was no XML returned
+		return CollectionUtilities.emptyList();	//return an empty list, because there was no XML returned
 	}
 
 	/**Retrieves properties of this resource using the PROPFIND method.
@@ -194,7 +195,7 @@ Debug.trace("making collection for segment URI", segmentURI);
 				return propertyList.getValue();	//return the list of properties for this resource
 			}
 		}
-		return emptyList();	//return an empty list; for some reason, no properties were returned		
+		return CollectionUtilities.emptyList();	//return an empty list; for some reason, no properties were returned		
 	}
 
 }
