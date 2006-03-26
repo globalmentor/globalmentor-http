@@ -37,12 +37,21 @@ public class HTTPClient extends AbstractClient
 	}
 */
 
-	/**Creates a connection to a host.
+	/**Creates an unsecure connection to a host.
 	@param host The host to which to connect.
 	*/
 	public HTTPClientTCPConnection createConnection(final Host host)
 	{
-		return new HTTPClientTCPConnection(this, host);	//return a new connection to the given host
+		return createConnection(host, false);	//create and return a connection that is not secure
+	}
+
+	/**Creates a connection to a host that is optionally secure.
+	@param host The host to which to connect.
+	@param secure Whether the connection should be secure.
+	*/
+	public HTTPClientTCPConnection createConnection(final Host host, final boolean secure)
+	{
+		return new HTTPClientTCPConnection(this, host, secure);	//return a new connection to the given host
 	}
 
 }

@@ -5,6 +5,7 @@ import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import com.garretwilson.io.InputStreamUtilities;
 import com.garretwilson.io.ParseIOException;
 import com.garretwilson.io.ParseReader;
 import static com.garretwilson.lang.BooleanUtilities.*;
@@ -23,6 +24,9 @@ import static com.garretwilson.util.MapUtilities.*;
 */
 public class HTTPParser
 {
+	
+	/**The convenience zero-length byte array.*/
+	private final static byte[] NO_BYTES=new byte[0];
 
 	/**Parses the HTTP status line.
 	@param inputStream The source of the HTTP message.
@@ -104,16 +108,75 @@ public class HTTPParser
 	*/
 	protected static void parseLF(final InputStream inputStream) throws EOFException, ParseIOException, IOException	//TODO make sure our byte-level processing doesn't interfere with any UTF-8 encoding
 	{
-		final int lfValue=inputStream.read();	//read the LF value
-		if(lfValue<0)	//if we reached the end of the file
+		parseExpectedByte(inputStream, LF);	//parse an expected LF TODO probably remove this method and call parseExpectedByte() directly
+	}
+
+	/**Reads a byte sequence expected to be CRLF.
+	@param inputStream The source of the second half of a CRLF sequence.
+	@exception EOFException If there is no more data in the input stream.
+	@exception ParseIOException if the next character read is not an LF.
+	@exception IOException if there is an error reading the content.
+	*/
+	protected static void parseCRLF(final InputStream inputStream) throws EOFException, ParseIOException, IOException	//TODO make sure our byte-level processing doesn't interfere with any UTF-8 encoding
+	{
+		parseExpectedByte(inputStream, CR);	//parse an expected CR
+		parseExpectedByte(inputStream, LF);	//parse an expected LF
+	}
+
+	/**Reads an expected byte from an input stream.
+	@param inputStream The source of the the byte.
+	@param byteValue The byte to expect.
+	@exception EOFException If there is no more data in the input stream.
+	@exception ParseIOException if the next character read is not an the expected character.
+	@exception IOException if there is an error reading the content.
+	*/
+	protected static void parseExpectedByte(final InputStream inputStream, final int byteValue) throws EOFException, ParseIOException, IOException	//TODO make sure our byte-level processing doesn't interfere with any UTF-8 encoding
+	{
+		final int value=inputStream.read();	//read the byte
+		if(value<0)	//if we reached the end of the file
 		{
-			throw new EOFException("Unexpectedly reached end of stream while reading line looking for second half of CRLF.");						
+			throw new EOFException("Unexpectedly reached end of stream while reading line looking for character "+byteValue+" ('"+(char)byteValue+"').");
 		}
-		else if(lfValue!=LF)	//if we found an unknown value
+		else if(value!=byteValue)	//if we found an unknown value
 		{
-			throw new ParseIOException("Unexpected character '"+(char)lfValue+"'.");
+			throw new ParseIOException("Unexpected character "+value+" ('"+(char)value+"') looking for character "+byteValue+" ('"+(char)byteValue+"').");
 		}		
 	}
+
+	/**Parses the next chunk in a chunked transfer coding sequence.
+	@param inputStream The source of the second half of a CRLF sequence.
+	@return The next chunk read, or <code>null</code> if the ending, empty chunk was reached.
+	@exception EOFException If there is no more data in the input stream.
+	@exception ParseIOException if the next character read is not an LF.
+	@exception IOException if there is an error reading the content.
+	*/
+	public static byte[] parseChunk(final InputStream inputStream) throws ParseIOException, EOFException, IOException
+	{
+		final String chunkSizeLine=parseHeaderLine(inputStream);	//parse a header line TODO should this method be renamed?
+		final int extensionDelimiterIndex=chunkSizeLine.indexOf(';');	//see if there is an extension
+		final String chunkSizeString=extensionDelimiterIndex>=0 ? chunkSizeLine.substring(0, extensionDelimiterIndex) : chunkSizeLine;	//get the chunk size string
+		final int chunkSize;
+		try
+		{
+			chunkSize=Integer.valueOf(chunkSizeString, 16);	//get the size of the chunk
+		}
+		catch(final NumberFormatException numberFormatException)	//if the chunk size isn't correctly formatted
+		{
+			throw new ParseIOException(numberFormatException.toString());
+		}
+		if(chunkSize>0)	//if a positive chunk size is given
+		{
+			final byte[] chunk=InputStreamUtilities.getBytes(inputStream, chunkSize);	//read this chunk
+//TODO del Debug.trace("read chunk of size", chunkSize, new String(chunk, UTF_8));	//TODO del
+			parseCRLF(inputStream);	//parse a CRLF, but ignore it
+			return chunk;	//return the chunk
+		}
+		else if(chunkSize==0)	//if the chunk size is zero, there's nothing to read---not even a CRLF
+		{
+			return null;	//there are no chunks left
+		}
+		throw new IOException("Illegal chunk size: "+chunkSize);	//a negative chunk size is not allowed
+	}	
 
 	/**Parses an HTTP version from the given character sequence.
 	@param versionCharSequence The version characters to parse.
@@ -150,7 +213,7 @@ public class HTTPParser
 			throw new SyntaxException(versionCharSequence.toString(), "HTTP version does not begin with "+VERSION_IDENTIFIER+VERSION_SEPARATOR);
 		}
 	}
-	
+
 	/**Parses HTTP message headers, correctly folding LWS into a single space.
 	@param inputStream The source of the HTTP message.
 	@return The parsed headers.
@@ -185,15 +248,14 @@ public class HTTPParser
 				}
 				else	//if we didn't find the header separator
 				{
-					throw new ParseIOException("Header does not contain delimiter ':'.");					
+					throw new ParseIOException("Header does not contain delimiter '"+HEADER_SEPARATOR+"'.");					
 				}
 			}
 		}
 		return headerList;	//return the list of headers
 	}
 
-	/**Parses a line of text from a message header, assuming each line ends
-	 	in CRLF and the content is encoded in UTF-8.
+	/**Parses a line of text from a message header, assuming each line ends in CRLF and the content is encoded in UTF-8.
 	All spaces and horizontal tabs are folded into a single space.
 	@param inputStream The source of the HTTP message.
 	@return A line of text without the ending CRLF.

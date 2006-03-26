@@ -32,7 +32,7 @@ public interface HTTPMessage
 	*/
 	public String getHeader(final String name);
 
-	/**@return Retrieves a list of name-value pairs representing all the headers of this message.
+	/**Retrieves a list of name-value pairs representing all the headers of this message.
 	@return The header value, or <code>null</code> if no such header is present.
 	*/
 	public NameValuePair<String, String>[] getHeaders();
@@ -110,6 +110,13 @@ public interface HTTPMessage
 	@exception IllegalArgumentException if the given content length is less than zero.
 	*/
 	public void setContentLength(final long contentLength);
+
+	//Transfer-Encoding header
+
+	/**@return An array of specified transfer encodings, or <code>null</code> if no transfer encodings are specified.
+	@see HTTPConstants#TRANSFER_ENCODING_HEADER
+	*/
+	public String[] getTransferEncoding();
 
 		//content
 	

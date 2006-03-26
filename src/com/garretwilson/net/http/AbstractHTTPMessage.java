@@ -104,7 +104,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 		return headerList!=null && headerList.size()>0 ? headerList.get(0) : null;	//return value of the first header if there are headers with this name
 	}
 
-	/**@return Retrieves a list of name-value pairs representing all the headers of this message.
+	/**Retrieves a list of name-value pairs representing all the headers of this message.
 	@return The header value, or <code>null</code> if no such header is present.
 	*/
 	public NameValuePair<String, String>[] getHeaders()
@@ -241,6 +241,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 
 	/**@return The content length, or <code>-1</code> if no content length is given.
 	@exception SyntaxException if the content length is given but in an invalid format.
+	@see HTTPConstants#CONTENT_LENGTH_HEADER
 	*/
 	public long getContentLength() throws SyntaxException
 	{
@@ -265,6 +266,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 	/**Sets the content length header.
 	@param contentLength The length of the body content.
 	@exception IllegalArgumentException if the given content length is less than zero.
+	@see HTTPConstants#CONTENT_LENGTH_HEADER
 	*/
 	public void setContentLength(final long contentLength)
 	{
@@ -273,6 +275,24 @@ public class AbstractHTTPMessage implements HTTPMessage
 			throw new IllegalArgumentException("Invalid content length "+contentLength);
 		}
 		setHeader(CONTENT_LENGTH_HEADER, Long.toString(contentLength));	//set the content length
+	}
+
+	//Transfer-Encoding header
+
+	/**@return An array of specified transfer encodings, or <code>null</code> if no transfer encodings are specified.
+	@see HTTPConstants#TRANSFER_ENCODING_HEADER
+	*/
+	public String[] getTransferEncoding()
+	{
+		final String transferEncodingHeader=getHeader(TRANSFER_ENCODING_HEADER);	//get the transfer encoding header
+		try
+		{
+			return transferEncodingHeader!=null ? parseList(new ParseReader(transferEncodingHeader)) : null;	//return the list of transfer encodings, if there is a transfer encoding header
+		}
+		catch(final IOException ioException)	//we shouldn't have I/O errors parsing a list TODO fix---we may, if the server isn't well written
+		{
+			throw new AssertionError(ioException);	//TODO fix all these errors
+		}		
 	}
 
 	/**Retrieves an XML document from the body of the HTTP message.

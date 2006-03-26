@@ -9,8 +9,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.*;
 
-import com.garretwilson.io.InputStreamUtilities;
-import com.garretwilson.io.ParseIOException;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import com.garretwilson.io.*;
 import static com.garretwilson.io.InputStreamUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.net.*;
@@ -24,6 +29,7 @@ import com.garretwilson.swing.BasicOptionPane;
 import com.garretwilson.swing.PasswordPanel;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import com.garretwilson.util.*;
+import static com.garretwilson.util.ArrayUtilities.*;
 
 /**Represents a connection from a client to a server using HTTP over TCP as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
@@ -57,6 +63,12 @@ public class HTTPClientTCPConnection
 		/**@return The host to which to connect.*/
 		public Host getHost() {return host;}
 
+	/**Whether the connection is secure.*/
+	private final boolean secure;
+
+		/**@return Whether the connection is secure.*/
+		public boolean isSecure() {return secure;}
+	
 	/**The socket to the server.*/
 	private Socket socket=null;
 
@@ -102,7 +114,49 @@ public class HTTPClientTCPConnection
 			final int port=host.getPort();	//get the port, if any
 //G***fix			final InetSocketAddress socketAddress=new InetSocketAddress(host.getName(), port>=0 ? port : DEFAULT_PORT);	//create a new socket address
 //G***fix			channel=SocketChannel.open(socketAddress);	//open a channel to the address
-			socket=new Socket(host.getName(), port>=0 ? port : DEFAULT_PORT);	//open a socket to the host
+Debug.trace("ready to make connection, with secure:", isSecure());
+			if(isSecure())	//if this is a secure connection
+			{
+					//TODO testing ignore all certificate problems
+			  TrustManager[] trustAllCerts = new TrustManager[]{
+		        new X509TrustManager() {
+		            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+		                return null;
+		            }
+		            public void checkClientTrusted(
+		                java.security.cert.X509Certificate[] certs, String authType) {
+		            }
+		            public void checkServerTrusted(
+		                java.security.cert.X509Certificate[] certs, String authType) {
+		            }
+		        }
+		    };
+		    
+		    // Install the all-trusting trust manager
+			  
+			  //TODO see http://www.javaalmanac.com/egs/javax.net.ssl/TrustAll.html
+		    try {
+		        SSLContext sc = SSLContext.getInstance("SSL");
+		        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+						final SSLSocketFactory sslSocketFactory=sc.getSocketFactory();
+						socket=sslSocketFactory.createSocket(host.getName(), port>=0 ? port : DEFAULT_SECURE_PORT);	//open a secure socket to the host
+		    } catch (Exception e) {
+Debug.error(e);
+		    }
+/*TODO fix when certificate is renewed
+				final SSLSocketFactory sslSocketFactory=(SSLSocketFactory)SSLSocketFactory.getDefault();	//get the default SSL Socket factory TODO maybe keep one of these around for multiple use
+				socket=sslSocketFactory.createSocket(host.getName(), port>=0 ? port : DEFAULT_SECURE_PORT);	//open a secure socket to the host
+*/
+//TODO do extra certificate checks
+//TODO see to disable certificate checks: http://www.javaalmanac.com/egs/javax.net.ssl/TrustAll.html
+//TODO see http://javaboutique.internet.com/resources/books/JavaNut/javanut3_1.html
+//TODO see http://jirc.hick.org/cgi-bin/raffi.cgi?ACTION=VIEW&PAGE=SSL_Java
+//TODO see http://javaalmanac.com/egs/javax.net.ssl/Client.html?l=rel
+			}
+			else	//if this is not a secure connection
+			{
+				socket=new Socket(host.getName(), port>=0 ? port : DEFAULT_PORT);	//open a socket to the host
+			}
 			//TODO later turn on non-blocking access when we have a separate client which will on a separate thread feed requests and retrieve responses
 //G***fix			inputStream=new BufferedInputStream(newInputStream(channel));	//create a new input stream from the channel
 //		G***fix			outputStream=new BufferedOutputStream(newOutputStream(channel));	//create a new output stream to the channel
@@ -204,12 +258,14 @@ public class HTTPClientTCPConnection
 	/**Host constructor.
 	@param client The client with which this connection is associated.
 	@param host The host to which to connect.
+	@param secure Whether the connection should be secure.
 	@exception NullPointerException if the given client or host is <code>null</code>.
 	*/
-	HTTPClientTCPConnection(final HTTPClient client, final Host host)
+	HTTPClientTCPConnection(final HTTPClient client, final Host host, final boolean secure)
 	{
 		this.client=checkNull(client, "Client cannot be null");	//save the client
 		this.host=checkNull(host, "Host cannot be null");	//save the host
+		this.secure=secure;	//save whether the connection should be secure
 	}
 
 	/**Convenience method to sends a request and get a response.
@@ -353,13 +409,10 @@ Debug.trace("ready to send back response");
 			final InputStream inputStream=getInputStream();	//get the input stream of the response
 			final HTTPStatus status=parseStatusLine(inputStream);	//parse the status line
 	Debug.trace("response status:", status);
+//TODO do something about errors, such as 400 No Host matches server name
 			final HTTPResponse response=new DefaultHTTPResponse(status.getVersion(), status.getStatusCode(), status.getReasonPhrase());	//create a new response TODO use a factory
 	Debug.trace("created response; now parsing headers");
-			for(final NameValuePair<String, String> header:parseHeaders(inputStream))	//parse the headers
-			{
-	Debug.trace("header", header.getName(), header.getValue());
-				response.addHeader(header.getName(), header.getValue());	//add this header to the response
-			}
+			readHeaders(response);	//read the headers into the response
 			response.setBody(readResponseBody(inputStream, request, response));	//read and set the response body
 			return response;	//return the response
 		}
@@ -373,6 +426,19 @@ Debug.trace("ready to send back response");
 			{
 				Debug.trace("staying alive");
 			}
+		}
+	}
+
+	/**Reads headers from the current position in the input stream and places them in the given response.
+	@param response The response to contain the read headers.
+	@exception IOException if there is an error reading the data.
+	*/
+	protected void readHeaders(final HTTPResponse response) throws IOException
+	{
+		for(final NameValuePair<String, String> header:parseHeaders(inputStream))	//parse the headers
+		{
+Debug.trace("header", header.getName(), header.getValue());
+			response.addHeader(header.getName(), header.getValue());	//add this header to the response
 		}
 	}
 
@@ -395,24 +461,41 @@ Debug.trace("ready to send back response");
 		{
 			try
 			{
-				final long contentLength=response.getContentLength();	//get the content length
-	Debug.trace("content length", contentLength);
-				if(contentLength>=0)	//if there is a content length
+				final String[] transferEncoding=response.getTransferEncoding();	//get the list of transfer encodings, which takes precedence over any Content-Length header (RFC 2616 4.4.2)
+				if(transferEncoding!=null && transferEncoding.length>0 && !contains(transferEncoding, IDENTITY_TRANSFER_CODING))	//if the transfer encoding contains anything other than "identity", use the chunked encoding algorithm to get the body contents (RFC 2616 4.4.2)
 				{
-					assert contentLength<=Integer.MAX_VALUE : "Unsupported content length.";
-					final byte[] responseBody=InputStreamUtilities.getBytes(inputStream, (int)contentLength);
-					if(responseBody.length==contentLength)	//if we read all the response body
+//TODO del Debug.trace("using chunked encoding");
+					final ByteArrayOutputStream bodyBuffer=new ByteArrayOutputStream();	//create a buffer in which to store chunks
+					byte[] chunk;	//we'll store each chunk here as we read it
+					while((chunk=parseChunk(inputStream))!=null)	//read chunks until there are no more chunks
 					{
-						return responseBody;	//return the response body
+						bodyBuffer.write(chunk);	//add this chunk to the buffer
 					}
-					else	//if we couldn't read the entire body
-					{
-						throw new EOFException("Only read "+responseBody.length+" of "+contentLength+" expected content bytes.");	//show that we reached the end of the stream
-					}
+//TODO del Debug.trace("reading post-chunk headers");
+					readHeaders(response);	//read any post-chunk headers into the response
+					return bodyBuffer.toByteArray();	//return the body we read as chunks
 				}
-				else	//if there is no content length
-				{		
-					throw new UnsupportedOperationException("Missing content length in HTTP response.");	//TODO fix chunked type
+				else	//if chunked encoding is not used
+				{
+					final long contentLength=response.getContentLength();	//get the content length
+		Debug.trace("content length", contentLength);
+					if(contentLength>=0)	//if there is a content length
+					{
+						assert contentLength<=Integer.MAX_VALUE : "Unsupported content length.";
+						final byte[] responseBody=InputStreamUtilities.getBytes(inputStream, (int)contentLength);
+						if(responseBody.length==contentLength)	//if we read all the response body
+						{
+							return responseBody;	//return the response body
+						}
+						else	//if we couldn't read the entire body
+						{
+							throw new EOFException("Only read "+responseBody.length+" of "+contentLength+" expected content bytes.");	//show that we reached the end of the stream
+						}
+					}
+					else	//if there is no content length
+					{		
+						throw new UnsupportedOperationException("Missing content length in HTTP response.");	//TODO fix chunked type
+					}
 				}
 			}
 			catch(final SyntaxException syntaxException)	//if there is a syntax error

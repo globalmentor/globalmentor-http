@@ -217,7 +217,9 @@ public class HTTPResource extends DefaultResource
 	*/
 	protected HTTPResponse sendRequest(final HTTPRequest request) throws IOException	//TODO add connection peristence
 	{
-		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getReferenceURI()));	//get a connection to the URI
+		final URI referenceURI=getReferenceURI();	//get the reference URI
+		final boolean secure=HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
+		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getReferenceURI()), secure);	//get a connection to the URI
 		try
 		{
 			return connection.sendRequest(request);	//send the request and return the response
