@@ -161,6 +161,9 @@ Debug.trace("making collection for segment URI", segmentURI);
 		final Document document=response.getXML();	//get the XML from the response body
 		if(document!=null)	//if there was an XML document in the request
 		{
+			
+Debug.trace(XMLUtilities.toString(document));
+			
 			final Element documentElement=document.getDocumentElement();	//get the document element
 				//TODO check to make sure the document element is correct
 			final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> propertyLists=getMultistatusProperties(documentElement);	//get the properties from the multistatus document			
