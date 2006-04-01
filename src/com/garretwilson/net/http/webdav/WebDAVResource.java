@@ -138,6 +138,7 @@ Debug.trace("making collection for segment URI", segmentURI);
 
 	/**Retrieves properties using the PROPFIND method.
 	The cached property list is updated.
+	The URI of each resource is canonicized to be an absolute URI.
 	@param depth The requested depth.
 	@return A list of all properties of all requested resources, each representing the URI of the resource paired by a list of its
 		properties, each property representing  the qualified name of the property and the value.
@@ -146,13 +147,14 @@ Debug.trace("making collection for segment URI", segmentURI);
 	*/
 	public List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> propFind(final Depth depth) throws IOException
 	{
+		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
 		if(isCached() && depth==Depth.ZERO && cachedPropertyList!=null)	//if we can return cached values, only the properties for this resource are requested, and we have a cached property list
 		{
 			final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> cachedPropFindList=new ArrayList<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>>();
-			cachedPropFindList.add(new NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>(getReferenceURI(), cachedPropertyList));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
+			cachedPropFindList.add(new NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>(referenceURI, cachedPropertyList));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
 			return cachedPropFindList;	//return the manufactured property list from our cached properyy list
 		}
-		final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, getReferenceURI());	//create a MKCOL request
+		final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, referenceURI);	//create a MKCOL request
 		request.setDepth(depth);	//set the requested depth
 		final Document propfindDocument=createPropfindDocument(getDOMImplementation());	//create a multistatus document	//TODO check DOM exceptions here
 		addProperties(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
@@ -166,10 +168,10 @@ Debug.trace(XMLUtilities.toString(document));
 			
 			final Element documentElement=document.getDocumentElement();	//get the document element
 				//TODO check to make sure the document element is correct
-			final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> propertyLists=getMultistatusProperties(documentElement);	//get the properties from the multistatus document			
+			final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> propertyLists=getMultistatusProperties(documentElement, referenceURI);	//get the properties from the multistatus document, relative to this resource URI			
 			for(final NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>> propertyList:propertyLists)	//look at each property list
 			{
-				if(getReferenceURI().equals(propertyList.getName()))	//if this property list is for this resource
+				if(propertyList.getName().equals(referenceURI))	//if this property list is for this resource
 				{
 					cachedPropertyList=propertyList.getValue();	//cache the list of properties for this resource
 					break;	//stop looking for properties to cache
@@ -183,6 +185,7 @@ Debug.trace(XMLUtilities.toString(document));
 	/**Retrieves properties of this resource using the PROPFIND method.
 	This is a convenience method for <code>propFind(Depth)</code>.
 	The cached property list is updated.
+	The URI of each resource is canonicized to be an absolute URI.
 	@return A list of all properties of this resource, each property representing  the qualified name of the property and the value.
 	@exception IOException if there was an error invoking the method.
 	@see #propFind(Depth)
@@ -190,10 +193,11 @@ Debug.trace(XMLUtilities.toString(document));
 	*/
 	public List<NameValuePair<QualifiedName, ?>> propFind() throws IOException
 	{
+		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
 		final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> propertyLists=propFind(Depth.ZERO);	//do a propfind with no depth
 		for(final NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>> propertyList:propertyLists)	//look at each property list
 		{
-			if(getReferenceURI().equals(propertyList.getName()))	//if this property list is for this resource
+			if(propertyList.getName().equals(referenceURI))	//if this property list is for this resource
 			{
 				return propertyList.getValue();	//return the list of properties for this resource
 			}
