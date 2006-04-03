@@ -142,7 +142,7 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 	public DigestAuthenticateChallenge(final String realm, final String nonce, final String opaque, final boolean stale, final String algorithm) throws NoSuchAlgorithmException
 	{
 		super(AuthenticationScheme.DIGEST, realm);	//construct the parent class
-		this.nonce=checkNull(nonce, "Nonce must be provided");
+		this.nonce=checkInstance(nonce, "Nonce must be provided");
 		this.opaque=opaque;
 		this.stale=stale;
 		messageDigest=MessageDigest.getInstance(algorithm);	//construct the message digest

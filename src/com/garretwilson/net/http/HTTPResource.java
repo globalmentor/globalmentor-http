@@ -100,7 +100,7 @@ public class HTTPResource extends DefaultResource
 		{
 			throw new IllegalArgumentException("Invalid HTTP scheme "+scheme);
 		}
-		this.client=checkNull(client, "Client cannot be null.");	//save the client
+		this.client=checkInstance(client, "Client cannot be null.");	//save the client
 	}
 
 	/**Deletes the resource using the DELETE method.

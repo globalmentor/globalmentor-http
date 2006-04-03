@@ -263,8 +263,8 @@ Debug.error(e);
 	*/
 	HTTPClientTCPConnection(final HTTPClient client, final Host host, final boolean secure)
 	{
-		this.client=checkNull(client, "Client cannot be null");	//save the client
-		this.host=checkNull(host, "Host cannot be null");	//save the host
+		this.client=checkInstance(client, "Client cannot be null");	//save the client
+		this.host=checkInstance(host, "Host cannot be null");	//save the host
 		this.secure=secure;	//save whether the connection should be secure
 	}
 

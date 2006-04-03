@@ -25,7 +25,7 @@ public class HTTPMovedPermanentlyException extends HTTPRedirectException
 	public HTTPMovedPermanentlyException(final URI location)
 	{
 		super(SC_MOVED_PERMANENTLY);	//construct the parent class
-		this.location=checkNull(location, "Location must be provided.");	//save the location
+		this.location=checkInstance(location, "Location must be provided.");	//save the location
 	}
 
 }

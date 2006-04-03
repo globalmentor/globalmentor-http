@@ -25,7 +25,7 @@ public class HTTPMovedTemporarilyException extends HTTPRedirectException
 	public HTTPMovedTemporarilyException(final URI location)
 	{
 		super(SC_MOVED_TEMPORARILY);	//construct the parent class
-		this.location=checkNull(location, "Location must be provided.");	//save the location
+		this.location=checkInstance(location, "Location must be provided.");	//save the location
 	}
 
 }

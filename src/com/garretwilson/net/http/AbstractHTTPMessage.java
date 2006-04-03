@@ -164,7 +164,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 		*/
 		public void setBody(final byte[] body)
 		{
-			this.body=checkNull(body, "Body is null.");	//save the body
+			this.body=checkInstance(body, "Body is null.");	//save the body
 			if(body.length>0)	//if there is a request body
 			{
 				setContentLength(body.length);	//set the content length
