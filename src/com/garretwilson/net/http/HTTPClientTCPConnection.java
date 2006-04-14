@@ -314,13 +314,12 @@ Debug.trace("unauthorized; looking for challenge");
 				{
 Debug.trace("found a challenge");
 					final AuthenticationScheme scheme=challenge.getScheme();	//get the scheme
-					if(scheme==AuthenticationScheme.DIGEST)	//digest
+					if(scheme==AuthenticationScheme.BASIC || scheme==AuthenticationScheme.DIGEST)	//if this is basic or digest authentication
 					{
-Debug.trace("found a digest challenge");
-						final DigestAuthenticateChallenge digestChallenge=(DigestAuthenticateChallenge)challenge;	//get the challenge as a digest challenge
+Debug.trace("found a basic or digest challenge");
 						PasswordAuthentication passwordAuthentication=null;	//we'll try to get password authentication from somewhere
 						final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
-						final String realm=digestChallenge.getRealm();	//get the
+						final String realm=challenge.getRealm();	//get the challenge realm
 						final HTTPClient client=getClient();	//get the client with which we're associated
 						final Set<String> usernames=client.getUsernames(rootURI, realm);	//get users that are cached for this domain and realm
 						if(usernames.size()==1)	//if we have exactly one user's authentication information
@@ -343,13 +342,25 @@ Debug.trace("found a digest challenge");
 							{
 								break;	//G***testing
 							}
-							final Nonce cnonce=new DefaultNonce(getClass().getName());	//create our own nonce value to send back
-								//generate credentials for the client
-							final DigestAuthenticateCredentials digestCredentials=new DigestAuthenticateCredentials(request.getMethod(),
-									passwordAuthentication.getUserName(), digestChallenge.getRealm(), passwordAuthentication.getPassword(),
-									digestChallenge.getNonce(), request.getRequestURI(), "cnonce", digestChallenge.getOpaque(), QOP.AUTH, nonceCount,
-									digestChallenge.getMessageDigest().getAlgorithm());	//TODO fix cnonce
-							request.setAuthorization(digestCredentials);	//store the credentials in the request
+							final AuthenticateCredentials credentials;	//try to get credentials based upon the authentication type
+							if(challenge instanceof BasicAuthenticateChallenge)	//if this is basic authentication
+							{
+								credentials=new BasicAuthenticateCredentials(passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword());	//create basic authentication credentials
+							}
+							else if(challenge instanceof DigestAuthenticateChallenge)	//if this is digest authentication
+							{
+								final DigestAuthenticateChallenge digestChallenge=(DigestAuthenticateChallenge)challenge;	//get the challenge as a digest challenge
+								final Nonce cnonce=new DefaultNonce(getClass().getName());	//create our own nonce value to send back
+								credentials=new DigestAuthenticateCredentials(request.getMethod(),	//generate credentials for the client
+										passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword(),
+										digestChallenge.getNonce(), request.getRequestURI(), "cnonce", digestChallenge.getOpaque(), QOP.AUTH, nonceCount,
+										digestChallenge.getMessageDigest().getAlgorithm());	//TODO fix cnonce
+							}
+							else	//if we don't recognize the challenge type
+							{
+								throw new AssertionError("Unrecognized challenge type: "+challenge.getClass());
+							}
+							request.setAuthorization(credentials);	//store the credentials in the request
 							writeRequest(request);	//write the modified request
 							response=readResponse(request);	//read the new response
 							if(response.getResponseClass()==HTTPResponseClass.SUCCESS)	//if we succeeded

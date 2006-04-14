@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 
 import static com.garretwilson.lang.ByteUtilities.*;
 import static com.garretwilson.lang.LongUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.checkInstance;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
@@ -174,7 +175,7 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 	protected DigestAuthenticateCredentials(final String method, final String username, final String realm, final char[] password, final String nonce, final String digestURI, final String response,
 			final String cnonce, final String opaque, final QOP qop, final long nonceCount, final String algorithm) throws NoSuchAlgorithmException
 	{
-		super(AuthenticationScheme.DIGEST, realm);	//construct the parent class
+		super(AuthenticationScheme.DIGEST, checkInstance(realm, "Realm must be provided."));	//construct the parent class
 		if(nonce==null)	//if the nonce is null
 		{
 			throw new NullPointerException("Nonce must be provided.");

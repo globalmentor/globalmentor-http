@@ -1,11 +1,6 @@
 package com.garretwilson.net.http;
 
-import java.util.*;
-
-import static com.garretwilson.net.http.HTTPConstants.*;
-import static com.garretwilson.text.CharacterConstants.*;
-import static com.garretwilson.text.FormatUtilities.*;
-import com.garretwilson.util.NameValuePair;
+import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**An authentication challenge or response.
 @author Garret Wilson
@@ -32,11 +27,7 @@ public abstract class AbstractHTTPAuthentication implements HTTPAuthentication
 	*/
 	public AbstractHTTPAuthentication(final AuthenticationScheme scheme, final String realm)
 	{
-		if(scheme==null)	//if the authentication scheme is null
-		{
-			throw new NullPointerException("Authentication scheme must be provided.");
-		}
-		this.scheme=scheme;
+		this.scheme=checkInstance(scheme, "Authentication scheme must be provided.");
 		this.realm=realm;
 	}
 

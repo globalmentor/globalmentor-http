@@ -568,7 +568,7 @@ Debug.trace("parsing authorization header", header);
 				final String parameters=header.subSequence(schemeDelimiterIndex+1, header.length()).toString();	//get the rest of the credentials
 				switch(AuthenticationScheme.valueOf(scheme.toUpperCase()))	//see which type of authentication scheme this is
 				{
-					case DIGEST:
+					case BASIC:
 						{
 							final Map<String, String> parameterMap=parseParameterMap(new ParseReader(parameters));	//parse the parameters into a map
 Debug.trace("parameter map", parameterMap);
@@ -577,35 +577,47 @@ Debug.trace("parameter map", parameterMap);
 							{
 								throw new SyntaxException(header.toString(), WWW_AUTHENTICATE_HEADER+" missing parameter "+REALM_PARAMETER);
 							}
-//TODO implement domain
-							final String nonce=parameterMap.get(NONCE_PARAMETER);	//get the nonce
-							if(nonce==null)	//if no nonce is present
-							{
-								throw new SyntaxException(header.toString(), WWW_AUTHENTICATE_HEADER+" missing parameter "+NONCE_PARAMETER);
-							}
-							final String opaque=parameterMap.get(OPAQUE_PARAMETER);	//get the opaque parameter
-							final String staleString=parameterMap.get(STALE_PARAMETER);	//get the stale parameter
-							final Boolean stale=parseBoolean(staleString);	//get the staleness parameter
-							final String algorithm=parameterMap.get(ALGORITHM_PARAMETER);	//get the algorithm
-							final String qopOptionsString=parameterMap.get(QOP_PARAMETER);	//get the quality of protection
-//TODO implement auth-param
-							final DigestAuthenticateChallenge digestChallenge=new DigestAuthenticateChallenge(realm, nonce, opaque, algorithm);	//create the challenge
-							if(stale!=null)	//if a stale parameter was given
-							{
-								digestChallenge.setStale(stale);	//set the staleness
-							}
-							if(qopOptionsString!=null)	//if quality of protection was indicated
-							{
-								final String[] qopOptionsStrings=parseList(new ParseReader(qopOptionsString));	//parse the quality of protection identifiers
-								final QOP[] qopOptions=new QOP[qopOptionsStrings.length];	//create an array of quality of protection enums
-								for(int i=qopOptions.length-1; i>=0; --i)	//look at each quality of protection string
-								{
-									qopOptions[i]=QOP.valueOfString(qopOptionsStrings[i]);	//convert this quality of protection string to an enum
-								}
-								digestChallenge.setQOPOptions(qopOptions);	//set the quality of protection options								
-							}
-							return digestChallenge;
+							final BasicAuthenticateChallenge basicChallenge=new BasicAuthenticateChallenge(realm);	//create the challenge
+							return basicChallenge;	//return the basic authentication challenge
 						}
+					case DIGEST:
+					{
+						final Map<String, String> parameterMap=parseParameterMap(new ParseReader(parameters));	//parse the parameters into a map
+Debug.trace("parameter map", parameterMap);
+						final String realm=parameterMap.get(REALM_PARAMETER);	//get the realm
+						if(realm==null)	//if no realm is present
+						{
+							throw new SyntaxException(header.toString(), WWW_AUTHENTICATE_HEADER+" missing parameter "+REALM_PARAMETER);
+						}
+//TODO implement domain
+						final String nonce=parameterMap.get(NONCE_PARAMETER);	//get the nonce
+						if(nonce==null)	//if no nonce is present
+						{
+							throw new SyntaxException(header.toString(), WWW_AUTHENTICATE_HEADER+" missing parameter "+NONCE_PARAMETER);
+						}
+						final String opaque=parameterMap.get(OPAQUE_PARAMETER);	//get the opaque parameter
+						final String staleString=parameterMap.get(STALE_PARAMETER);	//get the stale parameter
+						final Boolean stale=parseBoolean(staleString);	//get the staleness parameter
+						final String algorithm=parameterMap.get(ALGORITHM_PARAMETER);	//get the algorithm
+						final String qopOptionsString=parameterMap.get(QOP_PARAMETER);	//get the quality of protection
+//TODO implement auth-param
+						final DigestAuthenticateChallenge digestChallenge=new DigestAuthenticateChallenge(realm, nonce, opaque, algorithm);	//create the challenge
+						if(stale!=null)	//if a stale parameter was given
+						{
+							digestChallenge.setStale(stale);	//set the staleness
+						}
+						if(qopOptionsString!=null)	//if quality of protection was indicated
+						{
+							final String[] qopOptionsStrings=parseList(new ParseReader(qopOptionsString));	//parse the quality of protection identifiers
+							final QOP[] qopOptions=new QOP[qopOptionsStrings.length];	//create an array of quality of protection enums
+							for(int i=qopOptions.length-1; i>=0; --i)	//look at each quality of protection string
+							{
+								qopOptions[i]=QOP.valueOfString(qopOptionsStrings[i]);	//convert this quality of protection string to an enum
+							}
+							digestChallenge.setQOPOptions(qopOptions);	//set the quality of protection options								
+						}
+						return digestChallenge;	//return the digest authentication challenge
+					}
 					default:	//if we don't support this authentication scheme
 						return null;	//show that we don't support this authentication scheme TODO fix for BASIC and other schemes
 				}

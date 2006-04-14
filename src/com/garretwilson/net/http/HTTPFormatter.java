@@ -1,16 +1,21 @@
 package com.garretwilson.net.http;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static java.util.Collections.*;
 
+import static com.garretwilson.net.http.BasicAuthenticationConstants.*;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
+
 import com.garretwilson.text.FormatUtilities;
+import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.text.CharacterConstants.*;
 
+import com.garretwilson.util.Base64;
 import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.NameValuePair;
 
@@ -85,7 +90,25 @@ public class HTTPFormatter
 	{
 		final AuthenticationScheme scheme=credentials.getScheme();	//get the authentication scheme
 		stringBuilder.append(scheme).append(SP);	//authentication scheme
-		if(credentials instanceof DigestAuthenticateCredentials)	//if this is digest credentials
+		if(credentials instanceof BasicAuthenticateCredentials)	//if this is basic credentials
+		{
+			final BasicAuthenticateCredentials basicCredentials=(BasicAuthenticateCredentials)credentials;	//get the credentials as basic credentials
+			final List<NameValuePair<String, String>> parameterList=new ArrayList<NameValuePair<String, String>>();	//create the list of parameters
+			final StringBuilder credentialsBuilder=new StringBuilder();	//build basic credentials	//TODO put this in a shared location
+			credentialsBuilder.append(basicCredentials.getUsername());	//username
+			credentialsBuilder.append(BASIC_DELIMITER);	//:
+			credentialsBuilder.append(basicCredentials.getPassword());	//password
+			try
+			{
+				final String base64Credentials=Base64.encodeBytes(credentialsBuilder.toString().getBytes(UTF_8));	//base64-encode the credential string
+				stringBuilder.append(base64Credentials);	//append the base64-encoded basic credentials
+			}
+			catch(final UnsupportedEncodingException unsupportedEncodingException)	//UTF-8 should always be accepted
+			{
+				throw new AssertionError(unsupportedEncodingException);
+			}
+		}
+		else if(credentials instanceof DigestAuthenticateCredentials)	//if this is digest credentials
 		{
 			final DigestAuthenticateCredentials digestCredentials=(DigestAuthenticateCredentials)credentials;	//get the credentials as digest credentials
 			final List<NameValuePair<String, String>> parameterList=new ArrayList<NameValuePair<String, String>>();	//create the list of parameters
@@ -122,7 +145,7 @@ public class HTTPFormatter
 			unquotedWWWAuthenticateParameters.add(QOP_PARAMETER);	//qop
 			formatAttributeList(stringBuilder, unquotedWWWAuthenticateParameters, parameterList.toArray(new NameValuePair[parameterList.size()]));	//parameters
 		}
-		else	//if this is an unsupported challenge TODO implement BASIC challenge
+		else	//if this is an unsupported challenge
 		{
 			throw new IllegalArgumentException(scheme.toString());
 		}
