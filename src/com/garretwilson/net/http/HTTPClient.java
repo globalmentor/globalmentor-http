@@ -1,6 +1,7 @@
 package com.garretwilson.net.http;
 
 import com.garretwilson.net.AbstractClient;
+import com.garretwilson.net.Authenticable;
 import com.garretwilson.net.Host;
 
 /**Represents the identify of a group of related HTTP connections.
@@ -24,6 +25,20 @@ public class HTTPClient extends AbstractClient
 			instance=new HTTPClient();	//create a new client			
 		}
 		return instance;	//return the shared instance of the client
+	}
+
+	/**Default constructor with no authenticator.*/
+	public HTTPClient()
+	{
+		this(null);	//construct the class with no authenticator
+	}
+
+	/**Authenticator constructor.
+	@param authenticator The authenticator to use for this client, or <code>null</code> if the default authenticator should be used if available. 
+	*/
+	public HTTPClient(final Authenticable authenticator)
+	{
+		super(authenticator);	//construct the parent class
 	}
 
 	/**Creates a connection from a URI.

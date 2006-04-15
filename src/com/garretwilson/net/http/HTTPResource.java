@@ -5,6 +5,7 @@ import java.net.*;
 
 import org.w3c.dom.DOMImplementation;
 
+import com.garretwilson.io.IO;
 import com.garretwilson.io.OutputStreamDecorator;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
@@ -201,6 +202,42 @@ public class HTTPResource extends DefaultResource
 		request.setBody(content);	//set the content of the request 
 		final HTTPResponse response=sendRequest(request);	//get the response
 		cachedExists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists because we just created it
+	}
+	
+	/**Reads an object from the resource using HTTP GET with the given I/O support.
+	@param io The I/O support for reading the object.
+	@return The object read from the resource.
+	@throws IOException if there is an error reading the data.
+	*/ 
+	public <T> T get(final IO<T> io) throws IOException
+	{
+		final InputStream inputStream=getInputStream();	//get an input stream to the resource
+		try
+		{
+			return io.read(inputStream, getReferenceURI());	//read the object, using the resource reference URI as the base URI
+		}
+		finally
+		{
+			inputStream.close();	//always close the input stream
+		}
+	}
+	
+	/**Writes an object to the resource using HTTP PUT with the given I/O support.
+	@param object The object to write to the resource.
+	@param io The I/O support for writing the object.
+	@throws IOException if there is an error writing the data.
+	*/
+	public <T> void put(final T object, final IO<T> io) throws IOException
+	{
+		final OutputStream outputStream=getOutputStream();//get an output stream to the resource
+		try
+		{
+			io.write(outputStream, getReferenceURI(), object);	//write the object, using the resource reference URI as the base URI
+		}
+		finally
+		{
+			outputStream.close();	//always close the output stream
+		}
 	}
 
 	/**Retrieves an output stream which, upon closing, will store the contents of a resource using the PUT method.
