@@ -1,6 +1,6 @@
 package com.garretwilson.net.http;
 
-import com.garretwilson.util.SyntaxException;
+import com.garretwilson.text.SyntaxException;
 
 /**An HTTP response as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".

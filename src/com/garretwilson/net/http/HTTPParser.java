@@ -16,6 +16,8 @@ import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
+
+import com.garretwilson.text.SyntaxException;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.MapUtilities.*;
 

@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.w3c.dom.Document;
 
+import com.garretwilson.text.SyntaxException;
 import com.garretwilson.util.NameValuePair;
-import com.garretwilson.util.SyntaxException;
 
 /**An HTTP request or response as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".

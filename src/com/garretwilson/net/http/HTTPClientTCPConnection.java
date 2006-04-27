@@ -27,6 +27,8 @@ import com.garretwilson.security.DefaultNonce;
 import com.garretwilson.security.Nonce;
 import com.garretwilson.swing.BasicOptionPane;
 import com.garretwilson.swing.PasswordPanel;
+import com.garretwilson.text.SyntaxException;
+
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.ArrayUtilities.*;

@@ -16,7 +16,7 @@ import com.garretwilson.net.http.DefaultHTTPRequest;
 import com.garretwilson.net.http.HTTPConstants;
 import com.garretwilson.net.http.HTTPRequest;
 import com.garretwilson.net.http.HTTPVersion;
-import com.garretwilson.util.SyntaxException;
+import com.garretwilson.text.SyntaxException;
 
 /**The default implementation of a WebDAV request as defined by
 <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>,	"HTTP Extensions for Distributed Authoring -- WEBDAV".

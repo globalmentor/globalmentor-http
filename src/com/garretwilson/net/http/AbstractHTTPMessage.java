@@ -13,6 +13,7 @@ import static com.garretwilson.net.http.HTTPParser.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 
 import com.garretwilson.text.CharacterEncoding;
+import com.garretwilson.text.SyntaxException;
 import com.garretwilson.text.xml.XMLProcessor;
 import com.garretwilson.text.xml.XMLSerializer;
 import com.garretwilson.util.*;
