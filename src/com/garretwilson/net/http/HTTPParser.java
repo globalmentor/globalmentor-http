@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import static java.util.Collections.*;
+import java.util.regex.Matcher;
 
 import com.garretwilson.io.InputStreamUtilities;
 import com.garretwilson.io.ParseIOException;
@@ -326,10 +328,11 @@ public class HTTPParser
 	/**Parses a list of strings, reading until the end of the reader is reached.
 	@param reader The source of the data.
 	@exception IOException if there is an error reading the data.
+	@return A list of list element string values.
 	*/
 	public static String[] parseList(final ParseReader reader) throws IOException
 	{
-		final List<String> elementList=new ArrayList<String>();	//create a new list to hold our list element
+		final List<String> elementList=new ArrayList<String>();	//create a new list to hold our list elements
 /*TODO maybe fix for EOL detection later 
 		reader.skipCharsEOF(WHITESPACE_CHARS);	//skip whitespace until we reach a character or the end of the file
 		reader.skipCh
@@ -342,6 +345,38 @@ public class HTTPParser
 			reader.skipCharsEOF(WHITESPACE_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		}
 		return elementList.toArray(new String[elementList.size()]);	//return the list of elements we parsed
+	}
+
+	/**Parses a list of weighted strings (string with an optional qvalue parameter), reading until the end of the reader is reached.
+	If no weight is specified for a list item, it defaults to 1.0.
+	Any data after a qvalue in each list element is ignored.
+	The returned values are returned in order sorted by weight from lowest to highest.
+	@param reader The source of the data.
+	@exception IOException if there is an error reading the data.
+	*/
+	@SuppressWarnings("unchecked")	//we cast to an array of generic objects we have created, which Java cannot check at runtime
+	public static WeightedValue<String>[] parseWeightedList(final ParseReader reader) throws IOException
+	{
+		final List<WeightedValue<String>> elementList=new ArrayList<WeightedValue<String>>();	//create a new list to hold our list elements
+		reader.skipCharsEOF(WHITESPACE_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+		while(!reader.isEOF())	//while we haven't reached the end of the file
+		{
+			final String element=parseListElement(reader);	//parse the next element
+			final Matcher weightMatcher=LIST_ELEMENT_WEIGHT_PATTERN.matcher(element);	//match on the element
+			if(weightMatcher.matches())	//if the element matches
+			{
+				final String value=weightMatcher.group(1);	//the first group is the value
+				final String qvalueString=weightMatcher.group(2);	//the second group is the qvalue, if any
+				elementList.add(new WeightedValue<String>(value, qvalueString!=null ? Float.valueOf(qvalueString) : 1.0f));	//add this element, defaulting to 1.0 if no qvalue is specified (we don't need to check for a number format exception, as the regular expression ensures the correct format)
+				reader.skipCharsEOF(WHITESPACE_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+			}
+			else	//if the element doesn't match (this should never happen, because the matcher accepts zero or more occurrences of any character
+			{
+				throw new AssertionError("Weighted list element "+element+" was expected to match pattern "+LIST_ELEMENT_WEIGHT_PATTERN+".");
+			}
+		}
+		sort(elementList);	//sort the elements by natural order (weight)
+		return (WeightedValue<String>[])elementList.toArray(new WeightedValue[elementList.size()]);	//return the list of elements we parsed
 	}
 
 	/**Parses a list element from the given reader.
