@@ -9,6 +9,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
@@ -64,6 +65,74 @@ public class WebDAVResource extends HTTPResource
 	public WebDAVResource(final URI referenceURI, final HTTPClient client) throws IllegalArgumentException, NullPointerException
 	{
 		super(referenceURI, client);	//construct the parent class
+	}
+
+	/**Copies the resource using the COPY method with an infinite depth, overwriting any resource at the given destination URI.
+	This implementation delegates to {@link #copy(URI, boolean)}.
+	@param destinationURI The destination to which the resource will be copied.
+	@exception NullPointerException if the given destination is <code>null</code>.
+	@exception IllegalArgumentException if the given destination URI is not absolute.
+	@exception HTTPPreconditionFailedException if the operation failed because of the overwrite setting.
+	@exception IOException if there was an error invoking the method.
+	@see Depth#INFINITY
+	*/
+	public void copy(final URI destinationURI) throws IOException
+	{
+		copy(destinationURI, true);	//copy the resource with overwrite
+	}
+
+	/**Copies the resource using the COPY method, overwriting any resource at the given destination URI, specifying the depth.
+	This implementation delegates to {@link #copy(URI, Depth, boolean)}.
+	@param destinationURI The destination to which the resource will be copied.
+	@param depth The depth to copy; either {@link Depth#ZERO} or {@link Depth#INFINITY}.
+	@exception NullPointerException if the given destination and/or depth is <code>null</code>.
+	@exception IllegalArgumentException if the given destination URI is not absolute.
+	@exception IllegalArgumentException if the given given depth is not {@link Depth#ZERO} or {@link Depth#INFINITY}.
+	@exception HTTPPreconditionFailedException if the operation failed because of the overwrite setting.
+	@exception IOException if there was an error invoking the method.
+	*/
+	public void copy(final URI destinationURI, final Depth depth) throws IOException
+	{
+		copy(destinationURI, depth, true);	//copy the resource with overwrite
+	}
+
+	/**Copies the resource using the COPY method with an infinite depth, specifying whether overwrite should occur.
+	This implementation delegates to {@link #copy(URI, Depth, boolean)}.
+	@param destinationURI The destination to which the resource will be copied.
+	@param overwrite Whether overwrite should occur if a resource already exists at the given destination URI.
+	@exception NullPointerException if the given destination is <code>null</code>.
+	@exception IllegalArgumentException if the given destination URI is not absolute.
+	@exception HTTPPreconditionFailedException if the operation failed because of the overwrite setting.
+	@exception IOException if there was an error invoking the method.
+	@see Depth#INFINITY
+	*/
+	public void copy(final URI destinationURI, final boolean overwrite) throws IOException
+	{
+		copy(destinationURI, Depth.INFINITY, overwrite);	//copy the resource with infinite depth
+	}
+
+	/**Copies the resource using the COPY method, specifying the depth and whether overwrite should occur.
+	@param destinationURI The destination to which the resource will be copied.
+	@param depth The depth to copy; either {@link Depth#ZERO} or {@link Depth#INFINITY}.
+	@param overwrite Whether overwrite should occur if a resource already exists at the given destination URI.
+	@exception NullPointerException if the given destination and/or depth is <code>null</code>.
+	@exception IllegalArgumentException if the given destination URI is not absolute.
+	@exception IllegalArgumentException if the given given depth is not {@link Depth#ZERO} or {@link Depth#INFINITY}.
+	@exception HTTPPreconditionFailedException if the operation failed because of the overwrite setting.
+	@exception IOException if there was an error invoking the method.
+	*/
+	public void copy(final URI destinationURI, final Depth depth, final boolean overwrite) throws IOException
+	{
+		final WebDAVRequest request=new DefaultWebDAVRequest(COPY_METHOD, getReferenceURI());	//create a COPY request
+		request.setDestination(destinationURI);	//set the destination URI
+		checkInstance(depth, "Depth cannot be null.");
+		if(depth!=Depth.ZERO && depth!=Depth.INFINITY)	//if the depth is not ZERO or INFINITY
+		{
+			throw new IllegalArgumentException("Depth of "+depth+" is not allowed for the "+COPY_METHOD+" method.");
+		}
+		request.setDepth(depth);	//set the depth
+		request.setOverwrite(overwrite);	//set the overwrite option
+		final HTTPResponse response=sendRequest(request);	//get the response
 	}
 
 	/**Creates a collection using the MKCOL method.
@@ -136,6 +205,41 @@ public class WebDAVResource extends HTTPResource
 		}
 	}
 
+	
+	
+	
+	/**Moves the resource using the MOVE method with an infinite depth, overwriting any resource at the given destination URI.
+	This implementation delegates to {@link #move(URI, boolean)}.
+	@param destinationURI The destination to which the resource will be moved.
+	@exception NullPointerException if the given destination is <code>null</code>.
+	@exception IllegalArgumentException if the given destination URI is not absolute.
+	@exception HTTPPreconditionFailedException if the operation failed because of the overwrite setting.
+	@exception IOException if there was an error invoking the method.
+	@see Depth#INFINITY
+	*/
+	public void move(final URI destinationURI) throws IOException
+	{
+		move(destinationURI, true);	//move the resource with overwrite
+	}
+
+	/**Moves the resource using the MOVE method with an infinite depth, specifying whether overwrite should occur.
+	@param destinationURI The destination to which the resource will be moved.
+	@param overwrite Whether overwrite should occur if a resource already exists at the given destination URI.
+	@exception NullPointerException if the given destination is <code>null</code>.
+	@exception IllegalArgumentException if the given destination URI is not absolute.
+	@exception HTTPPreconditionFailedException if the operation failed because of the overwrite setting.
+	@exception IOException if there was an error invoking the method.
+	@see Depth#INFINITY
+	*/
+	public void move(final URI destinationURI, final boolean overwrite) throws IOException
+	{
+		final WebDAVRequest request=new DefaultWebDAVRequest(MOVE_METHOD, getReferenceURI());	//create a MOVE request
+		request.setDestination(destinationURI);	//set the destination URI
+		request.setDepth(Depth.INFINITY);	//set the depth to infinity
+		request.setOverwrite(overwrite);	//set the overwrite option
+		final HTTPResponse response=sendRequest(request);	//get the response
+	}
+		
 	/**Retrieves properties using the PROPFIND method.
 	The cached property list is updated.
 	The URI of each resource is canonicized to be an absolute URI.

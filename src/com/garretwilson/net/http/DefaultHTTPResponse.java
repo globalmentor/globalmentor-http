@@ -66,13 +66,14 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 		is available, an HTTP exception is thrown.</p>
 	<p>This method calls <code>checkStatus(int, String)</code>, and most subclasses
 		should override that method instead of this one.</p>
-	<p>This version provides specialzed exceptions for the following status codes:</p>
+	<p>This version provides specialized exceptions for the following status codes:</p>
 	<dl>
-		<dt>401</dt> <dd><code>HTTPUnauthorizedException</code></dd>
-		<dt>403</dt> <dd><code>HTTPForbiddenException</code></dd>
-		<dt>404</dt> <dd><code>HTTPNotFoundException</code></dd>
-		<dt>409</dt> <dd><code>HTTPConflictException</code></dd>
-		<dt>410</dt> <dd><code>HTTPGoneException</code></dd>
+		<dt>401</dt> <dd>{@link HTTPUnauthorizedException}</dd>
+		<dt>403</dt> <dd>{@link HTTPForbiddenException}</dd>
+		<dt>404</dt> <dd>{@link HTTPNotFoundException}</dd>
+		<dt>409</dt> <dd>{@link HTTPConflictException}</dd>
+		<dt>410</dt> <dd>{@link HTTPGoneException}</dd>
+		<dt>412</dt> <dd>{@link HTTPPreconditionFailed}</dd>
 	</dl>
 	<p>All other client or server error codes will be sent back as
 	@exception HTTPException if the response code represents an error condition.
@@ -97,6 +98,8 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 					throw new HTTPConflictException(reasonPhrase);
 				case SC_GONE:	//410 Gone
 					throw new HTTPGoneException(reasonPhrase);
+				case SC_PRECONDITION_FAILED:	//412 Precondition Failed
+					throw new HTTPPreconditionFailedException(reasonPhrase);
 	/*TODO
 				   415 (Unsupported Media Type)- The server does not support the request
 				   type of the body.
