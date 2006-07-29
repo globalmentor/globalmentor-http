@@ -334,15 +334,15 @@ public class HTTPParser
 	{
 		final List<String> elementList=new ArrayList<String>();	//create a new list to hold our list elements
 /*TODO maybe fix for EOL detection later 
-		reader.skipCharsEOF(WHITESPACE_CHARS);	//skip whitespace until we reach a character or the end of the file
+		reader.skipCharsEOF(LWS_CHARS);	//skip whitespace until we reach a character or the end of the file
 		reader.skipCh
 */
-		reader.skipCharsEOF(WHITESPACE_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+		reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		while(!reader.isEOF())	//while we haven't reached the end of the file
 		{
 			final String element=parseListElement(reader);	//parse the next element
 			elementList.add(element);	//add this element
-			reader.skipCharsEOF(WHITESPACE_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+			reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		}
 		return elementList.toArray(new String[elementList.size()]);	//return the list of elements we parsed
 	}
@@ -358,7 +358,7 @@ public class HTTPParser
 	public static WeightedValue<String>[] parseWeightedList(final ParseReader reader) throws IOException
 	{
 		final List<WeightedValue<String>> elementList=new ArrayList<WeightedValue<String>>();	//create a new list to hold our list elements
-		reader.skipCharsEOF(WHITESPACE_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+		reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		while(!reader.isEOF())	//while we haven't reached the end of the file
 		{
 			final String element=parseListElement(reader);	//parse the next element
@@ -368,7 +368,7 @@ public class HTTPParser
 				final String value=weightMatcher.group(1);	//the first group is the value
 				final String qvalueString=weightMatcher.group(2);	//the second group is the qvalue, if any
 				elementList.add(new WeightedValue<String>(value, qvalueString!=null ? Float.valueOf(qvalueString) : 1.0f));	//add this element, defaulting to 1.0 if no qvalue is specified (we don't need to check for a number format exception, as the regular expression ensures the correct format)
-				reader.skipCharsEOF(WHITESPACE_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+				reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 			}
 			else	//if the element doesn't match (this should never happen, because the matcher accepts zero or more occurrences of any character
 			{
@@ -386,8 +386,8 @@ public class HTTPParser
 	*/
 	public static String parseListElement(final ParseReader reader) throws IOException	//TODO fix to handle embedded quotes
 	{
-		reader.skipChars(WHITESPACE_CHARS);	//skip whitespace
-		return reader.readStringUntilCharEOF(DELIMITER_CHARS);	//read until we hit a delimiter or the end of the file
+		reader.skipChars(LWS_CHARS);	//skip whitespace
+		return reader.readStringUntilCharEOF(LWS_CHARS+LIST_DELIMITER);	//read until we hit a delimiter or the end of the file
 	}
 
 	/**Parses a list of attribute name/value pair from the given reader, reading until the end of the reader is reached.
@@ -418,15 +418,15 @@ public class HTTPParser
 	{
 		final List<NameValuePair<String, String>> parameterList=new ArrayList<NameValuePair<String, String>>();	//create a new list to hold our parameters
 /*TODO maybe fix for EOL detection later 
-		reader.skipCharsEOF(WHITESPACE_CHARS);	//skip whitespace until we reach a character or the end of the file
+		reader.skipCharsEOF(LWS_CHARS);	//skip whitespace until we reach a character or the end of the file
 		reader.skipCh
 */
-		reader.skipCharsEOF(WHITESPACE_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+		reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		while(!reader.isEOF())	//while we haven't reached the end of the file
 		{
 			final NameValuePair<String, String> parameter=parseParameter(reader);	//parse the next parameter
 			parameterList.add(parameter);	//add this parameter
-			reader.skipCharsEOF(WHITESPACE_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+			reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		}
 		return parameterList;	//return the list of parameters we parsed
 	}
@@ -439,10 +439,10 @@ public class HTTPParser
 	*/
 	public static NameValuePair<String, String> parseParameter(final ParseReader reader) throws IOException
 	{
-		reader.skipChars(WHITESPACE_CHARS);	//skip whitespace
-		final String name=reader.readStringUntilChar(WHITESPACE_CHARS+EQUALS_SIGN_CHAR);	//name
+		reader.skipChars(LWS_CHARS);	//skip whitespace
+		final String name=reader.readStringUntilChar(LWS_CHARS+EQUALS_SIGN_CHAR);	//name
 		reader.readExpectedChar(EQUALS_SIGN_CHAR);	//=
-		reader.skipChars(WHITESPACE_CHARS);	//skip whitespace
+		reader.skipChars(LWS_CHARS);	//skip whitespace
 		final String value;
 		if(reader.peekChar()==QUOTE)	//if this value is quoted
 		{
@@ -450,7 +450,7 @@ public class HTTPParser
 		}
 		else	//if the value isn't quoted
 		{
-			value=reader.readStringUntilCharEOF(DELIMITER_CHARS);	//read until we hit a delimiter or the end of the file
+			value=reader.readStringUntilCharEOF(DELIMITER_CHARS);	//read until we hit a delimiter or the end of the file TODO make sure this is the correct constant
 		}
 		return new NameValuePair<String, String>(name, value);	//return the name and value we parsed
 	}
@@ -490,15 +490,15 @@ public class HTTPParser
 /*G***fix
 	public List<NameValuePair<String, String>> parseParameters(final ParseReader reader) throws IOException
 	{
-		reader.skipChars(WHITESPACE_CHARS);	//skip whitespace
-		final String name=reader.readStringUntilChar(WHITESPACE_CHARS+EQUALS_SIGN_CHAR);	//name
+		reader.skipChars(LWS_CHARS);	//skip whitespace
+		final String name=reader.readStringUntilChar(LWS_CHARS+EQUALS_SIGN_CHAR);	//name
 		reader.readExpectedChar(EQUALS_SIGN_CHAR);	//=
-		reader.skipChars(WHITESPACE_CHARS);	//skip whitespace
+		reader.skipChars(LWS_CHARS);	//skip whitespace
 		if(reader.peekChar()==QUOTE_CHAR)	//if this value is quoted
 		{
 			
 		}
-		final String value=reader.readStringUntilChar(WHITESPACE_CHARS+EQUALS_SIGN_CHAR);	//name
+		final String value=reader.readStringUntilChar(LWS_CHARS+EQUALS_SIGN_CHAR);	//name
 		
 		
 		
@@ -516,7 +516,7 @@ public class HTTPParser
 	*/
 	public static AuthenticateCredentials parseAuthorizationHeader(final CharSequence header) throws SyntaxException, IllegalArgumentException
 	{
-Debug.trace("parsing authorization header", header);
+//TODO del Debug.trace("parsing authorization header", header);
 		try
 		{
 			final int schemeDelimiterIndex=indexOf(header, SP);	//find the space between the scheme and the rest of the credentials
@@ -529,7 +529,7 @@ Debug.trace("parsing authorization header", header);
 					case DIGEST:
 						{
 							final Map<String, String> parameterMap=parseParameterMap(new ParseReader(parameters));	//parse the parameters into a map
-		Debug.trace("parameter map", parameterMap);
+//						TODO del 		Debug.trace("parameter map", parameterMap);
 							final String username=parameterMap.get(USERNAME_PARAMETER);	//get the username
 							if(username==null)	//if no username is present
 							{
@@ -608,7 +608,7 @@ Debug.trace("parsing authorization header", header);
 					case BASIC:
 						{
 							final Map<String, String> parameterMap=parseParameterMap(new ParseReader(parameters));	//parse the parameters into a map
-Debug.trace("parameter map", parameterMap);
+//TODO del Debug.trace("parameter map", parameterMap);
 							final String realm=parameterMap.get(REALM_PARAMETER);	//get the realm
 							if(realm==null)	//if no realm is present
 							{
@@ -620,7 +620,7 @@ Debug.trace("parameter map", parameterMap);
 					case DIGEST:
 					{
 						final Map<String, String> parameterMap=parseParameterMap(new ParseReader(parameters));	//parse the parameters into a map
-Debug.trace("parameter map", parameterMap);
+//TODO del Debug.trace("parameter map", parameterMap);
 						final String realm=parameterMap.get(REALM_PARAMETER);	//get the realm
 						if(realm==null)	//if no realm is present
 						{
