@@ -116,7 +116,7 @@ public class HTTPClientTCPConnection
 			final int port=host.getPort();	//get the port, if any
 //G***fix			final InetSocketAddress socketAddress=new InetSocketAddress(host.getName(), port>=0 ? port : DEFAULT_PORT);	//create a new socket address
 //G***fix			channel=SocketChannel.open(socketAddress);	//open a channel to the address
-Debug.trace("ready to make connection, with secure:", isSecure());
+//		TODO del Debug.trace("ready to make connection, with secure:", isSecure());
 			if(isSecure())	//if this is a secure connection
 			{
 					//TODO testing ignore all certificate problems
@@ -297,28 +297,28 @@ Debug.error(e);
 
 	public HTTPResponse getResponse() throws IOException, NoSuchElementException
 	{
-Debug.trace("getting response");
+//	TODO del Debug.trace("getting response");
 		final HTTPRequest request=getRequestQueue().remove();	//get the next request
 		long nonceCount=0;	//G***testing
 		try
 		{
-Debug.trace("writing request");
+//		TODO del Debug.trace("writing request");
 			writeRequest(request);	//write the request
-Debug.trace("reading response");
+//		TODO del Debug.trace("reading response");
 			HTTPResponse response=readResponse(request);	//read the response TODO check for redirects
-Debug.trace("response connection header:", response.getConnection());
+//		TODO del Debug.trace("response connection header:", response.getConnection());
 			while(response.getStatusCode()==SC_UNAUTHORIZED)	//if the request requires authorization
 			{
 				disconnect();	//disconnect from the server so that the server won't time out while we look for credentials and throw a SocketException TODO improve
-Debug.trace("unauthorized; looking for challenge");
+//			TODO del Debug.trace("unauthorized; looking for challenge");
 				final AuthenticateChallenge challenge=response.getWWWAuthenticate();	//get the challenge
 				if(challenge!=null)	//if there is a challenge
 				{
-Debug.trace("found a challenge");
+//				TODO del Debug.trace("found a challenge");
 					final AuthenticationScheme scheme=challenge.getScheme();	//get the scheme
 					if(scheme==AuthenticationScheme.BASIC || scheme==AuthenticationScheme.DIGEST)	//if this is basic or digest authentication
 					{
-Debug.trace("found a basic or digest challenge");
+//					TODO del Debug.trace("found a basic or digest challenge");
 						PasswordAuthentication passwordAuthentication=null;	//we'll try to get password authentication from somewhere
 						final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
 						final String realm=challenge.getRealm();	//get the challenge realm
@@ -418,13 +418,13 @@ Debug.trace("ready to send back response");
 	{
 		try
 		{
-	Debug.trace("before reading response, are we connected?", isConnected());
+//TODO del 	Debug.trace("before reading response, are we connected?", isConnected());
 			final InputStream inputStream=getInputStream();	//get the input stream of the response
 			final HTTPStatus status=parseStatusLine(inputStream);	//parse the status line
-	Debug.trace("response status:", status);
+//		TODO del 	Debug.trace("response status:", status);
 //TODO do something about errors, such as 400 No Host matches server name
 			final HTTPResponse response=new DefaultHTTPResponse(status.getVersion(), status.getStatusCode(), status.getReasonPhrase());	//create a new response TODO use a factory
-	Debug.trace("created response; now parsing headers");
+//		TODO del 	Debug.trace("created response; now parsing headers");
 			readHeaders(response);	//read the headers into the response
 			response.setBody(readResponseBody(inputStream, request, response));	//read and set the response body
 			return response;	//return the response
@@ -437,7 +437,7 @@ Debug.trace("ready to send back response");
 			}
 			else	//G***del
 			{
-				Debug.trace("staying alive");
+//			TODO del 				Debug.trace("staying alive");
 			}
 		}
 	}
@@ -450,6 +450,7 @@ Debug.trace("ready to send back response");
 	{
 		for(final NameValuePair<String, String> header:parseHeaders(inputStream))	//parse the headers
 		{
+//		TODO del Debug.trace("header", header.getName(), header.getValue());
 Debug.trace("header", header.getName(), header.getValue());
 			response.addHeader(header.getName(), header.getValue());	//add this header to the response
 		}
@@ -490,8 +491,15 @@ Debug.trace("header", header.getName(), header.getValue());
 				}
 				else	//if chunked encoding is not used
 				{
-					final long contentLength=response.getContentLength();	//get the content length
+//TODO fix					final long contentLength=response.getContentLength();	//get the content length
+					long contentLength=response.getContentLength();	//get the content length
 		Debug.trace("content length", contentLength);
+					
+					if(contentLength<0)	//TODO fix; does Tomcat send back no content length if there is no message? even if the response length is set to zero? is this correct?
+					{
+						contentLength=0;
+					}
+
 					if(contentLength>=0)	//if there is a content length
 					{
 						assert contentLength<=Integer.MAX_VALUE : "Unsupported content length.";

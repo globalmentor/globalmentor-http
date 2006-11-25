@@ -125,7 +125,16 @@ public class HTTPResource extends DefaultResource
 	{
 		if(!isCached() || cachedExists==null)	//if we aren't returning cached values, or we don't have a cached existence value
 		{
-			head();	//invoke the HEAD method to update the cached existence value
+			try
+			{
+				head();	//invoke the HEAD method to update the cached existence value
+			}
+			catch(final HTTPNotFoundException notFoundException)	//ignore 404 Not Found
+			{
+			}
+			catch(final HTTPGoneException goneException)	//ignore 410 Gone
+			{
+			}
 			assert cachedExists!=null : "Expected head() to cache existence value.";
 		}
 		return cachedExists.booleanValue();	//return the cached existence value
@@ -198,9 +207,11 @@ public class HTTPResource extends DefaultResource
 	*/
 	public void put(final byte[] content) throws IOException
 	{
+Debug.trace("ready to put bytes:", content.length);
 		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getReferenceURI());	//create a PUT request
 		request.setBody(content);	//set the content of the request 
 		final HTTPResponse response=sendRequest(request);	//get the response
+Debug.trace("response:", response.getStatusCode());
 		cachedExists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists because we just created it
 	}
 	
