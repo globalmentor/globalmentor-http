@@ -3,7 +3,6 @@ package com.garretwilson.net.http;
 import static com.garretwilson.net.http.HTTPConstants.*;
 
 /**Indicates that the server understood the request, but is refusing to fulfill it.
- 	from fulfilling the request. 
 Corresponds to HTTP status code 403.
 @author Garret Wilson
 */
