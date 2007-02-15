@@ -260,7 +260,7 @@ public class WebDAVResource extends HTTPResource
 		}
 		final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, referenceURI);	//create a MKCOL request
 		request.setDepth(depth);	//set the requested depth
-		final Document propfindDocument=createPropfindDocument(getDOMImplementation());	//create a multistatus document	//TODO check DOM exceptions here
+		final Document propfindDocument=createPropfindDocument(createWebDAVDocumentBuilder().getDOMImplementation());	//create a propfind document	//TODO check DOM exceptions here
 		addProperties(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
 		request.setXML(propfindDocument);	//set the XML in the body of our request
 		final HTTPResponse response=sendRequest(request);	//get the response
@@ -309,4 +309,26 @@ public class WebDAVResource extends HTTPResource
 		return CollectionUtilities.emptyList();	//return an empty list; for some reason, no properties were returned		
 	}
 
+	/**Updates properties using the PROPPATCH method.
+	Patching properties involves setting and removing properties.
+	The cached property list is cleared.
+	The URI of each resource is canonicized to be an absolute URI.
+
+	
+	@exception IOException if there was an error invoking the method.
+	*/
+	public void propPatch(final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> setPropertyList, final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> removePropertyList) throws IOException
+	{
+		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
+		emptyCache();	//empty the cache
+		final Document propertyupdateDocument=createPropertyupdateDocument(createWebDAVDocumentBuilder().getDOMImplementation());	//create a propertyupdate document	//TODO check DOM exceptions here
+		final Element propertyupdateElement=propertyupdateDocument.getDocumentElement();	//get the document element
+		if(!setPropertyList.isEmpty())	//if there are properties to set
+		{
+			//TODO
+			final Element setElement=addSet(propertyupdateElement);	//add a set element
+		}
+		throw new UnsupportedOperationException("WebDAV PROPPATCH not yet fully implemented.");	//TODO del
+	}
+	
 }

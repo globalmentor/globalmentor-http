@@ -94,12 +94,18 @@ public class WebDAVConstants
 	public final static String ELEMENT_PROP="prop";
 	/**The property name element name.*/
 	public final static String ELEMENT_PROPNAME="propname";
-	/**The propfind element name.*/
+	/**The property find element name.*/
 	public final static String ELEMENT_PROPFIND="propfind";
-	/**The propstat element name.*/
+	/**The property status stat element name.*/
 	public final static String ELEMENT_PROPSTAT="propstat";
+	/**The property update element name.*/
+	public final static String ELEMENT_PROPERTYUPDATE="propertyupdate";
+	/**The property remove element name.*/
+	public final static String ELEMENT_REMOVE="remove";
 	/**The response element name.*/
 	public final static String ELEMENT_RESPONSE="response";
+	/**The property set element name.*/
+	public final static String ELEMENT_SET="set";
 	/**The status element name.*/
 	public final static String ELEMENT_STATUS="status";
 

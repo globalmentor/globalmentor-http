@@ -3,18 +3,14 @@ package com.garretwilson.net.http;
 import java.io.*;
 import java.net.*;
 
-import org.w3c.dom.DOMImplementation;
-
 import com.garretwilson.io.IO;
 import com.garretwilson.io.OutputStreamDecorator;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
-import com.garretwilson.net.http.*;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
 
-import com.garretwilson.text.xml.XMLDOMImplementation;
 import com.garretwilson.util.Debug;
 import com.garretwilson.model.DefaultResource;
 
@@ -60,12 +56,6 @@ public class HTTPResource extends DefaultResource
 
 	/**The cached existence state, or <code>null</code> if existence has not yet been cached.*/
 	protected Boolean cachedExists=null;
-
-	/**The DOM implementation used as a document factory.*/
-	private final DOMImplementation domImplementation=new XMLDOMImplementation();	//TODO get this in a general way
-
-		/**@return The DOM implementation used as a document factory.*/
-		protected DOMImplementation getDOMImplementation() {return domImplementation;}
 
 	/**Constructs an HTTP resource at a particular URI using the default client.
 	@param referenceURI The URI of the HTTP resource this object represents.
