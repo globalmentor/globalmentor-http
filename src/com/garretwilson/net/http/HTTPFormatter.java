@@ -16,7 +16,6 @@ import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.text.CharacterConstants.*;
 
 import com.garretwilson.util.Base64;
-import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.NameValuePair;
 
 /**Class that knows how to format HTTP information.
@@ -67,7 +66,7 @@ public class HTTPFormatter
 	*/
 	public static StringBuilder formatAttributeList(final StringBuilder stringBuilder, final NameValuePair<?, ?>... attributes)
 	{
-		return formatAttributeList(stringBuilder, CollectionUtilities.emptySet(), attributes);	//format the attributes quoting all values
+		return formatAttributeList(stringBuilder, emptySet(), attributes);	//format the attributes quoting all values
 	}
 	/**Formats an HTTP list using the format:
 	 <var>name</var>="<var>value</value>", <var>name</var>="<var>value</value>"

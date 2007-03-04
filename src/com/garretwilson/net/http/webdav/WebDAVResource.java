@@ -16,11 +16,6 @@ import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
 import static com.garretwilson.net.http.webdav.WebDAVUtilities.*;
 
-import com.garretwilson.text.xml.QualifiedName;
-import com.garretwilson.text.xml.XMLUtilities;
-import com.garretwilson.util.CollectionUtilities;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.IDMappedList;
 import com.garretwilson.util.NameValuePair;
 
 /**A client's view of a WebDAV resource on the server.
@@ -39,10 +34,10 @@ public class WebDAVResource extends HTTPResource
 		cachedPropertyList=null;	//uncache the properties
 	}
 
-	/**The cached list of no-depth properties for this resource, or <code>null</code> if no properties have been cached.
+	/**The cached list of properties for this resource, or <code>null</code> if no properties have been cached.
 	Properties are only cached if all properties are requested.
 	*/
-	protected List<NameValuePair<QualifiedName, ?>> cachedPropertyList=null;
+	protected List<WebDAVProperty> cachedPropertyList=null;
 		
 	/**Constructs a WebDAV resource at a particular URI using the default client.
 	@param referenceURI The URI of the WebDAV resource this object represents.
@@ -243,25 +238,25 @@ public class WebDAVResource extends HTTPResource
 	/**Retrieves properties using the PROPFIND method.
 	The cached property list is updated.
 	The URI of each resource is canonicized to be an absolute URI.
+	None of the returned properties will have <code>null</code> property values.
 	@param depth The requested depth.
-	@return A list of all properties of all requested resources, each representing the URI of the resource paired by a list of its
-		properties, each property representing  the qualified name of the property and the value.
+	@return A list of all properties of all requested resources, each representing the URI of the resource paired by a list of its properties.
 	@exception IOException if there was an error invoking the method.
 	@see #cachedPropertyList
 	*/
-	public List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> propFind(final Depth depth) throws IOException
+	public List<NameValuePair<URI, List<WebDAVProperty>>> propFind(final Depth depth) throws IOException
 	{
 		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
 		if(isCached() && depth==Depth.ZERO && cachedPropertyList!=null)	//if we can return cached values, only the properties for this resource are requested, and we have a cached property list
 		{
-			final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> cachedPropFindList=new ArrayList<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>>();
-			cachedPropFindList.add(new NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>(referenceURI, cachedPropertyList));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
+			final List<NameValuePair<URI, List<WebDAVProperty>>> cachedPropFindList=new ArrayList<NameValuePair<URI, List<WebDAVProperty>>>();
+			cachedPropFindList.add(new NameValuePair<URI, List<WebDAVProperty>>(referenceURI, cachedPropertyList));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
 			return cachedPropFindList;	//return the manufactured property list from our cached properyy list
 		}
 		final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, referenceURI);	//create a MKCOL request
 		request.setDepth(depth);	//set the requested depth
 		final Document propfindDocument=createPropfindDocument(createWebDAVDocumentBuilder().getDOMImplementation());	//create a propfind document	//TODO check DOM exceptions here
-		addProperties(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
+		addPropertyNames(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
 		request.setXML(propfindDocument);	//set the XML in the body of our request
 		final HTTPResponse response=sendRequest(request);	//get the response
 		final Document document=response.getXML();	//get the XML from the response body
@@ -272,8 +267,8 @@ public class WebDAVResource extends HTTPResource
 			
 			final Element documentElement=document.getDocumentElement();	//get the document element
 				//TODO check to make sure the document element is correct
-			final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> propertyLists=getMultistatusProperties(documentElement, referenceURI);	//get the properties from the multistatus document, relative to this resource URI			
-			for(final NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>> propertyList:propertyLists)	//look at each property list
+			final List<NameValuePair<URI, List<WebDAVProperty>>> propertyLists=getMultistatusProperties(documentElement, referenceURI);	//get the properties from the multistatus document, relative to this resource URI			
+			for(final NameValuePair<URI, List<WebDAVProperty>> propertyList:propertyLists)	//look at each property list
 			{
 				if(propertyList.getName().equals(referenceURI))	//if this property list is for this resource
 				{
@@ -283,52 +278,63 @@ public class WebDAVResource extends HTTPResource
 			}
 			return propertyLists;	//return all the properties requested
 		}
-		return CollectionUtilities.emptyList();	//return an empty list, because there was no XML returned
+		return emptyList();	//return an empty list, because there was no XML returned
 	}
 
 	/**Retrieves properties of this resource using the PROPFIND method.
 	This is a convenience method for <code>propFind(Depth)</code>.
 	The cached property list is updated.
 	The URI of each resource is canonicized to be an absolute URI.
-	@return A list of all properties of this resource, each property representing  the qualified name of the property and the value.
+	None of the returned properties will have <code>null</code> property values.
+	@return A list of all properties of this resource.
 	@exception IOException if there was an error invoking the method.
 	@see #propFind(Depth)
 	@see #cachedPropertyList
 	*/
-	public List<NameValuePair<QualifiedName, ?>> propFind() throws IOException
+	public List<WebDAVProperty> propFind() throws IOException
 	{
 		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
-		final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> propertyLists=propFind(Depth.ZERO);	//do a propfind with no depth
-		for(final NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>> propertyList:propertyLists)	//look at each property list
+		final List<NameValuePair<URI, List<WebDAVProperty>>> propertyLists=propFind(Depth.ZERO);	//do a propfind with no depth
+		for(final NameValuePair<URI, List<WebDAVProperty>> propertyList:propertyLists)	//look at each property list
 		{
 			if(propertyList.getName().equals(referenceURI))	//if this property list is for this resource
 			{
 				return propertyList.getValue();	//return the list of properties for this resource
 			}
 		}
-		return CollectionUtilities.emptyList();	//return an empty list; for some reason, no properties were returned		
+		return emptyList();	//return an empty list; for some reason, no properties were returned		
 	}
 
 	/**Updates properties using the PROPPATCH method.
 	Patching properties involves setting and removing properties.
 	The cached property list is cleared.
 	The URI of each resource is canonicized to be an absolute URI.
-
-	
+	@param propertyList The list of properties to set or remove, in order;
+		if the value of a property is <code>null</code>, the property will be removed.
 	@exception IOException if there was an error invoking the method.
 	*/
-	public void propPatch(final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> setPropertyList, final List<NameValuePair<URI, List<NameValuePair<QualifiedName, ?>>>> removePropertyList) throws IOException
+	public void propPatch(final List<WebDAVProperty> propertyList) throws IOException
 	{
 		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
 		emptyCache();	//empty the cache
 		final Document propertyupdateDocument=createPropertyupdateDocument(createWebDAVDocumentBuilder().getDOMImplementation());	//create a propertyupdate document	//TODO check DOM exceptions here
 		final Element propertyupdateElement=propertyupdateDocument.getDocumentElement();	//get the document element
-		if(!setPropertyList.isEmpty())	//if there are properties to set
+		for(final WebDAVProperty property:propertyList)	//for each property
 		{
-			//TODO
-			final Element setElement=addSet(propertyupdateElement);	//add a set element
+			final WebDAVPropertyValue value=property.getValue();	//see if a value is given for this property
+			if(value!=null)	//if a value is given
+			{
+				final Element setElement=addSet(propertyupdateElement);	//add a set element
+				final Element propElement=addProp(setElement);	//add a property element
+				addProperty(propElement, property);	//add the property
+			}
+			else	//if a value isn't given
+			{				
+				final Element removeElement=addRemove(propertyupdateElement);	//add a remove element
+				final Element propElement=addProp(removeElement);	//add a property element
+				addPropertyName(propElement, property.getName());	//add just the property name for removal
+			}
 		}
-		throw new UnsupportedOperationException("WebDAV PROPPATCH not yet fully implemented.");	//TODO del
 	}
 	
 }

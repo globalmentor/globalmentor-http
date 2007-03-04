@@ -35,8 +35,10 @@ import static com.garretwilson.util.ArrayUtilities.*;
 
 /**Represents a connection from a client to a server using HTTP over TCP as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
+This client supports logging.
 @author Garret Wilson
 @see HTTPClient
+@see Client#isLogged()
 */
 public class HTTPClientTCPConnection
 {
@@ -164,6 +166,11 @@ Debug.error(e);
 //		G***fix			outputStream=new BufferedOutputStream(newOutputStream(channel));	//create a new output stream to the channel
 			inputStream=new BufferedInputStream(socket.getInputStream());	//get an input stream from the socket
 			outputStream=new BufferedOutputStream(socket.getOutputStream());	//get an output stream from the socket
+			if(getClient().isLogged())	//if we're using a logged client
+			{
+				inputStream=new LogInputStream(inputStream);	//log all communication from the input stream
+				outputStream=new LogOutputStream(outputStream);	//log all communication to the output stream
+			}
 		}
 	}
 
@@ -389,9 +396,9 @@ Debug.error(e);
 					break;	//we can't authenticate without a challenge
 				}
 			}
-Debug.trace("ready to check response status");
+//TODO del Debug.trace("ready to check response status");
 			response.checkStatus();	//check the status of our response before return it
-Debug.trace("ready to send back response");			
+//TODO del Debug.trace("ready to send back response");			
 			return response;	//return the response we received
 		}
 		catch(final IllegalArgumentException illegalArgumentException)
@@ -410,9 +417,11 @@ Debug.trace("ready to send back response");
 
 	/**Reads a response from the input stream.
 	If persistent connections are not supported, the connection will be disconnected.
+	Written data will be logged if requested by the client.
 	@param request The request in which the response is a response.
 	@return A response parsed from the input stream data.
 	@exception IOException if there is an error reading the data.
+	@see Client#isLogged()
 	*/
 	protected HTTPResponse readResponse(final HTTPRequest request) throws IOException
 	{
@@ -427,6 +436,10 @@ Debug.trace("ready to send back response");
 //		TODO del 	Debug.trace("created response; now parsing headers");
 			readHeaders(response);	//read the headers into the response
 			response.setBody(readResponseBody(inputStream, request, response));	//read and set the response body
+			if(getClient().isLogged() && inputStream instanceof LogInputStream)	//if the client wants logging to occur, and the input stream was already logging
+			{
+				Debug.log("HTTP Response:\n", new String(((LogInputStream)inputStream).getLoggedBytes(true), UTF_8));	//get the logged bytes, clearing the buffer, and log the bytes as a UTF-8 string
+			}
 			return response;	//return the response
 		}
 		finally
@@ -450,8 +463,7 @@ Debug.trace("ready to send back response");
 	{
 		for(final NameValuePair<String, String> header:parseHeaders(inputStream))	//parse the headers
 		{
-//		TODO del Debug.trace("header", header.getName(), header.getValue());
-Debug.trace("header", header.getName(), header.getValue());
+//TODO del Debug.trace("header", header.getName(), header.getValue());
 			response.addHeader(header.getName(), header.getValue());	//add this header to the response
 		}
 	}
@@ -493,7 +505,7 @@ Debug.trace("header", header.getName(), header.getValue());
 				{
 //TODO fix					final long contentLength=response.getContentLength();	//get the content length
 					long contentLength=response.getContentLength();	//get the content length
-		Debug.trace("content length", contentLength);
+//TODO del		Debug.trace("content length", contentLength);
 					
 					if(contentLength<0)	//TODO fix; does Tomcat send back no content length if there is no message? even if the response length is set to zero? is this correct?
 					{
@@ -529,8 +541,10 @@ Debug.trace("header", header.getName(), header.getValue());
 	/**Writes a request to the output stream.
 	A connection will be made to the appropriate host if needed.
 	The request's Host header will be updated.
+	Written data will be logged if requested by the client.
 	@param request The request to write.
 	@exception IOException if there is an error writing the data.
+	@see Client#isLogged()
 	*/
 	protected void writeRequest(final HTTPRequest request) throws IOException
 	{
@@ -567,7 +581,7 @@ Debug.trace("header", header.getName(), header.getValue());
 			formatHeaderLine(headerBuilder, header);	//format this header line
 		}
 		headerBuilder.append(CRLF);	//append a blank line, signifying the end of the headers
-Debug.trace(headerBuilder);
+//TODO del Debug.trace(headerBuilder);
 		connect(host);	//make sure we're connected to the same host as the request
 		final OutputStream outputStream=getOutputStream();	//get the output stream
 		outputStream.write(getBytes(headerBuilder));	//write the header
@@ -576,6 +590,10 @@ Debug.trace(headerBuilder);
 			outputStream.write(requestBody);	//write the body
 		}
 		outputStream.flush();	//flush the data to the server
+		if(getClient().isLogged() && outputStream instanceof LogOutputStream)	//if the client wants logging to occur, and the output stream was already logging
+		{
+			Debug.log("HTTP Request:\n", new String(((LogOutputStream)outputStream).getLoggedBytes(true), UTF_8));	//get the logged bytes, clearing the buffer, and log the bytes as a UTF-8 string
+		}
 	}
 
 	/**Writes a HTTP header to the output stream, followed by CRLF.

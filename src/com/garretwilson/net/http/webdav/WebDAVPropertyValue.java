@@ -5,4 +5,6 @@ package com.garretwilson.net.http.webdav;
 */
 public interface WebDAVPropertyValue
 {
+	/**@return A non-<code>null</code> literal representing plain text contained in this WebDAV value, which may be the empty string.*/
+	public String getText();
 }

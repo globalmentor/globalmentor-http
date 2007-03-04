@@ -197,11 +197,11 @@ public class HTTPResource extends DefaultResource
 	*/
 	public void put(final byte[] content) throws IOException
 	{
-Debug.trace("ready to put bytes:", content.length);
+//TODO del Debug.trace("ready to put bytes:", content.length);
 		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getReferenceURI());	//create a PUT request
 		request.setBody(content);	//set the content of the request 
 		final HTTPResponse response=sendRequest(request);	//get the response
-Debug.trace("response:", response.getStatusCode());
+//TODO del Debug.trace("response:", response.getStatusCode());
 		cachedExists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists because we just created it
 	}
 	
@@ -283,28 +283,17 @@ Debug.trace("response:", response.getStatusCode());
 		}
 	
 		//TODO maybe improve flush() at some point to actually send data to the HTTP Resource
-	
-	  /**Closes this output stream and releases any system resources associated with this stream.
-	  This version writes the accumulated data to the HTTP resource, and unconditionally
-	  	releases the accumulated bytes.
-	  @exception IOException if an I/O error occurs.
-	  */
-		public void close() throws IOException	//TODO what if there is an error writing to the stream, and the client tries to close the stream out of an attempt for consistency?
-		{
-			final ByteArrayOutputStream byteArrayOutputStream=getOutputStream();	//get the decorated output stream, if there still is one
-			if(byteArrayOutputStream!=null)	//if we had a byte array output stream before closing, this adapter was still open
-			{
-				final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the collected bytes
-				try
-				{
-					put(bytes);	//put the bytes to the HTTP resource
-				}
-				finally
-				{
-					super.close();	//do the default closing, releasing the decorated output stream from the decorator
-				}
-			}
-  	}
-	}
 
+	  /**Called before the stream is closed.
+	  This version writes the accumulated data to the HTTP resource, and unconditionally releases the accumulated bytes.
+		@exception IOException if an I/O error occurs.
+		*/
+	  protected void beforeClose() throws IOException 
+	  {
+			final ByteArrayOutputStream byteArrayOutputStream=getOutputStream();	//get the decorated output stream
+			assert byteArrayOutputStream!=null : "Missing decorated stream.";
+			final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the collected bytes
+			put(bytes);	//put the bytes to the HTTP resource
+	  }
+	}
 }
