@@ -20,7 +20,7 @@ For many error conditions, a subclass of <code>HTTPException</code>
 @author Garret Wilson
 @see HTTPException
 */
-public class HTTPResource extends DefaultResource
+public class HTTPResource extends DefaultResource	//TODO update class to have a cache timeout
 {
 
 	/**The client used to create a connection to this resource.*/
@@ -127,7 +127,7 @@ public class HTTPResource extends DefaultResource
 			}
 			assert cachedExists!=null : "Expected head() to cache existence value.";
 		}
-		return cachedExists.booleanValue();	//return the cached existence value
+		return cachedExists.booleanValue();	//return the cached existence value TODO fix the race condition here
 	}
 
 	/**Retrieves the contents of a resource using the GET method.

@@ -23,7 +23,7 @@ public class WebDAVDocumentFragmentPropertyValue extends ObjectDecorator<Documen
 	/**@return The document fragment this value represents.*/
 	public DocumentFragment getDocumentFragment()
 	{
-		return getDecoratedObject();
+		return getObject();
 	}
 
 	/**@return A non-<code>null</code> literal representing plain text contained in this WebDAV value, which may be the empty string.*/

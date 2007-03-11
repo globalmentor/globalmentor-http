@@ -3,6 +3,7 @@ package com.garretwilson.net.http.webdav;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
 import static java.util.Collections.*;
 
 import org.w3c.dom.Document;
@@ -13,14 +14,13 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
+
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
 import static com.garretwilson.net.http.webdav.WebDAVUtilities.*;
-
 import com.garretwilson.util.NameValuePair;
 
 /**A client's view of a WebDAV resource on the server.
-For many error conditions, a subclass of <code>HTTPException</code>
-	will be thrown.
+For many error conditions, a subclass of <code>HTTPException</code> will be thrown.
 @author Garret Wilson
 @see HTTPException
 */
@@ -32,13 +32,17 @@ public class WebDAVResource extends HTTPResource
 	{
 		super.emptyCache();	//empty the parent's cache
 		cachedPropertyList=null;	//uncache the properties
+		cachedCollection=null;	//uncache the collection state
 	}
 
 	/**The cached list of properties for this resource, or <code>null</code> if no properties have been cached.
 	Properties are only cached if all properties are requested.
 	*/
 	protected List<WebDAVProperty> cachedPropertyList=null;
-		
+
+	/**The cached collection state, or <code>null</code> if collection state has not yet been cached.*/
+	protected Boolean cachedCollection=null;
+
 	/**Constructs a WebDAV resource at a particular URI using the default client.
 	@param referenceURI The URI of the WebDAV resource this object represents.
 	@exception IllegalArgumentException if the given reference URI is not absolute,
@@ -60,6 +64,23 @@ public class WebDAVResource extends HTTPResource
 	public WebDAVResource(final URI referenceURI, final HTTPClient client) throws IllegalArgumentException, NullPointerException
 	{
 		super(referenceURI, client);	//construct the parent class
+	}
+
+	/**Determines if a resource is a collection.
+	The cached collection property is updated.
+	@return <code>true</code> if the resource is present on the server and is a collection.
+	@exception IOException if there was an error invoking a method.
+	@see #cachedCollection
+	@see #propFind()
+	*/
+	public boolean isCollection() throws IOException
+	{
+		if(!isCached() || cachedCollection==null)	//if we aren't returning cached values, or we don't have a cached collection value
+		{
+			propFind();	//find the properties of this resource, which will update the cached collection state
+		}
+		assert cachedCollection!=null : "Expected propFind() to cache existence value.";
+		return cachedCollection.booleanValue();	//return the cached collection state TODO fix the race condition here
 	}
 
 	/**Copies the resource using the COPY method with an infinite depth, overwriting any resource at the given destination URI.
@@ -200,9 +221,6 @@ public class WebDAVResource extends HTTPResource
 		}
 	}
 
-	
-	
-	
 	/**Moves the resource using the MOVE method with an infinite depth, overwriting any resource at the given destination URI.
 	This implementation delegates to {@link #move(URI, boolean)}.
 	@param destinationURI The destination to which the resource will be moved.
@@ -237,6 +255,7 @@ public class WebDAVResource extends HTTPResource
 		
 	/**Retrieves properties using the PROPFIND method.
 	The cached property list is updated.
+	The cached collection status is updated.
 	The URI of each resource is canonicized to be an absolute URI.
 	None of the returned properties will have <code>null</code> property values.
 	@param depth The requested depth.
@@ -273,6 +292,7 @@ public class WebDAVResource extends HTTPResource
 				if(propertyList.getName().equals(referenceURI))	//if this property list is for this resource
 				{
 					cachedPropertyList=propertyList.getValue();	//cache the list of properties for this resource
+					cachedCollection=WebDAVUtilities.isCollection(cachedPropertyList);	//update the cached collection state
 					break;	//stop looking for properties to cache
 				}
 			}

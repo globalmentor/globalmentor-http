@@ -21,6 +21,6 @@ public class WebDAVLiteralPropertyValue extends ObjectDecorator<String> implemen
 	/**@return A non-<code>null</code> literal representing plain text contained in this WebDAV value, which may be the empty string.*/
 	public String getText()
 	{
-		return getDecoratedObject();	//return the string literal itself
+		return getObject();	//return the string literal itself
 	}
 }
