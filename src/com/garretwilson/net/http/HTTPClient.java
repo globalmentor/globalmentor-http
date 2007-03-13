@@ -1,5 +1,7 @@
 package com.garretwilson.net.http;
 
+import java.net.PasswordAuthentication;
+
 import com.garretwilson.net.AbstractClient;
 import com.garretwilson.net.Authenticable;
 import com.garretwilson.net.Host;
@@ -41,17 +43,6 @@ public class HTTPClient extends AbstractClient
 		super(authenticator);	//construct the parent class
 	}
 
-	/**Creates a connection from a URI.
-	@param uri The URI indicating the host to which to connect.
-	@exception IllegalArgumentException if the given URI does not contain a valid host.
-	*/
-/*G***del if not needed
-	public HTTPClientTCPConnection createConnection(final URI uri)
-	{
-		return new HTTPClientTCPConnection(this, uri);	//return a new connection to the given URI
-	}
-*/
-
 	/**Creates an unsecure connection to a host.
 	@param host The host to which to connect.
 	*/
@@ -60,13 +51,32 @@ public class HTTPClient extends AbstractClient
 		return createConnection(host, false);	//create and return a connection that is not secure
 	}
 
+	/**Creates an unsecure connection to a host, using connection-specific password authentication.
+	@param host The host to which to connect.
+	@param passwordAuthentication The connection-specific password authentication, or <code>null</code> if there should be no connection-specific password authentication.
+	*/
+	public HTTPClientTCPConnection createConnection(final Host host, final PasswordAuthentication passwordAuthentication)
+	{
+		return createConnection(host, passwordAuthentication, false);	//create and return a connection that is not secure
+	}
+
 	/**Creates a connection to a host that is optionally secure.
 	@param host The host to which to connect.
 	@param secure Whether the connection should be secure.
 	*/
 	public HTTPClientTCPConnection createConnection(final Host host, final boolean secure)
 	{
-		return new HTTPClientTCPConnection(this, host, secure);	//return a new connection to the given host
+		return createConnection(host, null, secure);	//create and return an optionally secure connection with no connection-specific authentication
+	}
+
+	/**Creates a connection to a host that is optionally secure, using connection-specific password authentication.
+	@param host The host to which to connect.
+	@param passwordAuthentication The connection-specific password authentication, or <code>null</code> if there should be no connection-specific password authentication.
+	@param secure Whether the connection should be secure.
+	*/
+	public HTTPClientTCPConnection createConnection(final Host host, final PasswordAuthentication passwordAuthentication, final boolean secure)
+	{
+		return new HTTPClientTCPConnection(this, host, passwordAuthentication, secure);	//return a new connection to the given host
 	}
 
 }

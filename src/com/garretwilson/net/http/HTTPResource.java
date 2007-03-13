@@ -13,6 +13,7 @@ import static com.garretwilson.net.http.HTTPConstants.*;
 
 import com.garretwilson.util.Debug;
 import com.garretwilson.model.DefaultResource;
+import com.garretwilson.net.Authenticable;
 
 /**A client's view of an HTTP resource on the server.
 For many error conditions, a subclass of <code>HTTPException</code>
@@ -28,6 +29,12 @@ public class HTTPResource extends DefaultResource	//TODO update class to have a 
 
 		/**@return The client used to create a connection to this resource.*/
 		protected HTTPClient getClient() {return client;}
+
+	/**The preset password authentication, or <code>null</code> if this resource specifies no preset password authentication.*/
+	private final PasswordAuthentication passwordAuthentication;
+	
+		/**@return The preset password authentication, or <code>null</code> if this connection specifies no preset password authentication.*/
+		protected PasswordAuthentication getPasswordAuthentication() {return passwordAuthentication;}
 
 	/**Whether cached properties are to be returned; the default is <code>true</code>.*/
 	private boolean cached=true;
@@ -47,7 +54,7 @@ public class HTTPResource extends DefaultResource	//TODO update class to have a 
 				this.cached=cached;	//update the cache state
 			}
 		}
-		
+
 	/**Removes all cached values.*/
 	public void emptyCache()
 	{
@@ -59,23 +66,44 @@ public class HTTPResource extends DefaultResource	//TODO update class to have a 
 
 	/**Constructs an HTTP resource at a particular URI using the default client.
 	@param referenceURI The URI of the HTTP resource this object represents.
-	@exception IllegalArgumentException if the given reference URI is not absolute,
-		the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
 	@exception NullPointerException if the given reference URI is <code>null</code>.
 	*/
 	public HTTPResource(final URI referenceURI) throws IllegalArgumentException, NullPointerException
 	{
-		this(referenceURI, HTTPClient.getInstance());	//construct the resource with the default client
+		this(referenceURI, (PasswordAuthentication)null);	//construct the resource with no preset password authentication
+	}
+
+	/**Constructs an HTTP resource at a particular URI using specified password authentication.
+	@param referenceURI The URI of the HTTP resource this object represents.
+	@param passwordAuthentication The password authentication to use in connecting to this resource, or <code>null</code> if there should be no preset password authentication.
+	@exception IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception NullPointerException if the given reference URI is <code>null</code>.
+	*/
+	public HTTPResource(final URI referenceURI, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException, NullPointerException
+	{
+		this(referenceURI, HTTPClient.getInstance(), passwordAuthentication);	//construct the resource with the default client		
 	}
 
 	/**Constructs an HTTP resource at a particular URI using a particular client.
 	@param referenceURI The URI of the HTTP resource this object represents.
 	@param client The client used to create a connection to this resource.
-	@exception IllegalArgumentException if the given reference URI is not absolute,
-		the reference URI has no host, or the scheme is not an HTTP scheme.
-	@exception NullPointerException if the given reference URI or client is <code>null</code>.
+	@exception IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception NullPointerException if the given reference URI and/or client is <code>null</code>.
 	*/
 	public HTTPResource(final URI referenceURI, final HTTPClient client) throws IllegalArgumentException, NullPointerException
+	{
+		this(referenceURI, client, null);	//construct the class with no preset password authentication
+	}
+
+	/**Constructs an HTTP resource at a particular URI using a particular client and specified password authentication.
+	@param referenceURI The URI of the HTTP resource this object represents.
+	@param client The client used to create a connection to this resource.
+	@param passwordAuthentication The password authentication to use in connecting to this resource, or <code>null</code> if there should be no preset password authentication.
+	@exception IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception NullPointerException if the given reference URI and/or client is <code>null</code>.
+	*/
+	public HTTPResource(final URI referenceURI, final HTTPClient client, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException, NullPointerException
 	{
 		super(referenceURI);	//construct the parent class
 		if(!referenceURI.isAbsolute())	//if the URI is not absolute
@@ -92,6 +120,7 @@ public class HTTPResource extends DefaultResource	//TODO update class to have a 
 			throw new IllegalArgumentException("Invalid HTTP scheme "+scheme);
 		}
 		this.client=checkInstance(client, "Client cannot be null.");	//save the client
+		this.passwordAuthentication=passwordAuthentication;	//save the password authentication
 	}
 
 	/**Deletes the resource using the DELETE method.
@@ -251,13 +280,35 @@ public class HTTPResource extends DefaultResource	//TODO update class to have a 
 	}
 
 	/**Sends a request to the server.
+	@param request The request to send to the server.
+	@return The response from the server.
 	@exception IOException if there was an error sending the request or receiving the response.
 	*/
 	protected HTTPResponse sendRequest(final HTTPRequest request) throws IOException	//TODO add connection peristence
 	{
 		final URI referenceURI=getReferenceURI();	//get the reference URI
 		final boolean secure=HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
-		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getReferenceURI()), secure);	//get a connection to the URI
+		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getReferenceURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
+		try
+		{
+			return connection.sendRequest(request);	//send the request and return the response
+		}
+		finally
+		{
+			connection.disconnect();	//always close the connection
+		}
+	}
+
+	/**Sends a request to the server using a custom authenticator.
+	@param request The request to send to the server.
+	@return The response from the server.
+	@exception IOException if there was an error sending the request or receiving the response.
+	*/
+	protected HTTPResponse sendRequest(final HTTPRequest request, final Authenticable authenticator) throws IOException	//TODO add connection peristence
+	{
+		final URI referenceURI=getReferenceURI();	//get the reference URI
+		final boolean secure=HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
+		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getReferenceURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
 		try
 		{
 			return connection.sendRequest(request);	//send the request and return the response

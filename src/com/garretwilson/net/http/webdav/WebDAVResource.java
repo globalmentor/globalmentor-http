@@ -44,26 +44,47 @@ public class WebDAVResource extends HTTPResource
 	protected Boolean cachedCollection=null;
 
 	/**Constructs a WebDAV resource at a particular URI using the default client.
-	@param referenceURI The URI of the WebDAV resource this object represents.
-	@exception IllegalArgumentException if the given reference URI is not absolute,
-		the reference URI has no host, or the scheme is not an HTTP scheme.
-	@exception NullPointerException if the given reference URI or client is <code>null</code>.
+	@param referenceURI The URI of the HTTP resource this object represents.
+	@exception IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception NullPointerException if the given reference URI is <code>null</code>.
 	*/
 	public WebDAVResource(final URI referenceURI) throws IllegalArgumentException, NullPointerException
 	{
-		super(referenceURI);	//construct the parent class
+		this(referenceURI, (PasswordAuthentication)null);	//construct the resource with no preset password authentication
+	}
+
+	/**Constructs a WebDAV resource at a particular URI using specified password authentication.
+	@param referenceURI The URI of the HTTP resource this object represents.
+	@param passwordAuthentication The password authentication to use in connecting to this resource, or <code>null</code> if there should be no preset password authentication.
+	@exception IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception NullPointerException if the given reference URI is <code>null</code>.
+	*/
+	public WebDAVResource(final URI referenceURI, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException, NullPointerException
+	{
+		this(referenceURI, HTTPClient.getInstance(), passwordAuthentication);	//construct the resource with the default client		
 	}
 
 	/**Constructs a WebDAV resource at a particular URI using a particular client.
-	@param referenceURI The URI of the WebDAV resource this object represents.
+	@param referenceURI The URI of the HTTP resource this object represents.
 	@param client The client used to create a connection to this resource.
-	@exception IllegalArgumentException if the given reference URI is not absolute,
-		the reference URI has no host, or the scheme is not an HTTP scheme.
-	@exception NullPointerException if the given reference URI or client is <code>null</code>.
+	@exception IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception NullPointerException if the given reference URI and/or client is <code>null</code>.
 	*/
 	public WebDAVResource(final URI referenceURI, final HTTPClient client) throws IllegalArgumentException, NullPointerException
 	{
-		super(referenceURI, client);	//construct the parent class
+		this(referenceURI, client, null);	//construct the class with no preset password authentication
+	}
+
+	/**Constructs a WebDAV resource at a particular URI using a particular client and specified password authentication.
+	@param referenceURI The URI of the HTTP resource this object represents.
+	@param client The client used to create a connection to this resource.
+	@param passwordAuthentication The password authentication to use in connecting to this resource, or <code>null</code> if there should be no preset password authentication.
+	@exception IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
+	@exception NullPointerException if the given reference URI and/or client is <code>null</code>.
+	*/
+	public WebDAVResource(final URI referenceURI, final HTTPClient client, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException, NullPointerException
+	{
+		super(referenceURI, client, passwordAuthentication);	//construct the parent class
 	}
 
 	/**Determines if a resource is a collection.
@@ -272,12 +293,13 @@ public class WebDAVResource extends HTTPResource
 			cachedPropFindList.add(new NameValuePair<URI, List<WebDAVProperty>>(referenceURI, cachedPropertyList));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
 			return cachedPropFindList;	//return the manufactured property list from our cached properyy list
 		}
-		final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, referenceURI);	//create a MKCOL request
+		final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, referenceURI);	//create a PROPFIND request
 		request.setDepth(depth);	//set the requested depth
 		final Document propfindDocument=createPropfindDocument(createWebDAVDocumentBuilder().getDOMImplementation());	//create a propfind document	//TODO check DOM exceptions here
 		addPropertyNames(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
 		request.setXML(propfindDocument);	//set the XML in the body of our request
 		final HTTPResponse response=sendRequest(request);	//get the response
+		//TODO check response; expect 207 Multi-Status
 		final Document document=response.getXML();	//get the XML from the response body
 		if(document!=null)	//if there was an XML document in the request
 		{
@@ -337,6 +359,8 @@ public class WebDAVResource extends HTTPResource
 	{
 		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
 		emptyCache();	//empty the cache
+		final WebDAVRequest request=new DefaultWebDAVRequest(PROPPATCH_METHOD, referenceURI);	//create a PROPPATCH request
+
 		final Document propertyupdateDocument=createPropertyupdateDocument(createWebDAVDocumentBuilder().getDOMImplementation());	//create a propertyupdate document	//TODO check DOM exceptions here
 		final Element propertyupdateElement=propertyupdateDocument.getDocumentElement();	//get the document element
 		for(final WebDAVProperty property:propertyList)	//for each property
@@ -355,6 +379,9 @@ public class WebDAVResource extends HTTPResource
 				addPropertyName(propElement, property.getName());	//add just the property name for removal
 			}
 		}
+		request.setXML(propertyupdateDocument);	//set the XML in the body of our request
+		final HTTPResponse response=sendRequest(request);	//get the response
+			//TODO check response; expect 207 Multi-Status
 	}
 	
 }

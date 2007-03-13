@@ -19,6 +19,7 @@ import com.garretwilson.io.*;
 import static com.garretwilson.io.InputStreamUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.net.*;
+
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPFormatter.*;
@@ -36,6 +37,13 @@ import static com.garretwilson.util.ArrayUtilities.*;
 /**Represents a connection from a client to a server using HTTP over TCP as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
 This client supports logging.
+If authentication is needed, authentication is attempted to be retrieved from the following sources, in this order:
+<ol>
+	<li>The {@link PasswordAuthentication}, if any, associated with this connection.</li>
+	<li>The {@link PasswordAuthentication}, if any, cached by the associated client.</li>
+	<li>The {@link Authenticable}, if any, specified by the associated client.</li>
+	<li>The {@link Authenticable}, if any, specified by the default client.</li>
+</ol>
 @author Garret Wilson
 @see HTTPClient
 @see Client#isLogged()
@@ -84,6 +92,13 @@ public class HTTPClientTCPConnection
 
 		/**@return The channel to the server.*/
 //G***del		private Channel getChannel() {return channel;}
+
+		
+	/**The connection-specific password authentication, or <code>null</code> if this connection specifies no password authentication.*/
+	private final PasswordAuthentication passwordAuthentication;
+	
+		/**@return The connection-specific password authentication, or <code>null</code> if this connection specifies no password authentication.*/
+		protected PasswordAuthentication getPasswordAuthentication() {return passwordAuthentication;}
 
 	/**@return The IP address to which the socket is connected, or <code>null</code> if this connection is not connected.*/
 	protected InetAddress getInetAddress() {return socket.getInetAddress();}
@@ -263,17 +278,19 @@ Debug.error(e);
 		this.host=URIUtilities.getHost(uri);	//save the host host
 	}
 */
-
-	/**Host constructor.
+		
+	/**Host, authenticator, and secure constructor.
 	@param client The client with which this connection is associated.
 	@param host The host to which to connect.
+	@param passwordAuthentication The connection-specific password authentication, or <code>null</code> if there should be no connection-specific password authentication.
 	@param secure Whether the connection should be secure.
 	@exception NullPointerException if the given client or host is <code>null</code>.
 	*/
-	HTTPClientTCPConnection(final HTTPClient client, final Host host, final boolean secure)
+	HTTPClientTCPConnection(final HTTPClient client, final Host host, final PasswordAuthentication passwordAuthentication, final boolean secure)
 	{
 		this.client=checkInstance(client, "Client cannot be null");	//save the client
 		this.host=checkInstance(host, "Host cannot be null");	//save the host
+		this.passwordAuthentication=passwordAuthentication;	//save the authentication, if any
 		this.secure=secure;	//save whether the connection should be secure
 	}
 
@@ -309,6 +326,8 @@ Debug.error(e);
 		long nonceCount=0;	//G***testing
 		try
 		{
+					//TODO find a way to store authentication information in the request if we already have it
+
 //		TODO del Debug.trace("writing request");
 			writeRequest(request);	//write the request
 //		TODO del Debug.trace("reading response");
@@ -326,21 +345,24 @@ Debug.error(e);
 					if(scheme==AuthenticationScheme.BASIC || scheme==AuthenticationScheme.DIGEST)	//if this is basic or digest authentication
 					{
 //					TODO del Debug.trace("found a basic or digest challenge");
-						PasswordAuthentication passwordAuthentication=null;	//we'll try to get password authentication from somewhere
 						final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
 						final String realm=challenge.getRealm();	//get the challenge realm
-						final HTTPClient client=getClient();	//get the client with which we're associated
-						final Set<String> usernames=client.getUsernames(rootURI, realm);	//get users that are cached for this domain and realm
-						if(usernames.size()==1)	//if we have exactly one user's authentication information
+						PasswordAuthentication passwordAuthentication=getPasswordAuthentication();	//see if password authentication has been specified specifically for this connection
+						if(passwordAuthentication==null)	//if there is no connection-specific password authentication, try to find some
 						{
-							final String username=usernames.iterator().next();	//get the username
-							final char[] password=client.getPassword(rootURI, realm, username);	//get the password for this user
-							if(password!=null)	//if we found a cached password
+							final HTTPClient client=getClient();	//get the client with which we're associated
+							final Set<String> usernames=client.getUsernames(rootURI, realm);	//get users that are cached for this domain and realm
+							if(usernames.size()==1)	//if we have exactly one user's authentication information
 							{
-								passwordAuthentication=new PasswordAuthentication(username, password);	//create new password authentication
+								final String username=usernames.iterator().next();	//get the username
+								final char[] password=client.getPassword(rootURI, realm, username);	//get the password for this user
+								if(password!=null)	//if we found a cached password
+								{
+									passwordAuthentication=new PasswordAuthentication(username, password);	//create new password authentication
+								}
 							}
 						}
-						if(passwordAuthentication==null)	//if we have no password authentication, yet
+						if(passwordAuthentication==null)	//if we have no password authentication, yet, either specified for this connection or cached in the client
 						{
 							passwordAuthentication=askPasswordAuthentication(request, response, challenge);	//ask for a password
 						}
