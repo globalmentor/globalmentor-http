@@ -3,21 +3,18 @@ package com.garretwilson.net.http.webdav;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
 import static java.util.Collections.*;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
-
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
-import static com.garretwilson.net.http.webdav.WebDAVUtilities.*;
 import com.garretwilson.util.NameValuePair;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**A client's view of a WebDAV resource on the server.
 For many error conditions, a subclass of <code>HTTPException</code> will be thrown.
@@ -295,8 +292,9 @@ public class WebDAVResource extends HTTPResource
 		}
 		final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, referenceURI);	//create a PROPFIND request
 		request.setDepth(depth);	//set the requested depth
-		final Document propfindDocument=createPropfindDocument(createWebDAVDocumentBuilder().getDOMImplementation());	//create a propfind document	//TODO check DOM exceptions here
-		addPropertyNames(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
+		final WebDAVXMLGenerator webdavXMLGenerator=new WebDAVXMLGenerator();	//create a WebDAV XML generator
+		final Document propfindDocument=webdavXMLGenerator.createPropfindDocument();	//create a propfind document	//TODO check DOM exceptions here
+		webdavXMLGenerator.addPropertyNames(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
 		request.setXML(propfindDocument);	//set the XML in the body of our request
 		final HTTPResponse response=sendRequest(request);	//get the response
 		//TODO check response; expect 207 Multi-Status
@@ -308,7 +306,7 @@ public class WebDAVResource extends HTTPResource
 			
 			final Element documentElement=document.getDocumentElement();	//get the document element
 				//TODO check to make sure the document element is correct
-			final List<NameValuePair<URI, List<WebDAVProperty>>> propertyLists=getMultistatusProperties(documentElement, referenceURI);	//get the properties from the multistatus document, relative to this resource URI			
+			final List<NameValuePair<URI, List<WebDAVProperty>>> propertyLists=WebDAVXMLProcessor.getMultistatusProperties(documentElement, referenceURI);	//get the properties from the multistatus document, relative to this resource URI			
 			for(final NameValuePair<URI, List<WebDAVProperty>> propertyList:propertyLists)	//look at each property list
 			{
 				if(propertyList.getName().equals(referenceURI))	//if this property list is for this resource
@@ -351,8 +349,7 @@ public class WebDAVResource extends HTTPResource
 	Patching properties involves setting and removing properties.
 	The cached property list is cleared.
 	The URI of each resource is canonicized to be an absolute URI.
-	@param propertyList The list of properties to set or remove, in order;
-		if the value of a property is <code>null</code>, the property will be removed.
+	@param propertyList The list of properties to set or remove, in order; if the value of a property is <code>null</code>, the property will be removed.
 	@exception IOException if there was an error invoking the method.
 	*/
 	public void propPatch(final List<WebDAVProperty> propertyList) throws IOException
@@ -360,23 +357,23 @@ public class WebDAVResource extends HTTPResource
 		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
 		emptyCache();	//empty the cache
 		final WebDAVRequest request=new DefaultWebDAVRequest(PROPPATCH_METHOD, referenceURI);	//create a PROPPATCH request
-
-		final Document propertyupdateDocument=createPropertyupdateDocument(createWebDAVDocumentBuilder().getDOMImplementation());	//create a propertyupdate document	//TODO check DOM exceptions here
+		final WebDAVXMLGenerator webdavXMLGenerator=new WebDAVXMLGenerator();	//create a WebDAV XML generator
+		final Document propertyupdateDocument=webdavXMLGenerator.createPropertyupdateDocument();	//create a propertyupdate document	//TODO check DOM exceptions here
 		final Element propertyupdateElement=propertyupdateDocument.getDocumentElement();	//get the document element
 		for(final WebDAVProperty property:propertyList)	//for each property
 		{
 			final WebDAVPropertyValue value=property.getValue();	//see if a value is given for this property
 			if(value!=null)	//if a value is given
 			{
-				final Element setElement=addSet(propertyupdateElement);	//add a set element
-				final Element propElement=addProp(setElement);	//add a property element
-				addProperty(propElement, property);	//add the property
+				final Element setElement=webdavXMLGenerator.addSet(propertyupdateElement);	//add a set element
+				final Element propElement=webdavXMLGenerator.addProp(setElement);	//add a property element
+				webdavXMLGenerator.addProperty(propElement, property);	//add the property
 			}
 			else	//if a value isn't given
 			{				
-				final Element removeElement=addRemove(propertyupdateElement);	//add a remove element
-				final Element propElement=addProp(removeElement);	//add a property element
-				addPropertyName(propElement, property.getName());	//add just the property name for removal
+				final Element removeElement=webdavXMLGenerator.addRemove(propertyupdateElement);	//add a remove element
+				final Element propElement=webdavXMLGenerator.addProp(removeElement);	//add a property element
+				webdavXMLGenerator.addPropertyName(propElement, property.getName());	//add just the property name for removal
 			}
 		}
 		request.setXML(propertyupdateDocument);	//set the XML in the body of our request

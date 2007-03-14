@@ -1,8 +1,11 @@
 package com.garretwilson.net.http.webdav;
 
 import java.net.URI;
+import java.util.*;
 
-import static com.garretwilson.text.xml.QualifiedName.*;
+import com.garretwilson.util.IDMappedList;
+
+import static com.garretwilson.net.http.webdav.WebDAVPropertyName.*;
 
 /**Constant values for WebDAV as defined by
 <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>,	"HTTP Extensions for Distributed Authoring -- WEBDAV".
@@ -66,22 +69,29 @@ public class WebDAVConstants
 	public final static String LOCK_DISCOVERY_PROPERTY_NAME="lockdiscovery";
 	public final static String RESOURCE_TYPE_PROPERTY_NAME="resourcetype";
 
-		//properties
-	public final static URI CREATION_DATE_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, CREATION_DATE_PROPERTY_NAME);
-	public final static URI DISPLAY_NAME_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, DISPLAY_NAME_PROPERTY_NAME);
-	public final static URI GET_CONTENT_LANGUAGE_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_CONTENT_LANGUAGE_PROPERTY_NAME);
-	public final static URI GET_CONTENT_LENGTH_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_CONTENT_LENGTH_PROPERTY_NAME);
-	public final static URI GET_CONTENT_TYPE_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_CONTENT_TYPE_PROPERTY_NAME);
-	public final static URI GET_ETAG_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_ETAG_PROPERTY_NAME);
-	public final static URI GET_LAST_MODIFIED_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, GET_LAST_MODIFIED_PROPERTY_NAME);
-	public final static URI LOCK_DISCOVERY_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, LOCK_DISCOVERY_PROPERTY_NAME);
-	public final static URI RESOURCE_TYPE_PROPERTY=createReferenceURI(WEBDAV_NAMESPACE, RESOURCE_TYPE_PROPERTY_NAME);
+		//properties TODO change these to property WebDAVPropertyNames, now that we have such a thing
+	public final static URI CREATION_DATE_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, CREATION_DATE_PROPERTY_NAME);
+	public final static URI DISPLAY_NAME_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, DISPLAY_NAME_PROPERTY_NAME);
+	public final static URI GET_CONTENT_LANGUAGE_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, GET_CONTENT_LANGUAGE_PROPERTY_NAME);
+	public final static URI GET_CONTENT_LENGTH_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, GET_CONTENT_LENGTH_PROPERTY_NAME);
+	public final static URI GET_CONTENT_TYPE_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, GET_CONTENT_TYPE_PROPERTY_NAME);
+	public final static URI GET_ETAG_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, GET_ETAG_PROPERTY_NAME);
+	public final static URI GET_LAST_MODIFIED_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, GET_LAST_MODIFIED_PROPERTY_NAME);
+	public final static URI LOCK_DISCOVERY_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, LOCK_DISCOVERY_PROPERTY_NAME);
+	public final static URI RESOURCE_TYPE_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, RESOURCE_TYPE_PROPERTY_NAME);
+
+	/**The constant property list indicating all properties.*/
+	public final static IDMappedList<URI, WebDAVPropertyName> ALL_PROPERTIES=new IDMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
+
+	/**The constant property list indicating all property names.*/
+	public final static IDMappedList<URI, WebDAVPropertyName> PROPERTY_NAMES=new IDMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
+
 
 		//resource type names
 	public final static String COLLECTION_TYPE_NAME="collection";
 
 		//resource types
-	public final static URI COLLECTION_TYPE=createReferenceURI(WEBDAV_NAMESPACE, COLLECTION_TYPE_NAME);
+	public final static URI COLLECTION_TYPE=createPropertyURI(WEBDAV_NAMESPACE, COLLECTION_TYPE_NAME);
 
 		//XML names
 	/**The all properties element name.*/
