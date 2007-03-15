@@ -86,7 +86,6 @@ public class WebDAVConstants
 	/**The constant property list indicating all property names.*/
 	public final static IDMappedList<URI, WebDAVPropertyName> PROPERTY_NAMES=new IDMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
 
-
 		//resource type names
 	public final static String COLLECTION_TYPE_NAME="collection";
 

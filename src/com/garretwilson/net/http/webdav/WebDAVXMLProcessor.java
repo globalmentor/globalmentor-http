@@ -202,8 +202,24 @@ public class WebDAVXMLProcessor
 	*/
 	public static WebDAVProperty getProperty(final Element element)
 	{
-		final DocumentFragment documentFragment=extractChildren(element);	//extract the children of the element to a document fragment; this is the value of the WebDAV property
-		return new WebDAVProperty(new WebDAVPropertyName(element.getNamespaceURI(), element.getLocalName()), new WebDAVDocumentFragmentPropertyValue(documentFragment));	//create and return a new WebDAV property based upon a document fragment 
+		final WebDAVPropertyValue webdavPropertyValue;	//we'll determine the value of the WebDAV property
+		if(element.getChildNodes().getLength()>0)	//if there are child nodes
+		{
+			if(getChildNodeNot(element, Node.TEXT_NODE)==null)	//if all child nodes are text nodes
+			{
+				webdavPropertyValue=new WebDAVLiteralPropertyValue(getText(element));	//use all the text as a literal WebDAV property value
+			}
+			else	//if there non-text child elements, gather all the child elements as is into a document fragment
+			{
+				final DocumentFragment documentFragment=extractChildren(element);	//extract the children of the element to a document fragment
+				webdavPropertyValue=new WebDAVDocumentFragmentPropertyValue(documentFragment);	//create a WebDAV property value from the document fragment
+			}
+		}
+		else	//if there are no child nodes
+		{
+			webdavPropertyValue=null;	//indicate that the WebDAV property value is null
+		}
+		return new WebDAVProperty(new WebDAVPropertyName(element.getNamespaceURI(), element.getLocalName()), webdavPropertyValue);	//create and return a new WebDAV property 
 	}
 
 }

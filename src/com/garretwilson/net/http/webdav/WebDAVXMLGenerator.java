@@ -147,29 +147,31 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 
 	/**Adds a property and a value to a property element.
 	@param propElement An XML element representing a property element.
-	@param property A property URI and its value, which cannot be <code>null</code>.
-	@exception NullPointerException if the value of the given property is <code>null</code>.
+	@param property A property URI and its value, may be <code>null</code> to indicate that no content should be added.
 	@exception DOMException if there is an error creating the child elements.
 	@return A WebDAV property XML element with its serialized value.
 	*/
 	public Element addProperty(final Element propElement, final WebDAVProperty property) throws DOMException
 	{
-		final WebDAVPropertyValue value=checkInstance(property.getValue(), "WebDAV property value cannot be null.");	//get the value of the property
 		final WebDAVPropertyName propertyName=property.getName();	//get the property name
 		final String propertyNamespace=propertyName.getNamespace();	//get the property namespace
 			//create a property element and append it to the given prop element
 		final Element propertyElement=appendElement(propElement, propertyNamespace, createQualifiedName(getNamespacePrefix(propertyNamespace), propertyName.getLocalName()));
-		if(value instanceof WebDAVDocumentFragmentPropertyValue)	//if this is a document fragment value
+		final WebDAVPropertyValue value=property.getValue();	//get the value of the property
+		if(value!=null)	//if there is a value
 		{
-			appendImportedChildNodes(propertyElement, ((WebDAVDocumentFragmentPropertyValue)value).getDocumentFragment());	//import and append all child nodes of the document fragment
-		}
-		else if(value instanceof WebDAVLiteralPropertyValue)	//if this is a literal value
-		{
-			appendText(propertyElement, ((WebDAVLiteralPropertyValue)value).toString());	//add the literal text to the property element
-		}
-		else	//if we don't recognize the WebDAV property type
-		{
-			throw new AssertionError("Unrecognized WebDAV property value type: "+value);
+			if(value instanceof WebDAVDocumentFragmentPropertyValue)	//if this is a document fragment value
+			{
+				appendImportedChildNodes(propertyElement, ((WebDAVDocumentFragmentPropertyValue)value).getDocumentFragment());	//import and append all child nodes of the document fragment
+			}
+			else if(value instanceof WebDAVLiteralPropertyValue)	//if this is a literal value
+			{
+				appendText(propertyElement, ((WebDAVLiteralPropertyValue)value).toString());	//add the literal text to the property element
+			}
+			else	//if we don't recognize the WebDAV property type
+			{
+				throw new AssertionError("Unrecognized WebDAV property value type: "+value);
+			}
 		}
 		return propertyElement;	//return the property element
 	}

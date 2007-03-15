@@ -346,13 +346,15 @@ public class WebDAVResource extends HTTPResource
 	}
 
 	/**Updates properties using the PROPPATCH method.
-	Patching properties involves setting and removing properties.
+	Rquested properties will first be removed, then requested properties will be set, in that order.
 	The cached property list is cleared.
 	The URI of each resource is canonicized to be an absolute URI.
+	@param removeProperties The list of properties to remove.
+	@param setPropertyNames The list of properties and values to set.
 	@param propertyList The list of properties to set or remove, in order; if the value of a property is <code>null</code>, the property will be removed.
 	@exception IOException if there was an error invoking the method.
 	*/
-	public void propPatch(final List<WebDAVProperty> propertyList) throws IOException
+	public void propPatch(final Collection<WebDAVPropertyName> removePropertyNames, final Collection<WebDAVProperty> setProperties) throws IOException
 	{
 		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
 		emptyCache();	//empty the cache
@@ -360,21 +362,17 @@ public class WebDAVResource extends HTTPResource
 		final WebDAVXMLGenerator webdavXMLGenerator=new WebDAVXMLGenerator();	//create a WebDAV XML generator
 		final Document propertyupdateDocument=webdavXMLGenerator.createPropertyupdateDocument();	//create a propertyupdate document	//TODO check DOM exceptions here
 		final Element propertyupdateElement=propertyupdateDocument.getDocumentElement();	//get the document element
-		for(final WebDAVProperty property:propertyList)	//for each property
+		for(final WebDAVPropertyName removePropertyName:removePropertyNames)	//for each property to remove
 		{
-			final WebDAVPropertyValue value=property.getValue();	//see if a value is given for this property
-			if(value!=null)	//if a value is given
-			{
-				final Element setElement=webdavXMLGenerator.addSet(propertyupdateElement);	//add a set element
-				final Element propElement=webdavXMLGenerator.addProp(setElement);	//add a property element
-				webdavXMLGenerator.addProperty(propElement, property);	//add the property
-			}
-			else	//if a value isn't given
-			{				
-				final Element removeElement=webdavXMLGenerator.addRemove(propertyupdateElement);	//add a remove element
-				final Element propElement=webdavXMLGenerator.addProp(removeElement);	//add a property element
-				webdavXMLGenerator.addPropertyName(propElement, property.getName());	//add just the property name for removal
-			}
+			final Element removeElement=webdavXMLGenerator.addRemove(propertyupdateElement);	//add a remove element
+			final Element propElement=webdavXMLGenerator.addProp(removeElement);	//add a property element
+			webdavXMLGenerator.addPropertyName(propElement, removePropertyName);	//add the property name for removal
+		}
+		for(final WebDAVProperty setProperty:setProperties)	//for each property to set
+		{
+			final Element setElement=webdavXMLGenerator.addSet(propertyupdateElement);	//add a set element
+			final Element propElement=webdavXMLGenerator.addProp(setElement);	//add a property element
+			webdavXMLGenerator.addProperty(propElement, setProperty);	//add the property
 		}
 		request.setXML(propertyupdateDocument);	//set the XML in the body of our request
 		final HTTPResponse response=sendRequest(request);	//get the response
