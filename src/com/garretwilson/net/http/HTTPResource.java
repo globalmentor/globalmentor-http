@@ -16,8 +16,8 @@ import com.garretwilson.model.DefaultResource;
 import com.garretwilson.net.Authenticable;
 
 /**A client's view of an HTTP resource on the server.
-For many error conditions, a subclass of <code>HTTPException</code>
-	will be thrown.
+For many error conditions, a subclass of {@link HTTPException} will be thrown.
+This class is not thread safe.
 @author Garret Wilson
 @see HTTPException
 */
@@ -36,6 +36,12 @@ public class HTTPResource extends DefaultResource	//TODO update class to have a 
 		/**@return The preset password authentication, or <code>null</code> if this connection specifies no preset password authentication.*/
 		protected PasswordAuthentication getPasswordAuthentication() {return passwordAuthentication;}
 
+	/**The length of time, in milliseconds, to keep cached information.*/
+	private final static long CACHE_EXPIRATION_MILLISECONDS=5000;
+		
+	/**The last time the cache was updated, in milliseconds, or -1 if no information has ever been cached.*/
+	protected long lastCachedMilliseconds=-1;
+		
 	/**Whether cached properties are to be returned; the default is <code>true</code>.*/
 	private boolean cached=true;
 
@@ -55,10 +61,19 @@ public class HTTPResource extends DefaultResource	//TODO update class to have a 
 			}
 		}
 
+		/**Determines if the cache is valid.
+		@return <code>true</code> if information is being cached and the cache is not stale.
+		*/
+		protected boolean isCacheValid()
+		{
+			return isCached() && System.currentTimeMillis()-lastCachedMilliseconds<CACHE_EXPIRATION_MILLISECONDS;	//see if information is being cached and the cache isn't yet expired
+		}
+
 	/**Removes all cached values.*/
 	public void emptyCache()
 	{
 		cachedExists=null;	//uncache the existence state
+		lastCachedMilliseconds=-1;	//indicate that the cache has expired
 	}
 
 	/**The cached existence state, or <code>null</code> if existence has not yet been cached.*/
@@ -142,7 +157,7 @@ public class HTTPResource extends DefaultResource	//TODO update class to have a 
 	*/
 	public boolean exists() throws IOException
 	{
-		if(!isCached() || cachedExists==null)	//if we aren't returning cached values, or we don't have a cached existence value
+		if(!isCacheValid() || cachedExists==null)	//if the cache is stale or we don't have a cached existence value
 		{
 			try
 			{
@@ -181,16 +196,19 @@ public class HTTPResource extends DefaultResource	//TODO update class to have a 
 			final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getReferenceURI());	//create a GET request
 			final HTTPResponse response=sendRequest(request);	//get the response
 			cachedExists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists
+			lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
 			return response.getBody();	//return the bytes received from the server
 		}
 		catch(final HTTPNotFoundException notFoundException)	//404 Not Found
 		{
 			cachedExists=Boolean.FALSE;	//show that the resource is not there
+			lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
 			throw notFoundException;	//rethrow the exception
 		}
 		catch(final HTTPGoneException goneException)	//410 Gone
 		{
 			cachedExists=Boolean.FALSE;	//show that the resource is permanently not there
+			lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
 			throw goneException;	//rethrow the exception
 		}
 	}
@@ -207,31 +225,37 @@ public class HTTPResource extends DefaultResource	//TODO update class to have a 
 			final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getReferenceURI());	//create a HEAD request
 			final HTTPResponse response=sendRequest(request);	//get the response
 			cachedExists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists
+			lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
 		}
 		catch(final HTTPNotFoundException notFoundException)	//404 Not Found
 		{
 			cachedExists=Boolean.FALSE;	//show that the resource is not there
+			lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
 			throw notFoundException;	//rethrow the exception
 		}
 		catch(final HTTPGoneException goneException)	//410 Gone
 		{
 			cachedExists=Boolean.FALSE;	//show that the resource is permanently not there
+			lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
 			throw goneException;	//rethrow the exception
 		}
 	}
 
 	/**Stores the contents of a resource using the PUT method.
+	The cache is emptied.
 	@param content The bytes to store at the resource location. 
 	@exception IOException if there was an error invoking the method.
 	*/
 	public void put(final byte[] content) throws IOException
 	{
 //TODO del Debug.trace("ready to put bytes:", content.length);
+		emptyCache();	//empty any cached information about the resource, as we'll be changing the resource
 		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getReferenceURI());	//create a PUT request
 		request.setBody(content);	//set the content of the request 
 		final HTTPResponse response=sendRequest(request);	//get the response
 //TODO del Debug.trace("response:", response.getStatusCode());
 		cachedExists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists because we just created it
+		lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
 	}
 	
 	/**Reads an object from the resource using HTTP GET with the given I/O support.

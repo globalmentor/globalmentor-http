@@ -10,6 +10,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
+
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
 import com.garretwilson.util.NameValuePair;
 
@@ -17,7 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**A client's view of a WebDAV resource on the server.
-For many error conditions, a subclass of <code>HTTPException</code> will be thrown.
+For many error conditions, a subclass of {@link HTTPException} will be thrown.
 @author Garret Wilson
 @see HTTPException
 */
@@ -93,7 +94,7 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public boolean isCollection() throws IOException
 	{
-		if(!isCached() || cachedCollection==null)	//if we aren't returning cached values, or we don't have a cached collection value
+		if(!isCacheValid() || cachedCollection==null)	//if the cache is stale or we don't have a cached collection value
 		{
 			propFind();	//find the properties of this resource, which will update the cached collection state
 		}
@@ -284,7 +285,7 @@ public class WebDAVResource extends HTTPResource
 	public List<NameValuePair<URI, List<WebDAVProperty>>> propFind(final Depth depth) throws IOException
 	{
 		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
-		if(isCached() && depth==Depth.ZERO && cachedPropertyList!=null)	//if we can return cached values, only the properties for this resource are requested, and we have a cached property list
+		if(isCacheValid() && depth==Depth.ZERO && cachedPropertyList!=null)	//if the cache is still valid and only the properties for this resource are requested, and we have a cached property list
 		{
 			final List<NameValuePair<URI, List<WebDAVProperty>>> cachedPropFindList=new ArrayList<NameValuePair<URI, List<WebDAVProperty>>>();
 			cachedPropFindList.add(new NameValuePair<URI, List<WebDAVProperty>>(referenceURI, cachedPropertyList));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
@@ -313,6 +314,7 @@ public class WebDAVResource extends HTTPResource
 				{
 					cachedPropertyList=propertyList.getValue();	//cache the list of properties for this resource
 					cachedCollection=WebDAVUtilities.isCollection(cachedPropertyList);	//update the cached collection state
+					lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
 					break;	//stop looking for properties to cache
 				}
 			}
