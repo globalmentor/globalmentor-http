@@ -3,7 +3,8 @@ package com.garretwilson.net.http.webdav;
 import java.net.URI;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import com.garretwilson.model.DefaultResource;
+
+import com.garretwilson.net.DefaultResource;
 import com.garretwilson.util.IDable;
 
 /**The name of a WebDAV property, consisting of a property namespace and a property local name.

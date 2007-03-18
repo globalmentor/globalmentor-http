@@ -11,6 +11,7 @@ import static com.garretwilson.net.http.HTTPParser.*;
 import static com.garretwilson.net.URIUtilities.*;
 
 import com.garretwilson.text.SyntaxException;
+import com.garretwilson.util.Debug;
 
 /**The default implementation of an HTTP response as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
@@ -68,6 +69,8 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 		should override that method instead of this one.</p>
 	<p>This version provides specialized exceptions for the following status codes:</p>
 	<dl>
+		<dt>301</dt> <dd>{@link HTTPMovedPermanentlyException}</dd>
+		<dt>302</dt> <dd>{@link HTTPMovedTemporarilyException}</dd>
 		<dt>401</dt> <dd>{@link HTTPUnauthorizedException}</dd>
 		<dt>403</dt> <dd>{@link HTTPForbiddenException}</dd>
 		<dt>404</dt> <dd>{@link HTTPNotFoundException}</dd>
@@ -88,7 +91,41 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 			final int statusCode=getStatusCode();	//get the status code
 			switch(statusCode)	//see which response code this is
 			{
-				case SC_UNAUTHORIZED:	//401 Forbidden
+				case SC_MOVED_PERMANENTLY:	//301 Moved Permanently
+					{
+						final String location=getHeader(LOCATION_HEADER);	//get the location header, if any
+						URI locationURI=null;	//we'll determine the location URI
+						if(location!=null)	//if a location was given
+						{
+							try
+							{
+								locationURI=new URI(location);	//parse the location
+							}
+							catch(final URISyntaxException uriSyntaxException)	//if the location wasn't in the correct format
+							{
+								Debug.warn(uriSyntaxException);
+							}
+						}
+						throw new HTTPMovedPermanentlyException(locationURI);	//throw a new permanent redirection exception
+					}
+				case SC_MOVED_TEMPORARILY:	//302 Found
+				{
+					final String location=getHeader(LOCATION_HEADER);	//get the location header, if any
+					URI locationURI=null;	//we'll determine the location URI
+					if(location!=null)	//if a location was given
+					{
+						try
+						{
+							locationURI=new URI(location);	//parse the location
+						}
+						catch(final URISyntaxException uriSyntaxException)	//if the location wasn't in the correct format
+						{
+							Debug.warn(uriSyntaxException);
+						}
+					}
+					throw new HTTPMovedTemporarilyException(locationURI);	//throw a new temporary redirection exception
+				}
+				case SC_UNAUTHORIZED:	//401 Unauthorized
 					throw new HTTPUnauthorizedException(getWWWAuthenticate());
 				case SC_FORBIDDEN:	//403 Forbidden
 					throw new HTTPForbiddenException(reasonPhrase);

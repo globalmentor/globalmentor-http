@@ -12,8 +12,8 @@ import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 
 import com.garretwilson.util.Debug;
-import com.garretwilson.model.DefaultResource;
 import com.garretwilson.net.Authenticable;
+import com.garretwilson.net.DefaultResource;
 
 /**A client's view of an HTTP resource on the server.
 For many error conditions, a subclass of {@link HTTPException} will be thrown.
