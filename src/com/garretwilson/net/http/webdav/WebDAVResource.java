@@ -96,9 +96,25 @@ public class WebDAVResource extends HTTPResource
 	{
 		if(!isCacheValid() || cachedCollection==null)	//if the cache is stale or we don't have a cached collection value
 		{
-			propFind();	//find the properties of this resource, which will update the cached collection state
+			if(isCacheValid() && Boolean.FALSE.equals(cachedExists))	//if the cache is valid and we already know the resource doesn't exist
+			{
+				cachedCollection=Boolean.FALSE;	//if the resource doesn't exist, it isn't a collection
+			}
+			else	//if the cache is invalid or we don't have a cached existence state
+			{
+				try
+				{
+					propFind();	//find the properties of this resource, which will update the cached collection state
+				}
+				catch(final HTTPNotFoundException notFoundException)	//ignore 404 Not Found
+				{
+				}
+				catch(final HTTPGoneException goneException)	//ignore 410 Gone
+				{
+				}
+				assert cachedCollection!=null : "Expected propFind() to cache existence value.";
+			}
 		}
-		assert cachedCollection!=null : "Expected propFind() to cache existence value.";
 		return cachedCollection.booleanValue();	//return the cached collection state TODO fix the race condition here
 	}
 
@@ -291,36 +307,53 @@ public class WebDAVResource extends HTTPResource
 			cachedPropFindList.add(new NameValuePair<URI, List<WebDAVProperty>>(referenceURI, cachedPropertyList));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
 			return cachedPropFindList;	//return the manufactured property list from our cached properyy list
 		}
-		final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, referenceURI);	//create a PROPFIND request
-		request.setDepth(depth);	//set the requested depth
-		final WebDAVXMLGenerator webdavXMLGenerator=new WebDAVXMLGenerator();	//create a WebDAV XML generator
-		final Document propfindDocument=webdavXMLGenerator.createPropfindDocument();	//create a propfind document	//TODO check DOM exceptions here
-		webdavXMLGenerator.addPropertyNames(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
-		request.setXML(propfindDocument);	//set the XML in the body of our request
-		final HTTPResponse response=sendRequest(request);	//get the response
-		//TODO check response; expect 207 Multi-Status
-		final Document document=response.getXML();	//get the XML from the response body
-		if(document!=null)	//if there was an XML document in the request
+		try
 		{
-			
-//		TODO del Debug.trace(XMLUtilities.toString(document));
-			
-			final Element documentElement=document.getDocumentElement();	//get the document element
-				//TODO check to make sure the document element is correct
-			final List<NameValuePair<URI, List<WebDAVProperty>>> propertyLists=WebDAVXMLProcessor.getMultistatusProperties(documentElement, referenceURI);	//get the properties from the multistatus document, relative to this resource URI			
-			for(final NameValuePair<URI, List<WebDAVProperty>> propertyList:propertyLists)	//look at each property list
+			final WebDAVRequest request=new DefaultWebDAVRequest(PROPFIND_METHOD, referenceURI);	//create a PROPFIND request
+			request.setDepth(depth);	//set the requested depth
+			final WebDAVXMLGenerator webdavXMLGenerator=new WebDAVXMLGenerator();	//create a WebDAV XML generator
+			final Document propfindDocument=webdavXMLGenerator.createPropfindDocument();	//create a propfind document	//TODO check DOM exceptions here
+			webdavXMLGenerator.addPropertyNames(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
+			request.setXML(propfindDocument);	//set the XML in the body of our request
+			final HTTPResponse response=sendRequest(request);	//get the response
+			//TODO check response; expect 207 Multi-Status
+			final Document document=response.getXML();	//get the XML from the response body
+			if(document!=null)	//if there was an XML document in the request
 			{
-				if(propertyList.getName().equals(referenceURI))	//if this property list is for this resource
+				
+	//		TODO del Debug.trace(XMLUtilities.toString(document));
+				
+				final Element documentElement=document.getDocumentElement();	//get the document element
+					//TODO check to make sure the document element is correct
+				final List<NameValuePair<URI, List<WebDAVProperty>>> propertyLists=WebDAVXMLProcessor.getMultistatusProperties(documentElement, referenceURI);	//get the properties from the multistatus document, relative to this resource URI			
+				for(final NameValuePair<URI, List<WebDAVProperty>> propertyList:propertyLists)	//look at each property list
 				{
-					cachedPropertyList=propertyList.getValue();	//cache the list of properties for this resource
-					cachedCollection=WebDAVUtilities.isCollection(cachedPropertyList);	//update the cached collection state
-					lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
-					break;	//stop looking for properties to cache
+					if(propertyList.getName().equals(referenceURI))	//if this property list is for this resource
+					{
+						cachedPropertyList=propertyList.getValue();	//cache the list of properties for this resource
+						cachedCollection=WebDAVUtilities.isCollection(cachedPropertyList);	//update the cached collection state
+						lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
+						break;	//stop looking for properties to cache
+					}
 				}
+				return propertyLists;	//return all the properties requested
 			}
-			return propertyLists;	//return all the properties requested
+			return emptyList();	//return an empty list, because there was no XML returned
 		}
-		return emptyList();	//return an empty list, because there was no XML returned
+		catch(final HTTPNotFoundException notFoundException)	//404 Not Found
+		{
+			cachedExists=Boolean.FALSE;	//show that the resource is not there
+			cachedCollection=Boolean.FALSE;	//update the cached collection state
+			lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
+			throw notFoundException;	//rethrow the exception
+		}
+		catch(final HTTPGoneException goneException)	//410 Gone
+		{
+			cachedExists=Boolean.FALSE;	//show that the resource is permanently not there
+			cachedCollection=Boolean.FALSE;	//update the cached collection state
+			lastCachedMilliseconds=System.currentTimeMillis();	//update the cache clock
+			throw goneException;	//rethrow the exception
+		}
 	}
 
 	/**Retrieves properties of this resource using the PROPFIND method.
