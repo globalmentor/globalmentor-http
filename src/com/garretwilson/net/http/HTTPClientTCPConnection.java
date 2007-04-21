@@ -5,6 +5,8 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import static java.nio.channels.Channels.*;
+
+import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.*;
@@ -154,14 +156,21 @@ public class HTTPClientTCPConnection
 		    // Install the all-trusting trust manager
 			  
 			  //TODO see http://www.javaalmanac.com/egs/javax.net.ssl/TrustAll.html
-		    try {
-		        SSLContext sc = SSLContext.getInstance("SSL");
-		        sc.init(null, trustAllCerts, new java.security.SecureRandom());
-						final SSLSocketFactory sslSocketFactory=sc.getSocketFactory();
-						socket=sslSocketFactory.createSocket(host.getName(), port>=0 ? port : DEFAULT_SECURE_PORT);	//open a secure socket to the host
-		    } catch (Exception e) {
-Debug.error(e);
+			  try
+			  {
+	        SSLContext sc = SSLContext.getInstance("SSL");
+	        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+					final SSLSocketFactory sslSocketFactory=sc.getSocketFactory();
+					socket=sslSocketFactory.createSocket(host.getName(), port>=0 ? port : DEFAULT_SECURE_PORT);	//open a secure socket to the host
 		    }
+			  catch(final NoSuchAlgorithmException noSuchAlgorithmException)	//we should always recognize SSL
+			  {
+			  	throw new AssertionError(noSuchAlgorithmException);
+		    }
+			  catch(final KeyManagementException keyManagementException)
+			  {
+			  	throw new AssertionError(keyManagementException);
+			  }
 /*TODO fix when certificate is renewed
 				final SSLSocketFactory sslSocketFactory=(SSLSocketFactory)SSLSocketFactory.getDefault();	//get the default SSL Socket factory TODO maybe keep one of these around for multiple use
 				socket=sslSocketFactory.createSocket(host.getName(), port>=0 ? port : DEFAULT_SECURE_PORT);	//open a secure socket to the host
