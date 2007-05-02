@@ -2,6 +2,8 @@ package com.garretwilson.net.http;
 
 import java.io.IOException;
 
+import com.garretwilson.net.*;
+
 /**A base class for HTTP-related errors.
 @author Garret Wilson
 */
@@ -48,6 +50,42 @@ public class HTTPException extends IOException
 		super(message);	//construct the parent class
 		initCause(cause);	//indicate the source of this exception
 		this.statusCode=statusCode;	//save the status code
+	}
+
+	/**Translates the given resource I/O exception to an HTTP-specific exception.
+	The following special translations are performed:
+	<dl>
+		<dt>{@link ResourceForbiddenException}</dt> <dd>{@link HTTPForbiddenException}</dd>
+		<dt>{@link ResourceNotFoundException}</dt> <dd>{@link HTTPNotFoundException}</dd>
+		<dt>{@link ResourceMovedTemporarilyException}</dt> <dd>{@link HTTPMovedTemporarilyException}</dd>
+		<dt>{@link ResourceMovedPermanentlyException}</dt> <dd>{@link HTTPMovedPermanentlyException}</dd>
+	</dl>
+	All other exceptions are sent back as {@link HTTPInternalServerErrorException}s.
+	@param resourceIOException The I/O exception related to a particular resource.
+	@return An HTTP exception analagous to the given resource I/O exception.
+	*/
+	public static HTTPException createHTTPException(final ResourceIOException resourceIOException)
+	{
+		if(resourceIOException instanceof ResourceForbiddenException)
+		{
+			return new HTTPForbiddenException(resourceIOException);
+		}
+		else if(resourceIOException instanceof ResourceNotFoundException)
+		{
+			return new HTTPNotFoundException(resourceIOException);
+		}
+		else if(resourceIOException instanceof ResourceMovedTemporarilyException)
+		{
+			return new HTTPMovedTemporarilyException(((ResourceMovedTemporarilyException)resourceIOException).getNewResourceURI());
+		}
+		else if(resourceIOException instanceof ResourceMovedPermanentlyException)
+		{
+			return new HTTPMovedPermanentlyException(((ResourceMovedPermanentlyException)resourceIOException).getNewResourceURI());
+		}
+		else	//if this is not one of our specially-handled exceptions
+		{
+			return new HTTPInternalServerErrorException(resourceIOException);	//return an internal server error
+		}
 	}
 
 }
