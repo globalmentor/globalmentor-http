@@ -156,7 +156,7 @@ public class WebDAVResource extends HTTPResource
 			{
 				final CacheKey cacheKey=new CacheKey(getClient(), getReferenceURI());	//create a new cache key
 				final CachedProperties cachedProperties=cachedPropertiesMap.get(cacheKey);	//get cached properties from the map
-				if(cachedProperties!=null || !cachedProperties.isStale())	//if information is cached that isn't stale
+				if(cachedProperties!=null && !cachedProperties.isStale())	//if information is cached that isn't stale
 				{
 					return cachedProperties.isCollection();	//return whether the resource is a collection
 				}
