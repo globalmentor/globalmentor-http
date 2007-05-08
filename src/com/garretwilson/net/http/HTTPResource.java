@@ -178,7 +178,7 @@ public class HTTPResource extends DefaultResource
 			{
 				final CacheKey cacheKey=new CacheKey(getClient(), getReferenceURI());	//create a new cache key
 				CachedExists cachedExists=cachedExistsMap.get(cacheKey);	//get cached exists state from the map
-				if(cachedExists!=null || !cachedExists.isStale())	//there is cached exists information that isn't stale
+				if(cachedExists!=null && !cachedExists.isStale())	//there is cached exists information that isn't stale
 				{
 					return cachedExists.exists();	//return the new exists information
 				}
