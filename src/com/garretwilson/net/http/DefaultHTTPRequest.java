@@ -76,7 +76,7 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 		super(version);	//construct the parent class
 		if(!uri.isAbsolute())	//if the URI is not absolute
 		{
-			throw new IllegalArgumentException("Request URI "+uri+" does represent neither an absolute URI.");
+			throw new IllegalArgumentException("Request URI "+uri+" does not represent an absolute URI.");
 		}
 		this.method=method;
 		this.uri=uri;
