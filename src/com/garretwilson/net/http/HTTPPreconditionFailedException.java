@@ -2,8 +2,7 @@ package com.garretwilson.net.http;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
 
-/**Indicates that precondition given in one or more of the request-header fields
- 	evaluated to false when it was tested on the server. 
+/**Indicates that precondition given in one or more of the request-header fields evaluated to false when it was tested on the server. 
 Corresponds to HTTP status code 412.
 @author Garret Wilson
 */

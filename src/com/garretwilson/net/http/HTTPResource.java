@@ -76,20 +76,29 @@ public class HTTPResource extends DefaultResource
 		}
 	}
 
-	/**Removes all cached information.
+	/**Removes all cached information for a given resource.
 	This version calls uncaches exists information.
+	@param resourceURI The URI of the resource for which cached information should be removed.
 	*/
-	protected void uncacheInfo()
+	protected void uncacheInfo(final URI resourceURI)
 	{
 		cacheLock.writeLock().lock();	//lock the cache for writing
 		try
 		{
-			cachedExistsMap.remove(new CacheKey(getClient(), getReferenceURI()));	//uncache the exists status
+			cachedExistsMap.remove(new CacheKey(getClient(), resourceURI));	//uncache the exists status for the given resource
 		}
 		finally
 		{
 			cacheLock.writeLock().unlock();	//always release the write lock
 		}		
+	}
+
+	/**Removes all cached information for this resource.
+	This is a convenience method that delegates to {@link #uncacheInfo(URI)}.
+	*/
+	protected void uncacheInfo()
+	{
+		uncacheInfo(getReferenceURI());	//uncache the information for this resource
 	}
 		
 	/**Constructs an HTTP resource at a particular URI using the default client.

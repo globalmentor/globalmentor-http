@@ -49,16 +49,17 @@ public class WebDAVResource extends HTTPResource
 		}
 	}
 
-	/**Removes all cached information.
+	/**Removes all cached information for a given resource.
 	This version, in addition to the default functionality, uncaches properties.
+	@param resourceURI The URI of the resource for which cached information should be removed.
 	*/
-	protected void uncacheInfo()
+	protected void uncacheInfo(final URI resourceURI)
 	{
 		cacheLock.writeLock().lock();	//lock the cache for writing
 		try
 		{
-			super.uncacheInfo();	//remove the default cached info
-			cachedPropertiesMap.remove(new CacheKey(getClient(), getReferenceURI()));	//uncache the properties
+			super.uncacheInfo(resourceURI);	//remove the default cached info
+			cachedPropertiesMap.remove(new CacheKey(getClient(), resourceURI));	//uncache the properties for the given resource
 		}
 		finally
 		{
@@ -247,6 +248,7 @@ public class WebDAVResource extends HTTPResource
 		request.setDepth(depth);	//set the depth
 		request.setOverwrite(overwrite);	//set the overwrite option
 		final HTTPResponse response=sendRequest(request);	//get the response
+		uncacheInfo(destinationURI);	//remove the cache information of the destination, because a copy of this resource replaced it
 	}
 
 	/**Creates a collection using the MKCOL method.
@@ -267,7 +269,7 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public void mkCols() throws IOException
 	{
-		mkCols(changePath(getReferenceURI(), ROOT_PATH));	//make the collections starting from the root
+		mkCols(changeRawPath(getReferenceURI(), ROOT_PATH));	//make the collections starting from the root
 	}
 
 	/**Creates the collection path of the URI as needed.
@@ -320,6 +322,7 @@ public class WebDAVResource extends HTTPResource
 	}
 
 	/**Moves the resource using the MOVE method with an infinite depth, overwriting any resource at the given destination URI.
+	The cached information is cleared.
 	This implementation delegates to {@link #move(URI, boolean)}.
 	@param destinationURI The destination to which the resource will be moved.
 	@exception NullPointerException if the given destination is <code>null</code>.
@@ -334,6 +337,7 @@ public class WebDAVResource extends HTTPResource
 	}
 
 	/**Moves the resource using the MOVE method with an infinite depth, specifying whether overwrite should occur.
+	The cached information is cleared.
 	@param destinationURI The destination to which the resource will be moved.
 	@param overwrite Whether overwrite should occur if a resource already exists at the given destination URI.
 	@exception NullPointerException if the given destination is <code>null</code>.
@@ -349,6 +353,8 @@ public class WebDAVResource extends HTTPResource
 		request.setDepth(Depth.INFINITY);	//set the depth to infinity
 		request.setOverwrite(overwrite);	//set the overwrite option
 		final HTTPResponse response=sendRequest(request);	//get the response
+		uncacheInfo();	//remove the cache information, because this resource is moving
+		uncacheInfo(destinationURI);	//remove the cache information of the destination, because this resource replaced it
 	}
 		
 	/**Retrieves properties using the {@value WebDAVConstants#PROPFIND_METHOD} method.
