@@ -26,7 +26,8 @@ public class WebDAVResource extends HTTPResource
 {
 
 	/**The soft value map containing cached properties. This map is made thread-safe through the use of {@link #cacheLock}.*/
-	protected final static Map<CacheKey, CachedProperties> cachedPropertiesMap=new SoftValueHashMap<CacheKey, CachedProperties>();
+//TODO important: replace with a workable soft value hash map	protected final static Map<CacheKey, CachedProperties> cachedPropertiesMap=new SoftValueHashMap<CacheKey, CachedProperties>();
+	protected final static Map<CacheKey, CachedProperties> cachedPropertiesMap=new HashMap<CacheKey, CachedProperties>();
 
 	/**Caches the given exists status for this resource.
 	This version removes cached properties if the new exists status is <code>false</code>.
@@ -422,6 +423,7 @@ public class WebDAVResource extends HTTPResource
 					finally
 					{
 						cacheLock.writeLock().unlock();	//always release the write lock
+
 					}					
 				}
 				return propertyLists;	//return all the properties requested

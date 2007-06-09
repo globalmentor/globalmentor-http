@@ -58,7 +58,8 @@ public class HTTPResource extends DefaultResource
 	protected final static ReadWriteLock cacheLock=new ReentrantReadWriteLock();
 
 	/**The soft value map containing cached exists information. This map is made thread-safe through the use of {@link #cacheLock}.*/
-	protected final static Map<CacheKey, CachedExists> cachedExistsMap=new SoftValueHashMap<CacheKey, CachedExists>();
+//TODO important: replace with a workable soft value hash map	protected final static Map<CacheKey, CachedExists> cachedExistsMap=new SoftValueHashMap<CacheKey, CachedExists>();
+	protected final static Map<CacheKey, CachedExists> cachedExistsMap=new HashMap<CacheKey, CachedExists>();
 
 	/**Caches the given exists status for this resource.
 	@param exists The existence status.
