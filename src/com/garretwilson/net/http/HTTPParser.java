@@ -402,7 +402,8 @@ public class HTTPParser
 	{
 		final List<NameValuePair<String, String>> parameterList=parseParameters(reader);	//parse the parameters
 		final Map<String, String> parameterMap=new HashMap<String, String>();	//create a map for the parameters
-		if(addAllValues(parameterMap, parameterList))	//add the values to the map; if we have duplicate values
+		addAll(parameterMap, parameterList);	//add the values to the map
+		if(parameterMap.size()<parameterList.size())	//if we had duplicate values
 		{
 			throw new IllegalArgumentException("Encountered duplicate parameter names.");
 		}
