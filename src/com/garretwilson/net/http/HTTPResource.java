@@ -58,23 +58,14 @@ public class HTTPResource extends DefaultResource
 	protected final static ReadWriteLock cacheLock=new ReentrantReadWriteLock();
 
 	/**The soft value map containing cached exists information. This map is made thread-safe through the use of {@link #cacheLock}.*/
-//TODO important: replace with a workable soft value hash map	protected final static Map<CacheKey, CachedExists> cachedExistsMap=new SoftValueHashMap<CacheKey, CachedExists>();
-	protected final static Map<CacheKey, CachedExists> cachedExistsMap=new HashMap<CacheKey, CachedExists>();
+	protected final static Map<CacheKey, CachedExists> cachedExistsMap=new DecoratorReadWriteLockMap<CacheKey, CachedExists>(new PurgeOnWriteSoftValueHashMap<CacheKey, CachedExists>(), cacheLock);
 
 	/**Caches the given exists status for this resource.
 	@param exists The existence status.
 	*/
 	protected void cacheExists(final boolean exists)
 	{
-		cacheLock.writeLock().lock();	//lock the cache for writing
-		try
-		{
-			cachedExistsMap.put(new CacheKey(getClient(), getReferenceURI()), new CachedExists(exists));	//cache the information
-		}
-		finally
-		{
-			cacheLock.writeLock().unlock();	//always release the write lock
-		}
+		cachedExistsMap.put(new CacheKey(getClient(), getReferenceURI()), new CachedExists(exists));	//cache the information
 	}
 
 	/**Removes all cached information for a given resource.
@@ -83,15 +74,7 @@ public class HTTPResource extends DefaultResource
 	*/
 	protected void uncacheInfo(final URI resourceURI)
 	{
-		cacheLock.writeLock().lock();	//lock the cache for writing
-		try
-		{
-			cachedExistsMap.remove(new CacheKey(getClient(), resourceURI));	//uncache the exists status for the given resource
-		}
-		finally
-		{
-			cacheLock.writeLock().unlock();	//always release the write lock
-		}		
+		cachedExistsMap.remove(new CacheKey(getClient(), resourceURI));	//uncache the exists status for the given resource
 	}
 
 	/**Removes all cached information for this resource.
@@ -183,33 +166,17 @@ public class HTTPResource extends DefaultResource
 	{
 		if(isCached())	//if we're caching values
 		{
-			cacheLock.readLock().lock();	//lock the cache for reading
-			try
+			final CacheKey cacheKey=new CacheKey(getClient(), getReferenceURI());	//create a new cache key
+			CachedExists cachedExists=cachedExistsMap.get(cacheKey);	//get cached exists state from the map
+			if(cachedExists!=null && !cachedExists.isStale())	//there is cached exists information that isn't stale
 			{
-				final CacheKey cacheKey=new CacheKey(getClient(), getReferenceURI());	//create a new cache key
-				CachedExists cachedExists=cachedExistsMap.get(cacheKey);	//get cached exists state from the map
-				if(cachedExists!=null && !cachedExists.isStale())	//there is cached exists information that isn't stale
-				{
-					return cachedExists.exists();	//return the new exists information
-				}
-			}
-			finally
-			{
-				cacheLock.readLock().unlock();	//always release the read lock
+				return cachedExists.exists();	//return the new exists information
 			}
 		}
 		final boolean exists=getExists();	//determine if the resource exists
 		if(isCached())	//if we are caching information
 		{
-			cacheLock.writeLock().lock();	//lock the cache for writing
-			try
-			{
-				cachedExistsMap.put(new CacheKey(getClient(), getReferenceURI()), new CachedExists(exists));	//cache the exists status
-			}
-			finally
-			{
-				cacheLock.writeLock().unlock();	//always release the write lock
-			}		
+			cachedExistsMap.put(new CacheKey(getClient(), getReferenceURI()), new CachedExists(exists));	//cache the exists status
 		}
 		return exists;	//return the exists status
 	}

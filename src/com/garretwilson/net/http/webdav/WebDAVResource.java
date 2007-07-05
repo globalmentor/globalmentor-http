@@ -26,8 +26,7 @@ public class WebDAVResource extends HTTPResource
 {
 
 	/**The soft value map containing cached properties. This map is made thread-safe through the use of {@link #cacheLock}.*/
-//TODO important: replace with a workable soft value hash map	protected final static Map<CacheKey, CachedProperties> cachedPropertiesMap=new SoftValueHashMap<CacheKey, CachedProperties>();
-	protected final static Map<CacheKey, CachedProperties> cachedPropertiesMap=new HashMap<CacheKey, CachedProperties>();
+	protected final static Map<CacheKey, CachedProperties> cachedPropertiesMap=new DecoratorReadWriteLockMap<CacheKey, CachedProperties>(new PurgeOnWriteSoftValueHashMap<CacheKey, CachedProperties>(), cacheLock);
 
 	/**Caches the given exists status for this resource.
 	This version removes cached properties if the new exists status is <code>false</code>.
@@ -153,20 +152,12 @@ public class WebDAVResource extends HTTPResource
 	{
 		if(isCached())	//if we are using cached info
 		{
-			cacheLock.readLock().lock();	//lock the cache for reading
-			try
+			final CacheKey cacheKey=new CacheKey(getClient(), getReferenceURI());	//create a new cache key
+			final CachedProperties cachedProperties=cachedPropertiesMap.get(cacheKey);	//get cached properties from the map
+			if(cachedProperties!=null && !cachedProperties.isStale())	//if information is cached that isn't stale
 			{
-				final CacheKey cacheKey=new CacheKey(getClient(), getReferenceURI());	//create a new cache key
-				final CachedProperties cachedProperties=cachedPropertiesMap.get(cacheKey);	//get cached properties from the map
-				if(cachedProperties!=null && !cachedProperties.isStale())	//if information is cached that isn't stale
-				{
-					return cachedProperties.isCollection();	//return whether the resource is a collection
-				}
+				return cachedProperties.isCollection();	//return whether the resource is a collection
 			}
-			finally
-			{
-				cacheLock.readLock().unlock();	//always release the read lock
-			}			
 		}
 		try
 		{
@@ -373,21 +364,13 @@ public class WebDAVResource extends HTTPResource
 			//return cached values if we can
 		if(depth==Depth.ZERO && isCached())	//if we're caching values and a depth of zero is requested
 		{
-			cacheLock.readLock().lock();	//lock the cache for reading
-			try
+			final CacheKey cacheKey=new CacheKey(httpClient, referenceURI);	//create a new cache key
+			final CachedProperties cachedProperties=cachedPropertiesMap.get(cacheKey);	//get cached properties from the map
+			if(cachedProperties!=null && !cachedProperties.isStale())	//if we have cached properties that is not stale
 			{
-				final CacheKey cacheKey=new CacheKey(httpClient, referenceURI);	//create a new cache key
-				final CachedProperties cachedProperties=cachedPropertiesMap.get(cacheKey);	//get cached properties from the map
-				if(cachedProperties!=null && !cachedProperties.isStale())	//if we have cached properties that is not stale
-				{
-					final List<NameValuePair<URI, List<WebDAVProperty>>> cachedPropFindList=new ArrayList<NameValuePair<URI, List<WebDAVProperty>>>();
-					cachedPropFindList.add(new NameValuePair<URI, List<WebDAVProperty>>(referenceURI, cachedProperties.getProperties()));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
-					return cachedPropFindList;	//return the manufactured property list from our cached properyy list
-				}
-			}
-			finally
-			{
-				cacheLock.readLock().unlock();	//always release the read lock
+				final List<NameValuePair<URI, List<WebDAVProperty>>> cachedPropFindList=new ArrayList<NameValuePair<URI, List<WebDAVProperty>>>();
+				cachedPropFindList.add(new NameValuePair<URI, List<WebDAVProperty>>(referenceURI, cachedProperties.getProperties()));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
+				return cachedPropFindList;	//return the manufactured property list from our cached properyy list
 			}
 		}
 		try
@@ -423,7 +406,6 @@ public class WebDAVResource extends HTTPResource
 					finally
 					{
 						cacheLock.writeLock().unlock();	//always release the write lock
-
 					}					
 				}
 				return propertyLists;	//return all the properties requested
