@@ -2,10 +2,13 @@ package com.garretwilson.net.http;
 
 import java.io.IOException;
 
-import org.w3c.dom.Document;
+import javax.xml.parsers.ParserConfigurationException;
 
 import com.garretwilson.text.SyntaxException;
 import com.garretwilson.util.NameValuePair;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**An HTTP request or response as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
@@ -121,10 +124,14 @@ public interface HTTPMessage
 		//content
 	
 	/**Retrieves an XML document from the body of the HTTP message.
+	@param namespaceAware <code>true</code> if the document should support for XML namespaces, else <code>false</code>.
+	@param validated <code>true</code> if the document should be validated as it is parsed, else <code>false</code>.
 	@return A document representing the XML information, or <code>null</code> if there is no content.
 	@exception IOException if there is an error reading the XML.
+	@exception ParserConfigurationException if an appropriate parser could not be found for parsing the XML.
+	@exception SAXException if there was an error parsing the XML.
 	*/
-	public Document getXML() throws IOException;
+	public Document getXML(final boolean namespaceAware, final boolean validating) throws IOException, ParserConfigurationException, SAXException;
 
 	/**Places an XML document into the body of the HTTP message.
 	@param document The XML document to place into the message.

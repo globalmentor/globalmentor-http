@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
@@ -16,6 +18,7 @@ import static java.util.Collections.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**A client's view of a WebDAV resource on the server.
 For many error conditions, a subclass of {@link HTTPException} will be thrown.
@@ -383,7 +386,7 @@ public class WebDAVResource extends HTTPResource
 			request.setXML(propfindDocument);	//set the XML in the body of our request
 			final HTTPResponse response=sendRequest(request);	//get the response
 			//TODO check response; expect 207 Multi-Status
-			final Document document=response.getXML();	//get the XML from the response body
+			final Document document=response.getXML(true, false);	//get the XML from the response body, aware of namespaces but not validating
 			if(document!=null)	//if there was an XML document in the request
 			{
 				final Element documentElement=document.getDocumentElement();	//get the document element
@@ -427,6 +430,14 @@ public class WebDAVResource extends HTTPResource
 				cacheExists(false);	//indicate that the resource is permanently missing
 			}
 			throw goneException;	//rethrow the exception
+		}
+		catch(final ParserConfigurationException parserConfigurationException)
+		{
+			throw (IOException)new IOException(parserConfigurationException.getMessage()).initCause(parserConfigurationException);
+		}
+		catch(final SAXException saxException)
+		{
+			throw (IOException)new IOException(saxException.getMessage()).initCause(saxException);			
 		}
 	}
 
