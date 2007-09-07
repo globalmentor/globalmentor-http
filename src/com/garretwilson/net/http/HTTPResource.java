@@ -65,7 +65,7 @@ public class HTTPResource extends DefaultResource
 	*/
 	protected void cacheExists(final boolean exists)
 	{
-		cachedExistsMap.put(new CacheKey(getClient(), getReferenceURI()), new CachedExists(exists));	//cache the information
+		cachedExistsMap.put(new CacheKey(getClient(), getURI()), new CachedExists(exists));	//cache the information
 	}
 
 	/**Removes all cached information for a given resource.
@@ -82,7 +82,7 @@ public class HTTPResource extends DefaultResource
 	*/
 	protected void uncacheInfo()
 	{
-		uncacheInfo(getReferenceURI());	//uncache the information for this resource
+		uncacheInfo(getURI());	//uncache the information for this resource
 	}
 		
 	/**Constructs an HTTP resource at a particular URI using the default client.
@@ -149,7 +149,7 @@ public class HTTPResource extends DefaultResource
 	*/
 	public void delete() throws IOException
 	{
-		final HTTPRequest request=new DefaultHTTPRequest(DELETE_METHOD, getReferenceURI());	//create a DELETE request
+		final HTTPRequest request=new DefaultHTTPRequest(DELETE_METHOD, getURI());	//create a DELETE request
 		final HTTPResponse response=sendRequest(request);	//get the response
 		if(isCached())	//if we're caching this resource
 		{
@@ -166,7 +166,7 @@ public class HTTPResource extends DefaultResource
 	{
 		if(isCached())	//if we're caching values
 		{
-			final CacheKey cacheKey=new CacheKey(getClient(), getReferenceURI());	//create a new cache key
+			final CacheKey cacheKey=new CacheKey(getClient(), getURI());	//create a new cache key
 			CachedExists cachedExists=cachedExistsMap.get(cacheKey);	//get cached exists state from the map
 			if(cachedExists!=null && !cachedExists.isStale())	//there is cached exists information that isn't stale
 			{
@@ -176,7 +176,7 @@ public class HTTPResource extends DefaultResource
 		final boolean exists=getExists();	//determine if the resource exists
 		if(isCached())	//if we are caching information
 		{
-			cachedExistsMap.put(new CacheKey(getClient(), getReferenceURI()), new CachedExists(exists));	//cache the exists status
+			cachedExistsMap.put(new CacheKey(getClient(), getURI()), new CachedExists(exists));	//cache the exists status
 		}
 		return exists;	//return the exists status
 	}
@@ -191,7 +191,7 @@ public class HTTPResource extends DefaultResource
 	{
 		try
 		{
-			final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getReferenceURI());	//create a HEAD request
+			final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getURI());	//create a HEAD request
 			final HTTPResponse response=sendRequest(request);	//get the response
 			return true;	//if no exceptions were thrown, assume the resource exists
 		}
@@ -227,7 +227,7 @@ public class HTTPResource extends DefaultResource
 		{
 			try
 			{
-				final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getReferenceURI());	//create a GET request
+				final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getURI());	//create a GET request
 				final HTTPResponse response=sendRequest(request);	//get the response
 				exists=Boolean.TRUE;	//if GET succeeds, the resource exists
 				return response.getBody();	//return the bytes received from the server
@@ -267,7 +267,7 @@ public class HTTPResource extends DefaultResource
 		{
 			try
 			{
-				final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getReferenceURI());	//create a HEAD request
+				final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getURI());	//create a HEAD request
 				final HTTPResponse response=sendRequest(request);	//get the response
 				exists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists
 			}
@@ -298,7 +298,7 @@ public class HTTPResource extends DefaultResource
 	public void put(final byte[] content) throws IOException
 	{
 //TODO del Debug.trace("ready to put bytes:", content.length);
-		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getReferenceURI());	//create a PUT request
+		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getURI());	//create a PUT request
 		request.setBody(content);	//set the content of the request 
 		final HTTPResponse response=sendRequest(request);	//get the response
 	}
@@ -313,7 +313,7 @@ public class HTTPResource extends DefaultResource
 		final InputStream inputStream=getInputStream();	//get an input stream to the resource
 		try
 		{
-			return io.read(inputStream, getReferenceURI());	//read the object, using the resource reference URI as the base URI
+			return io.read(inputStream, getURI());	//read the object, using the resource reference URI as the base URI
 		}
 		finally
 		{
@@ -331,7 +331,7 @@ public class HTTPResource extends DefaultResource
 		final OutputStream outputStream=getOutputStream();//get an output stream to the resource
 		try
 		{
-			io.write(outputStream, getReferenceURI(), object);	//write the object, using the resource reference URI as the base URI
+			io.write(outputStream, getURI(), object);	//write the object, using the resource reference URI as the base URI
 		}
 		finally
 		{
@@ -355,9 +355,9 @@ public class HTTPResource extends DefaultResource
 	*/
 	protected HTTPResponse sendRequest(final HTTPRequest request) throws IOException	//TODO add connection peristence
 	{
-		final URI referenceURI=getReferenceURI();	//get the reference URI
+		final URI referenceURI=getURI();	//get the reference URI
 		final boolean secure=HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
-		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getReferenceURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
+		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
 		try
 		{
 			return connection.sendRequest(request);	//send the request and return the response
@@ -375,9 +375,9 @@ public class HTTPResource extends DefaultResource
 	*/
 	protected HTTPResponse sendRequest(final HTTPRequest request, final Authenticable authenticator) throws IOException	//TODO add connection peristence
 	{
-		final URI referenceURI=getReferenceURI();	//get the reference URI
+		final URI referenceURI=getURI();	//get the reference URI
 		final boolean secure=HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
-		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getReferenceURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
+		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
 		try
 		{
 			return connection.sendRequest(request);	//send the request and return the response

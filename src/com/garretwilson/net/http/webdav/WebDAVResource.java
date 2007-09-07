@@ -43,7 +43,7 @@ public class WebDAVResource extends HTTPResource
 			super.cacheExists(exists);	//do the default caching
 			if(!exists)	//if the resource no longer exists
 			{
-				cachedPropertiesMap.remove(new CacheKey(getClient(), getReferenceURI()));	//uncache the properties, as the resource no longer exists
+				cachedPropertiesMap.remove(new CacheKey(getClient(), getURI()));	//uncache the properties, as the resource no longer exists
 			}
 		}
 		finally
@@ -155,7 +155,7 @@ public class WebDAVResource extends HTTPResource
 	{
 		if(isCached())	//if we are using cached info
 		{
-			final CacheKey cacheKey=new CacheKey(getClient(), getReferenceURI());	//create a new cache key
+			final CacheKey cacheKey=new CacheKey(getClient(), getURI());	//create a new cache key
 			final CachedProperties cachedProperties=cachedPropertiesMap.get(cacheKey);	//get cached properties from the map
 			if(cachedProperties!=null && !cachedProperties.isStale())	//if information is cached that isn't stale
 			{
@@ -233,7 +233,7 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public void copy(final URI destinationURI, final Depth depth, final boolean overwrite) throws IOException
 	{
-		final WebDAVRequest request=new DefaultWebDAVRequest(COPY_METHOD, getReferenceURI());	//create a COPY request
+		final WebDAVRequest request=new DefaultWebDAVRequest(COPY_METHOD, getURI());	//create a COPY request
 		request.setDestination(destinationURI);	//set the destination URI
 		checkInstance(depth, "Depth cannot be null.");
 		if(depth!=Depth.ZERO && depth!=Depth.INFINITY)	//if the depth is not ZERO or INFINITY
@@ -252,7 +252,7 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public void mkCol() throws IOException
 	{
-		final WebDAVRequest request=new DefaultWebDAVRequest(MKCOL_METHOD, getReferenceURI());	//create a MKCOL request
+		final WebDAVRequest request=new DefaultWebDAVRequest(MKCOL_METHOD, getURI());	//create a MKCOL request
 		final HTTPResponse response=sendRequest(request);	//get the response
 	}
 
@@ -264,7 +264,7 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public void mkCols() throws IOException
 	{
-		mkCols(changeRawPath(getReferenceURI(), ROOT_PATH));	//make the collections starting from the root
+		mkCols(changeRawPath(getURI(), ROOT_PATH));	//make the collections starting from the root
 	}
 
 	/**Creates the collection path of the URI as needed.
@@ -282,7 +282,7 @@ public class WebDAVResource extends HTTPResource
 		{
 			throw new IllegalArgumentException("Base URI "+baseURI+" does not end with '"+PATH_SEPARATOR+"'.");
 		}
-		final String referenceURIString=getReferenceURI().toString();	//get the string version of the resource's reference URI
+		final String referenceURIString=getURI().toString();	//get the string version of the resource's reference URI
 		if(!referenceURIString.startsWith(baseURIString))	//if the reference URI doesn't start with the given base URI
 		{
 			throw new IllegalArgumentException("Resource URI "+referenceURIString+" does not begin with base URI "+baseURIString);
@@ -343,7 +343,7 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public void move(final URI destinationURI, final boolean overwrite) throws IOException
 	{
-		final WebDAVRequest request=new DefaultWebDAVRequest(MOVE_METHOD, getReferenceURI());	//create a MOVE request
+		final WebDAVRequest request=new DefaultWebDAVRequest(MOVE_METHOD, getURI());	//create a MOVE request
 		request.setDestination(destinationURI);	//set the destination URI
 		request.setDepth(Depth.INFINITY);	//set the depth to infinity
 		request.setOverwrite(overwrite);	//set the overwrite option
@@ -363,7 +363,7 @@ public class WebDAVResource extends HTTPResource
 	public List<NameValuePair<URI, List<WebDAVProperty>>> propFind(final Depth depth) throws IOException
 	{
 		final HTTPClient httpClient=getClient();	//get the client we are using
-		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
+		final URI referenceURI=getURI();	//get the reference URI of this resource
 			//return cached values if we can
 		if(depth==Depth.ZERO && isCached())	//if we're caching values and a depth of zero is requested
 		{
@@ -453,7 +453,7 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public List<WebDAVProperty> propFind() throws IOException
 	{
-		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
+		final URI referenceURI=getURI();	//get the reference URI of this resource
 		final List<NameValuePair<URI, List<WebDAVProperty>>> propertyLists=propFind(Depth.ZERO);	//do a propfind with no depth
 		for(final NameValuePair<URI, List<WebDAVProperty>> propertyList:propertyLists)	//look at each property list
 		{
@@ -476,7 +476,7 @@ public class WebDAVResource extends HTTPResource
 	*/
 	public void propPatch(final Collection<WebDAVPropertyName> removePropertyNames, final Collection<WebDAVProperty> setProperties) throws IOException
 	{
-		final URI referenceURI=getReferenceURI();	//get the reference URI of this resource
+		final URI referenceURI=getURI();	//get the reference URI of this resource
 		uncacheInfo();	//empty the cache
 		final WebDAVRequest request=new DefaultWebDAVRequest(PROPPATCH_METHOD, referenceURI);	//create a PROPPATCH request
 		final WebDAVXMLGenerator webdavXMLGenerator=new WebDAVXMLGenerator();	//create a WebDAV XML generator

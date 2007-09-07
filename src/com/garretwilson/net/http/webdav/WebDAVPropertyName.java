@@ -22,7 +22,7 @@ public class WebDAVPropertyName extends DefaultResource implements IDable<URI>
 		public String getNamespace() {return namespace;}
 
 		/**@return The unique identifier of the object.*/
-		public URI getID() {return getReferenceURI();}
+		public URI getID() {return getURI();}
 
 	/**The property local name.*/
 	private final String localName;
