@@ -564,7 +564,7 @@ public class HTTPClientTCPConnection
 			}
 			catch(final SyntaxException syntaxException)	//if there is a syntax error
 			{
-				throw new ParseIOException(syntaxException.getMessage());	//TODO fix better parse IO exception
+				throw new ParseIOException(syntaxException);
 			}
 		}
 	}

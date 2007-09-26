@@ -635,7 +635,7 @@ public class HTTPParser
 						}
 						final String opaque=parameterMap.get(OPAQUE_PARAMETER);	//get the opaque parameter
 						final String staleString=parameterMap.get(STALE_PARAMETER);	//get the stale parameter
-						final Boolean stale=parseBoolean(staleString);	//get the staleness parameter
+						final Boolean stale=staleString!=null ? parseBoolean(staleString) : null;	//get the staleness parameter
 						final String algorithm=parameterMap.get(ALGORITHM_PARAMETER);	//get the algorithm
 						final String qopOptionsString=parameterMap.get(QOP_PARAMETER);	//get the quality of protection
 //TODO implement auth-param
