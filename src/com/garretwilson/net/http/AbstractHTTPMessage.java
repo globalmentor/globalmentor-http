@@ -257,7 +257,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 			}
 			catch(final NumberFormatException numberFormatException)	//if the string couldn't be parsed as a number
 			{
-				throw new SyntaxException(contentLengthString, numberFormatException);
+				throw new SyntaxException(numberFormatException, contentLengthString);
 			}
 		}
 		else	//if no content length is present

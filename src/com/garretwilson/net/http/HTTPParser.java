@@ -204,17 +204,17 @@ public class HTTPParser
 				}
 				catch(final NumberFormatException numberFormatException)	//if one of the version numbers weren't correctly formatted
 				{
-					throw new SyntaxException(versionCharSequence.subSequence(versionBeginIndex, versionCharSequence.length()).toString(), numberFormatException);
+					throw new SyntaxException(numberFormatException, versionCharSequence.subSequence(versionBeginIndex, versionCharSequence.length()).toString());
 				}
 			}
 			else	//if we didn't find the delimiter
 			{
-				throw new SyntaxException(versionCharSequence.toString(), "HTTP version missing delimiter '"+VERSION_DELIMITER+"'.");
+				throw new SyntaxException("HTTP version missing delimiter '"+VERSION_DELIMITER+"'.", versionCharSequence.toString());
 			}
 		}
 		else	//if the sequence doesn't begin with "HTTP/"
 		{
-			throw new SyntaxException(versionCharSequence.toString(), "HTTP version does not begin with "+VERSION_IDENTIFIER+VERSION_SEPARATOR);
+			throw new SyntaxException("HTTP version does not begin with "+VERSION_IDENTIFIER+VERSION_SEPARATOR, versionCharSequence.toString());
 		}
 	}
 
@@ -534,28 +534,28 @@ public class HTTPParser
 							final String username=parameterMap.get(USERNAME_PARAMETER);	//get the username
 							if(username==null)	//if no username is present
 							{
-								throw new SyntaxException(header.toString(), AUTHORIZATION_HEADER+" missing parameter "+USERNAME_PARAMETER);
+								throw new SyntaxException(AUTHORIZATION_HEADER+" missing parameter "+USERNAME_PARAMETER, header.toString());
 							}
 							final String realm=parameterMap.get(REALM_PARAMETER);	//get the realm
 							if(realm==null)	//if no realm is present
 							{
-								throw new SyntaxException(header.toString(), AUTHORIZATION_HEADER+" missing parameter "+REALM_PARAMETER);
+								throw new SyntaxException(AUTHORIZATION_HEADER+" missing parameter "+REALM_PARAMETER, header.toString());
 							}
 							final String nonce=parameterMap.get(NONCE_PARAMETER);	//get the nonce
 							if(nonce==null)	//if no nonce is present
 							{
-								throw new SyntaxException(header.toString(), AUTHORIZATION_HEADER+" missing parameter "+NONCE_PARAMETER);
+								throw new SyntaxException(AUTHORIZATION_HEADER+" missing parameter "+NONCE_PARAMETER, header.toString());
 							}
 							final String digestURIString=parameterMap.get(DIGEST_URI_PARAMETER);	//get the digest URI as a string
 							if(digestURIString==null)	//if no digest URI is present
 							{
-								throw new SyntaxException(header.toString(), AUTHORIZATION_HEADER+" missing parameter "+DIGEST_URI_PARAMETER);
+								throw new SyntaxException(AUTHORIZATION_HEADER+" missing parameter "+DIGEST_URI_PARAMETER, header.toString());
 							}
 //TODO del when works							final URI digestURI=URI.create(digestURIString);	//create a URI from the digest URI string; this will reject the wildcard request URI ('*')
 							final String response=parameterMap.get(RESPONSE_PARAMETER);	//get the response
 							if(response==null)	//if no response is present
 							{
-								throw new SyntaxException(header.toString(), AUTHORIZATION_HEADER+" missing parameter "+RESPONSE_PARAMETER);
+								throw new SyntaxException(AUTHORIZATION_HEADER+" missing parameter "+RESPONSE_PARAMETER, header.toString());
 							}
 							final String algorithm=parameterMap.get(ALGORITHM_PARAMETER);	//get the algorithm
 							final String cnonce=parameterMap.get(CNONCE_PARAMETER);	//get the cnonce
@@ -565,7 +565,7 @@ public class HTTPParser
 							final String nonceCountString=parameterMap.get(NONCE_COUNT_PARAMETER);	//get the quality of protection
 							if(nonceCountString.length()!=NONCE_COUNT_LENGTH)	//if the nonce count is not of the correct length
 							{
-								throw new SyntaxException(header.toString(), AUTHORIZATION_HEADER+' '+NONCE_COUNT_PARAMETER+" does not have length "+NONCE_COUNT_LENGTH+".");
+								throw new SyntaxException(AUTHORIZATION_HEADER+' '+NONCE_COUNT_PARAMETER+" does not have length "+NONCE_COUNT_LENGTH+".", header.toString());
 							}
 							final long nonceCount=Long.parseLong(nonceCountString, 16);	//parse the hex nonce count string to a long
 							return new DigestAuthenticateCredentials(username, realm, nonce, digestURIString, response, cnonce, opaque, messageQOP, nonceCount, algorithm!=null ? algorithm : MD5_ALGORITHM);
@@ -576,7 +576,7 @@ public class HTTPParser
 			}
 			else	//if no scheme delimiter was found
 			{
-				throw new SyntaxException(header.toString(), AUTHORIZATION_HEADER+" missing scheme delimiter.");
+				throw new SyntaxException(AUTHORIZATION_HEADER+" missing scheme delimiter.", header.toString());
 			}
 		}
 		catch(final NoSuchAlgorithmException noSuchAlgorithmException)	//if the algorithm was not supported
@@ -585,7 +585,7 @@ public class HTTPParser
 		}
 		catch(IOException ioException)
 		{
-			throw new SyntaxException(header.toString(), ioException);
+			throw new SyntaxException(ioException, header.toString());
 		}
 	}
 
@@ -613,7 +613,7 @@ public class HTTPParser
 							final String realm=parameterMap.get(REALM_PARAMETER);	//get the realm
 							if(realm==null)	//if no realm is present
 							{
-								throw new SyntaxException(header.toString(), WWW_AUTHENTICATE_HEADER+" missing parameter "+REALM_PARAMETER);
+								throw new SyntaxException(WWW_AUTHENTICATE_HEADER+" missing parameter "+REALM_PARAMETER, header.toString());
 							}
 							final BasicAuthenticateChallenge basicChallenge=new BasicAuthenticateChallenge(realm);	//create the challenge
 							return basicChallenge;	//return the basic authentication challenge
@@ -625,13 +625,13 @@ public class HTTPParser
 						final String realm=parameterMap.get(REALM_PARAMETER);	//get the realm
 						if(realm==null)	//if no realm is present
 						{
-							throw new SyntaxException(header.toString(), WWW_AUTHENTICATE_HEADER+" missing parameter "+REALM_PARAMETER);
+							throw new SyntaxException(WWW_AUTHENTICATE_HEADER+" missing parameter "+REALM_PARAMETER, header.toString());
 						}
 //TODO implement domain
 						final String nonce=parameterMap.get(NONCE_PARAMETER);	//get the nonce
 						if(nonce==null)	//if no nonce is present
 						{
-							throw new SyntaxException(header.toString(), WWW_AUTHENTICATE_HEADER+" missing parameter "+NONCE_PARAMETER);
+							throw new SyntaxException(WWW_AUTHENTICATE_HEADER+" missing parameter "+NONCE_PARAMETER, header.toString());
 						}
 						final String opaque=parameterMap.get(OPAQUE_PARAMETER);	//get the opaque parameter
 						final String staleString=parameterMap.get(STALE_PARAMETER);	//get the stale parameter
@@ -662,7 +662,7 @@ public class HTTPParser
 			}
 			else	//if no scheme delimiter was found
 			{
-				throw new SyntaxException(header.toString(), AUTHORIZATION_HEADER+" missing scheme delimiter.");
+				throw new SyntaxException(AUTHORIZATION_HEADER+" missing scheme delimiter.", header.toString());
 			}
 		}
 		catch(final NoSuchAlgorithmException noSuchAlgorithmException)	//if the algorithm was not supported
@@ -671,7 +671,7 @@ public class HTTPParser
 		}
 		catch(IOException ioException)
 		{
-			throw new SyntaxException(header.toString(), ioException);
+			throw new SyntaxException(ioException, header.toString());
 		}
 	}
 

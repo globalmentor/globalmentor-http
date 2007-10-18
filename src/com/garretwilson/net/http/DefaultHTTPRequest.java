@@ -99,7 +99,7 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 			}
 			catch(final IllegalArgumentException illegalArgumentException)	//if the host is not syntactically correct
 			{
-				throw new SyntaxException(host, illegalArgumentException);
+				throw new SyntaxException(illegalArgumentException, host);
 			}
 		}
 		else	//if no host was given
