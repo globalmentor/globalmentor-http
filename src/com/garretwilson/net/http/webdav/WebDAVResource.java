@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import static java.util.Collections.*;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
@@ -11,13 +13,10 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
-
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
 import com.garretwilson.util.*;
-import static java.util.Collections.*;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 /**A client's view of a WebDAV resource on the server.
@@ -465,13 +464,36 @@ public class WebDAVResource extends HTTPResource
 		return emptyList();	//return an empty list; for some reason, no properties were returned		
 	}
 
+	/**Removes properties using the PROPPATCH method.
+	If properties are being removed and others are being set at the same time, the {@link #propPatch(Collection, Collection)} method should be used.
+	The cached information is cleared.
+	The URI of each resource is canonicized to be an absolute URI.
+	@param removeProperties The list of properties to remove.
+	@exception IOException if there was an error invoking the method.
+	*/
+	public void removeProperties(final Collection<WebDAVPropertyName> removePropertyNames) throws IOException
+	{
+		propPatch(removePropertyNames, (Set<WebDAVProperty>)EMPTY_SET);	//perform a PROPPATCH with no properties to set		
+	}
+
+	/**Sets properties using the PROPPATCH method.
+	If properties are being removed and others are being set at the same time, the {@link #propPatch(Collection, Collection)} method should be used.
+	The cached information is cleared.
+	The URI of each resource is canonicized to be an absolute URI.
+	@param setPropertyNames The list of properties and values to set.
+	@exception IOException if there was an error invoking the method.
+	*/
+	public void setProperties(final Collection<WebDAVProperty> setProperties) throws IOException
+	{
+		propPatch((Set<WebDAVPropertyName>)EMPTY_SET, setProperties);	//perform a PROPPATCH with no properties to remove
+	}
+
 	/**Updates properties using the PROPPATCH method.
 	Rquested properties will first be removed, then requested properties will be set, in that order.
 	The cached information is cleared.
 	The URI of each resource is canonicized to be an absolute URI.
 	@param removeProperties The list of properties to remove.
 	@param setPropertyNames The list of properties and values to set.
-	@param propertyList The list of properties to set or remove, in order; if the value of a property is <code>null</code>, the property will be removed.
 	@exception IOException if there was an error invoking the method.
 	*/
 	public void propPatch(final Collection<WebDAVPropertyName> removePropertyNames, final Collection<WebDAVProperty> setProperties) throws IOException
