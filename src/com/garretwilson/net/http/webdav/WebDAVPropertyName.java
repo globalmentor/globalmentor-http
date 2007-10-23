@@ -35,7 +35,7 @@ public class WebDAVPropertyName extends DefaultResource implements IDable<URI>
 	@param namespace The property namespace.
 	@param localName The property local name.
 	@exception NullPointerException if the given namespace and/or local name is <code>null</code>.
-	*/	
+	*/
 	public WebDAVPropertyName(final String namespace, final String localName)
 	{
 		super(createPropertyURI(namespace, localName));	//create the property URI by combining the property namespace and the property local name
