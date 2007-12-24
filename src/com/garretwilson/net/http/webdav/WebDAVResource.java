@@ -11,7 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
 import com.garretwilson.util.*;

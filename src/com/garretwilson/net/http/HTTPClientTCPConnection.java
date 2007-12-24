@@ -22,7 +22,7 @@ import static com.garretwilson.io.InputStreamUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.net.*;
 
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPFormatter.*;
 import static com.garretwilson.net.http.HTTPParser.*;
@@ -582,7 +582,7 @@ public class HTTPClientTCPConnection
 		final URI uri=request.getURI();	//get the URI of the request object
 		final String requestURI=getRawPathQueryFragment(uri);	//get the unencoded path?query#fragment
 		request.setRequestURI(requestURI);	//set the request-uri 
-		final Host host=URIUtilities.getHost(uri);	//get the host
+		final Host host=URIs.getHost(uri);	//get the host
 		request.setHost(host);	//set the host header to be identical to the host in our request URI
 		final byte[] requestBody=request.getBody();	//get the request body
 /*G***del when works; maybe check and give an error if the content length doesn't reflect the length of the body

@@ -8,7 +8,7 @@ import java.net.URISyntaxException;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPFormatter.*;
 import static com.garretwilson.net.http.HTTPParser.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 
 import com.garretwilson.text.SyntaxException;
 import com.garretwilson.util.Debug;
