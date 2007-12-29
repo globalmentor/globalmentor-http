@@ -6,7 +6,7 @@ import java.net.URI;
 @author Garret Wilson
 @see <a href="http://www.webdav.org/mod_dav/">mod_dav: a DAV module for Apache</a>
 */
-public class ApacheWebDAVConstants
+public class ApacheWebDAV
 {
 
 	/**The recommended prefix to the Apache WebDAV property namespace.*/

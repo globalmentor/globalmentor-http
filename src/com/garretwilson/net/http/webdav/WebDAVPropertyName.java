@@ -43,6 +43,17 @@ public class WebDAVPropertyName extends DefaultResource implements IDable<URI>
 		this.localName=localName;
 	}
 
+	/**Namespace URI and local name constructor.
+	The local name is expected to be already encoded for inclusion in a URI.
+	@param namespaceURI The property namespace URI.
+	@param localName The property local name.
+	@exception NullPointerException if the given namespace URI and/or local name is <code>null</code>.
+	*/
+	public WebDAVPropertyName(final URI namespaceURI, final String localName)
+	{
+		this(namespaceURI.toString(), localName);	//create the property name using the string form of the namespace URI
+	}
+
 	/**Creates a WebDAV reference URI from a property namespace and local name.
 	Both components are expected to be already encoded for inclusion in a URI.
 	@param propertyNamespace The WebDAV property namespace.

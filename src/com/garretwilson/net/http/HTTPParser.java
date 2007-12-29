@@ -16,7 +16,7 @@ import static com.garretwilson.lang.StringBuilderUtilities.*;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.security.SecurityConstants.*;
-import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.Characters.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 
 import com.garretwilson.text.SyntaxException;
