@@ -2,7 +2,7 @@ package com.garretwilson.net.http;
 
 import static com.garretwilson.lang.FloatUtilities.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 
 /**A value with an associated "qvalue" specifying its weight.
 @param <V> The type of weighted value represented.
@@ -37,13 +37,13 @@ public class WeightedValue<V> implements Comparable<WeightedValue<V>>
 	/**@return A hash code for the object.*/
 	public int hashCode()
 	{
-		return ObjectUtilities.hashCode(getValue(), getQValue());
+		return Objects.hashCode(getValue(), getQValue());
 	}
 
 	/**@return A string representation of the object in the form <code><var>value</var>;q=<var>qvalue</var></code>.*/
 	public String toString()
 	{
-		return ObjectUtilities.toString(getValue())+";q="+getQValue();	//return a string representation, using "null" if the value is null
+		return Objects.toString(getValue())+";q="+getQValue();	//return a string representation, using "null" if the value is null
 	}
 
 	/**Compares this object with the specified object for order.

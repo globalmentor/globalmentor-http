@@ -2,7 +2,7 @@ package com.garretwilson.net.http;
 
 import java.security.*;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;

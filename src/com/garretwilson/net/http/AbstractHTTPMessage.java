@@ -9,13 +9,12 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.garretwilson.io.ParseReader;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPParser.*;
-import static com.garretwilson.text.CharacterEncodingConstants.*;
 import com.garretwilson.text.CharacterEncoding;
+import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.SyntaxException;
-import com.garretwilson.text.xml.XMLProcessor;
 import com.garretwilson.text.xml.XMLSerializer;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import com.garretwilson.util.*;

@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 
 import static com.garretwilson.lang.ByteUtilities.*;
 import static com.garretwilson.lang.LongUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.checkInstance;
+import static com.garretwilson.lang.Objects.checkInstance;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;

@@ -9,7 +9,7 @@ import static java.util.Collections.*;
 import javax.xml.parsers.ParserConfigurationException;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import com.garretwilson.net.http.*;

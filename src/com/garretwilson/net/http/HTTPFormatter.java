@@ -11,7 +11,7 @@ import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 
 import com.garretwilson.text.FormatUtilities;
-import static com.garretwilson.text.CharacterEncodingConstants.*;
+import static com.garretwilson.text.CharacterEncoding.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.text.Characters.*;
 

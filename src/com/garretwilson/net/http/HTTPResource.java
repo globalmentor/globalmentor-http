@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.concurrent.locks.*;
 
 import com.garretwilson.io.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.net.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;

@@ -19,7 +19,7 @@ import javax.net.ssl.X509TrustManager;
 
 import com.garretwilson.io.*;
 import static com.garretwilson.io.InputStreamUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.net.*;
 
 import static com.garretwilson.net.URIs.*;
@@ -30,9 +30,10 @@ import com.garretwilson.security.DefaultNonce;
 import com.garretwilson.security.Nonce;
 import com.garretwilson.swing.BasicOptionPane;
 import com.garretwilson.swing.PasswordPanel;
+import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.SyntaxException;
 
-import static com.garretwilson.text.CharacterEncodingConstants.*;
+import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 

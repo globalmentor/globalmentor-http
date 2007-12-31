@@ -6,7 +6,7 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
 import com.garretwilson.text.xml.XMLNamespacePrefixManager;
 import static com.garretwilson.text.xml.XMLUtilities.*;

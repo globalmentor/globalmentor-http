@@ -1,6 +1,6 @@
 package com.garretwilson.net.http;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**An encapsulation of basic authenticate credentials of HTTP Basic Access Authentication,
 <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,
