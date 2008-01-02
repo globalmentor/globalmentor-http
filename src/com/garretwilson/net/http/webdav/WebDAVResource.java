@@ -8,12 +8,13 @@ import static java.util.Collections.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import static com.garretwilson.lang.CharSequenceUtilities.*;
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
+import static com.globalmentor.java.CharSequenceUtilities.*;
+import static com.globalmentor.java.Objects.*;
+
 import com.garretwilson.util.*;
 
 import org.w3c.dom.*;

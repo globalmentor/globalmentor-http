@@ -1,8 +1,8 @@
 package com.garretwilson.net.http;
 
-import static com.garretwilson.lang.FloatUtilities.*;
+import static com.globalmentor.java.FloatUtilities.*;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 
 /**A value with an associated "qvalue" specifying its weight.
 @param <V> The type of weighted value represented.

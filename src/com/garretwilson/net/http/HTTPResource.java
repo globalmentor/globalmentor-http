@@ -6,13 +6,13 @@ import java.util.*;
 import java.util.concurrent.locks.*;
 
 import com.garretwilson.io.*;
-import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.net.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import com.garretwilson.util.*;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
+import static com.globalmentor.java.Objects.*;
 
 
 /**A client's view of an HTTP resource on the server.

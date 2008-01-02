@@ -1,6 +1,6 @@
 package com.garretwilson.net.http;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**An authentication challenge or response.
 @author Garret Wilson

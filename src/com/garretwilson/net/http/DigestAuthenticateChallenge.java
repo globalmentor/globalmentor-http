@@ -2,10 +2,10 @@ package com.garretwilson.net.http;
 
 import java.security.*;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 /**An encapsulation of a digest authenticate challenge of HTTP Digest Access Authentication,
 <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,

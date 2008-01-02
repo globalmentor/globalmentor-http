@@ -19,7 +19,6 @@ import javax.net.ssl.X509TrustManager;
 
 import com.garretwilson.io.*;
 import static com.garretwilson.io.InputStreamUtilities.*;
-import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.net.*;
 
 import static com.garretwilson.net.URIs.*;
@@ -36,6 +35,7 @@ import com.garretwilson.text.SyntaxException;
 import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.ArrayUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 /**Represents a connection from a client to a server using HTTP over TCP as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".

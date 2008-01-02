@@ -1,6 +1,7 @@
 package com.garretwilson.net.http.webdav;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
+
 import com.garretwilson.util.NameValuePair;
 
 /**A WebDAV property, representing a WebDAV property name and a value (such as a literal string value or a document fragment value).

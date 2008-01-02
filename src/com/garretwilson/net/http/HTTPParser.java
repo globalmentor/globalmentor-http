@@ -10,9 +10,6 @@ import java.util.regex.Matcher;
 import com.garretwilson.io.InputStreamUtilities;
 import com.garretwilson.io.ParseIOException;
 import com.garretwilson.io.ParseReader;
-import static com.garretwilson.lang.BooleanUtilities.*;
-import static com.garretwilson.lang.CharSequenceUtilities.*;
-import static com.garretwilson.lang.StringBuilderUtilities.*;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.security.SecurityConstants.*;
@@ -22,6 +19,9 @@ import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.SyntaxException;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.MapUtilities.*;
+import static com.globalmentor.java.BooleanUtilities.*;
+import static com.globalmentor.java.CharSequenceUtilities.*;
+import static com.globalmentor.java.StringBuilderUtilities.*;
 
 /**Parses HTTP content. 
 @author Garret Wilson

@@ -3,12 +3,12 @@ package com.garretwilson.net.http;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import static com.garretwilson.lang.ByteUtilities.*;
-import static com.garretwilson.lang.LongUtilities.*;
-import static com.garretwilson.lang.Objects.checkInstance;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
+import static com.globalmentor.java.ByteUtilities.*;
+import static com.globalmentor.java.LongUtilities.*;
+import static com.globalmentor.java.Objects.checkInstance;
 
 /**An encapsulation of digest authenticate credentials of HTTP Digest Access Authentication,
 <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,
