@@ -6,8 +6,8 @@ import java.security.NoSuchAlgorithmException;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
-import static com.globalmentor.java.ByteUtilities.*;
-import static com.globalmentor.java.LongUtilities.*;
+import static com.globalmentor.java.Bytes.*;
+import static com.globalmentor.java.Longs.*;
 import static com.globalmentor.java.Objects.checkInstance;
 
 /**An encapsulation of digest authenticate credentials of HTTP Digest Access Authentication,

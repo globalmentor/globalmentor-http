@@ -1,6 +1,6 @@
 package com.garretwilson.net.http;
 
-import static com.globalmentor.java.FloatUtilities.*;
+import static com.globalmentor.java.Floats.*;
 
 import com.globalmentor.java.Objects;
 

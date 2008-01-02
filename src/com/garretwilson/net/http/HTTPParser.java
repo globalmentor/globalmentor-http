@@ -19,9 +19,11 @@ import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.SyntaxException;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.MapUtilities.*;
-import static com.globalmentor.java.BooleanUtilities.*;
-import static com.globalmentor.java.CharSequenceUtilities.*;
-import static com.globalmentor.java.StringBuilderUtilities.*;
+
+import static com.globalmentor.java.Booleans.*;
+import static com.globalmentor.java.Bytes.*;
+import static com.globalmentor.java.CharSequences.*;
+import static com.globalmentor.java.StringBuilders.*;
 
 /**Parses HTTP content. 
 @author Garret Wilson
@@ -29,9 +31,6 @@ import static com.globalmentor.java.StringBuilderUtilities.*;
 public class HTTPParser
 {
 	
-	/**The convenience zero-length byte array.*/
-	private final static byte[] NO_BYTES=new byte[0];
-
 	/**Parses the HTTP status line.
 	@param inputStream The source of the HTTP message.
 	@return An array of parsed headers.
