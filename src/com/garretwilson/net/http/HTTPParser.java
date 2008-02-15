@@ -13,7 +13,6 @@ import com.garretwilson.io.ParseReader;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.security.SecurityConstants.*;
-import static com.garretwilson.text.Characters.*;
 import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.SyntaxException;
@@ -23,6 +22,7 @@ import static com.garretwilson.util.MapUtilities.*;
 import static com.globalmentor.java.Booleans.*;
 import static com.globalmentor.java.Bytes.*;
 import static com.globalmentor.java.CharSequences.*;
+import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.StringBuilders.*;
 
 /**Parses HTTP content. 
