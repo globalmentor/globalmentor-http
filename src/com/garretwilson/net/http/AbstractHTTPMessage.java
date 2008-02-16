@@ -8,11 +8,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import static com.garretwilson.io.Charsets.*;
 import com.garretwilson.io.ParseReader;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPParser.*;
-import com.garretwilson.text.CharacterEncoding;
-import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.SyntaxException;
 import com.garretwilson.text.xml.XMLSerializer;
 import static com.garretwilson.text.xml.XMLUtilities.*;
@@ -326,7 +325,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 		final ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();	//create a byte array output stream to hold our outgoing data
 		try
 		{
-			new XMLSerializer(true).serialize(document, byteArrayOutputStream, new CharacterEncoding(UTF_8, null, NO_BOM));	//serialize the document to the byte array with no byte order mark
+			new XMLSerializer(true).serialize(document, byteArrayOutputStream, UTF_8_CHARSET);	//serialize the document to the byte array with no byte order mark
 			final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the bytes we serialized
 			setBody(bytes);	//set the bytes of the XML document into the body of the message
 		}
