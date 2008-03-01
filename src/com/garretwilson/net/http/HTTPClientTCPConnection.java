@@ -33,9 +33,11 @@ import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.SyntaxException;
 
 import static com.garretwilson.text.CharacterEncoding.*;
-import com.garretwilson.util.*;
-import static com.garretwilson.util.ArrayUtilities.*;
+
+import com.globalmentor.util.*;
+
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.util.Arrays.*;
 
 /**Represents a connection from a client to a server using HTTP over TCP as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".

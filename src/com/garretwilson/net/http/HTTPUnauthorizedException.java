@@ -1,7 +1,8 @@
 package com.garretwilson.net.http;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
-import com.garretwilson.util.NameValuePair;
+
+import com.globalmentor.util.NameValuePair;
 
 /**Indicates that the request requires user authentication. 
 Corresponds to HTTP status code 401.

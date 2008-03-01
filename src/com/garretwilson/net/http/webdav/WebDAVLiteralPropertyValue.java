@@ -1,6 +1,6 @@
 package com.garretwilson.net.http.webdav;
 
-import com.garretwilson.util.ObjectDecorator;
+import com.globalmentor.util.ObjectDecorator;
 
 /**A literal WebDAV value of a resource property.
 The literal value of the resource can be returned using {@link #toString()} or {@link #getText()}.

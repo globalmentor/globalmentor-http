@@ -2,7 +2,7 @@ package com.garretwilson.net.http;
 
 import java.util.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
-import static com.garretwilson.util.CollectionUtilities.*;
+import static com.globalmentor.util.Collections.*;
 
 /**Indicates that method specified in the HTTP request line is not allowed for the
    resource identified by the request URI. 

@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
-import com.garretwilson.util.*;
+
+import com.globalmentor.util.*;
 
 import org.w3c.dom.*;
 
@@ -28,9 +29,9 @@ public class WebDAVXMLProcessor
 	@see WebDAVConstants#ALL_PROPERTIES
 	@see WebDAVConstants#PROPERTY_NAMES
 	*/
-	public static IDMappedList<URI, WebDAVPropertyName> getPropfindProperties(final HttpServletRequest request, final Element element)
+	public static DecoratorIDedMappedList<URI, WebDAVPropertyName> getPropfindProperties(final HttpServletRequest request, final Element element)
 	{
-		final IDMappedList<URI, WebDAVPropertyName> propertyList=new IDMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());	//create a list of WebDAV property names
+		final DecoratorIDedMappedList<URI, WebDAVPropertyName> propertyList=new DecoratorIDedMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());	//create a list of WebDAV property names
 		final NodeList childList=element.getChildNodes();	//get a list of element children
 		for(int childIndex=0; childIndex<childList.getLength(); ++childIndex)	//look at each child node
 		{

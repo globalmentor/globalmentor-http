@@ -16,14 +16,14 @@ import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.SyntaxException;
-import com.garretwilson.util.*;
-import static com.garretwilson.util.MapUtilities.*;
+import com.globalmentor.util.*;
 
 import static com.globalmentor.java.Booleans.*;
 import static com.globalmentor.java.Bytes.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.StringBuilders.*;
+import static com.globalmentor.util.Maps.*;
 
 /**Parses HTTP content. 
 @author Garret Wilson

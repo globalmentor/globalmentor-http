@@ -15,7 +15,7 @@ import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.*;
+import com.globalmentor.util.*;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;

@@ -9,7 +9,8 @@ import com.garretwilson.io.*;
 import com.garretwilson.net.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
-import com.garretwilson.util.*;
+
+import com.globalmentor.util.*;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.globalmentor.java.Objects.*;

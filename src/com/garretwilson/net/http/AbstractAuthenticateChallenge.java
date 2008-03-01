@@ -3,7 +3,9 @@ package com.garretwilson.net.http;
 import java.util.*;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
-import com.garretwilson.util.NameValuePair;
+
+import com.globalmentor.util.NameValuePair;
+
 import static com.garretwilson.text.FormatUtilities.*;
 
 /**An abstract encapsulation of a challenge to be sent back to client.

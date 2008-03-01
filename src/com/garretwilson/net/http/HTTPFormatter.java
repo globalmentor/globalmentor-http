@@ -15,8 +15,8 @@ import static com.garretwilson.text.CharacterEncoding.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.globalmentor.java.Characters.*;
 
-import com.garretwilson.util.Base64;
-import com.garretwilson.util.NameValuePair;
+import com.globalmentor.util.Base64;
+import com.globalmentor.util.NameValuePair;
 
 /**Class that knows how to format HTTP information.
 @author Garret Wilson

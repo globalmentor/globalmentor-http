@@ -3,7 +3,7 @@ package com.garretwilson.net.http.webdav;
 import java.net.URI;
 import java.util.*;
 
-import com.garretwilson.util.IDMappedList;
+import com.globalmentor.util.DecoratorIDedMappedList;
 
 import static com.garretwilson.net.http.webdav.WebDAVPropertyName.*;
 
@@ -81,10 +81,10 @@ public class WebDAVConstants
 	public final static URI RESOURCE_TYPE_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, RESOURCE_TYPE_PROPERTY_NAME);
 
 	/**The constant property list indicating all properties.*/
-	public final static IDMappedList<URI, WebDAVPropertyName> ALL_PROPERTIES=new IDMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
+	public final static DecoratorIDedMappedList<URI, WebDAVPropertyName> ALL_PROPERTIES=new DecoratorIDedMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
 
 	/**The constant property list indicating all property names.*/
-	public final static IDMappedList<URI, WebDAVPropertyName> PROPERTY_NAMES=new IDMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
+	public final static DecoratorIDedMappedList<URI, WebDAVPropertyName> PROPERTY_NAMES=new DecoratorIDedMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
 
 		//resource type names
 	public final static String COLLECTION_TYPE_NAME="collection";

@@ -17,7 +17,7 @@ import com.garretwilson.text.xml.XMLSerializer;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.*;
+import com.globalmentor.util.*;
 
 /**An abstract implementation of an HTTP request or response as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
@@ -43,7 +43,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 		while still keeping similarly-named headers together.
 	Headers names are stored in lowercase as a canonical representation.
 	*/
-	private MappedList<String, NameValuePair<String, List<String>>> headerMappedList=new IDMappedList<String, NameValuePair<String, List<String>>>(new HashMap<String, NameValuePair<String, List<String>>>(), new ArrayList<NameValuePair<String, List<String>>>());
+	private MappedList<String, NameValuePair<String, List<String>>> headerMappedList=new DecoratorIDedMappedList<String, NameValuePair<String, List<String>>>(new HashMap<String, NameValuePair<String, List<String>>>(), new ArrayList<NameValuePair<String, List<String>>>());
 
 	/**Constructs a message with a version.
 	@param version The HTTP version being used.
