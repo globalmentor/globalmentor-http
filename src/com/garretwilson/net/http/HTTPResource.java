@@ -5,11 +5,11 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.locks.*;
 
-import com.garretwilson.io.*;
 import com.garretwilson.net.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 
+import com.globalmentor.io.*;
 import com.globalmentor.util.*;
 
 import static com.garretwilson.net.http.HTTPConstants.*;

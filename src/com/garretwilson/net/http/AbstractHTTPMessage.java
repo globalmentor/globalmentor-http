@@ -8,15 +8,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import static com.garretwilson.io.Charsets.*;
-import com.garretwilson.io.ParseReader;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPParser.*;
 import com.garretwilson.text.SyntaxException;
 import com.garretwilson.text.xml.XMLSerializer;
 import static com.garretwilson.text.xml.XMLUtilities.*;
+import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.io.ParseReader;
 import com.globalmentor.util.*;
 
 /**An abstract implementation of an HTTP request or response as defined by

@@ -17,8 +17,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import com.garretwilson.io.*;
-import static com.garretwilson.io.InputStreamUtilities.*;
 import com.garretwilson.net.*;
 
 import static com.garretwilson.net.URIs.*;
@@ -34,8 +32,10 @@ import com.garretwilson.text.SyntaxException;
 
 import static com.garretwilson.text.CharacterEncoding.*;
 
+import com.globalmentor.io.*;
 import com.globalmentor.util.*;
 
+import static com.globalmentor.io.InputStreamUtilities.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Arrays.*;
 

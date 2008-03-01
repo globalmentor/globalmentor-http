@@ -7,15 +7,15 @@ import java.util.*;
 import static java.util.Collections.*;
 import java.util.regex.Matcher;
 
-import com.garretwilson.io.InputStreamUtilities;
-import com.garretwilson.io.ParseIOException;
-import com.garretwilson.io.ParseReader;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.SyntaxException;
+import com.globalmentor.io.InputStreamUtilities;
+import com.globalmentor.io.ParseIOException;
+import com.globalmentor.io.ParseReader;
 import com.globalmentor.util.*;
 
 import static com.globalmentor.java.Booleans.*;
