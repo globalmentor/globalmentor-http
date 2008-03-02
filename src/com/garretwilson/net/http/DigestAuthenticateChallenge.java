@@ -2,9 +2,9 @@ package com.garretwilson.net.http;
 
 import java.security.*;
 
-import static com.garretwilson.text.FormatUtilities.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.security.MessageDigests.*;
+import static com.globalmentor.text.FormatUtilities.*;
 
 /**An encapsulation of a digest authenticate challenge of HTTP Digest Access Authentication,
 <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,

@@ -25,18 +25,18 @@ import static com.garretwilson.net.http.HTTPFormatter.*;
 import static com.garretwilson.net.http.HTTPParser.*;
 import com.garretwilson.swing.BasicOptionPane;
 import com.garretwilson.swing.PasswordPanel;
-import com.garretwilson.text.CharacterEncoding;
-import com.garretwilson.text.SyntaxException;
 
-import static com.garretwilson.text.CharacterEncoding.*;
 
 import com.globalmentor.io.*;
 import com.globalmentor.security.DefaultNonce;
 import com.globalmentor.security.Nonce;
+import com.globalmentor.text.CharacterEncoding;
+import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.*;
 
 import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.CharacterEncoding.*;
 import static com.globalmentor.util.Arrays.*;
 
 /**Represents a connection from a client to a server using HTTP over TCP as defined by

@@ -2,7 +2,7 @@ package com.garretwilson.net.http.webdav;
 
 import org.w3c.dom.DocumentFragment;
 
-import com.garretwilson.text.xml.XMLUtilities;
+import com.globalmentor.text.xml.XMLUtilities;
 import com.globalmentor.util.ObjectDecorator;
 
 /**A WebDAV value representing a non-empty XML document fragment.

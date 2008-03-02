@@ -6,7 +6,7 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
-import static com.garretwilson.text.xml.XMLUtilities.*;
+import static com.globalmentor.text.xml.XMLUtilities.*;
 
 import com.globalmentor.util.*;
 

@@ -9,13 +9,14 @@ import java.util.regex.Matcher;
 
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
-import static com.garretwilson.text.CharacterEncoding.*;
-import com.garretwilson.text.CharacterEncoding;
-import com.garretwilson.text.SyntaxException;
 import com.globalmentor.io.InputStreams;
 import com.globalmentor.io.ParseIOException;
 import com.globalmentor.io.ParseReader;
 import static com.globalmentor.security.MessageDigests.*;
+import static com.globalmentor.text.CharacterEncoding.*;
+
+import com.globalmentor.text.CharacterEncoding;
+import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.*;
 
 import static com.globalmentor.java.Booleans.*;

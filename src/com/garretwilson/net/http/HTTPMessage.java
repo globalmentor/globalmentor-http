@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.garretwilson.text.SyntaxException;
+import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.NameValuePair;
 
 import org.w3c.dom.Document;

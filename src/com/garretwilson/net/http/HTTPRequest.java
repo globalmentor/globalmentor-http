@@ -3,7 +3,7 @@ package com.garretwilson.net.http;
 import java.net.URI;
 
 import com.garretwilson.net.Host;
-import com.garretwilson.text.SyntaxException;
+import com.globalmentor.text.SyntaxException;
 
 /**An HTTP request as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".

@@ -10,7 +10,7 @@ import static com.garretwilson.net.http.HTTPFormatter.*;
 import static com.garretwilson.net.http.HTTPParser.*;
 import static com.garretwilson.net.URIs.*;
 
-import com.garretwilson.text.SyntaxException;
+import com.globalmentor.text.SyntaxException;
 
 /**The default implementation of an HTTP request as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".

@@ -10,7 +10,7 @@ import static com.garretwilson.net.http.HTTPFormatter.*;
 import static com.garretwilson.net.http.HTTPParser.*;
 import static com.garretwilson.net.URIs.*;
 
-import com.garretwilson.text.SyntaxException;
+import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.Debug;
 
 /**The default implementation of an HTTP response as defined by

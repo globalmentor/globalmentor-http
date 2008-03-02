@@ -9,12 +9,12 @@ import static com.garretwilson.net.http.BasicAuthenticationConstants.*;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 
-import com.garretwilson.text.FormatUtilities;
-import static com.garretwilson.text.CharacterEncoding.*;
-import static com.garretwilson.text.FormatUtilities.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.security.MessageDigests.*;
+import static com.globalmentor.text.CharacterEncoding.*;
+import static com.globalmentor.text.FormatUtilities.*;
 
+import com.globalmentor.text.FormatUtilities;
 import com.globalmentor.util.Base64;
 import com.globalmentor.util.NameValuePair;
 

@@ -7,9 +7,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
-import com.garretwilson.text.xml.XMLNamespacePrefixManager;
-import static com.garretwilson.text.xml.XMLUtilities.*;
+
+import com.globalmentor.text.xml.XMLNamespacePrefixManager;
+
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.xml.XMLUtilities.*;
 
 import org.w3c.dom.*;
 
