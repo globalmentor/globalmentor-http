@@ -9,13 +9,13 @@ import java.util.regex.Matcher;
 
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
-import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.SyntaxException;
-import com.globalmentor.io.InputStreamUtilities;
+import com.globalmentor.io.InputStreams;
 import com.globalmentor.io.ParseIOException;
 import com.globalmentor.io.ParseReader;
+import static com.globalmentor.security.MessageDigestUtilities.*;
 import com.globalmentor.util.*;
 
 import static com.globalmentor.java.Booleans.*;
@@ -169,7 +169,7 @@ public class HTTPParser
 		}
 		if(chunkSize>0)	//if a positive chunk size is given
 		{
-			final byte[] chunk=InputStreamUtilities.getBytes(inputStream, chunkSize);	//read this chunk
+			final byte[] chunk=InputStreams.getBytes(inputStream, chunkSize);	//read this chunk
 //TODO del Debug.trace("read chunk of size", chunkSize, new String(chunk, UTF_8));	//TODO del
 			parseCRLF(inputStream);	//parse a CRLF, but ignore it
 			return chunk;	//return the chunk

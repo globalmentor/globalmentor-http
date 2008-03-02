@@ -23,8 +23,6 @@ import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPFormatter.*;
 import static com.garretwilson.net.http.HTTPParser.*;
-import com.garretwilson.security.DefaultNonce;
-import com.garretwilson.security.Nonce;
 import com.garretwilson.swing.BasicOptionPane;
 import com.garretwilson.swing.PasswordPanel;
 import com.garretwilson.text.CharacterEncoding;
@@ -33,9 +31,11 @@ import com.garretwilson.text.SyntaxException;
 import static com.garretwilson.text.CharacterEncoding.*;
 
 import com.globalmentor.io.*;
+import com.globalmentor.security.DefaultNonce;
+import com.globalmentor.security.Nonce;
 import com.globalmentor.util.*;
 
-import static com.globalmentor.io.InputStreamUtilities.*;
+import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Arrays.*;
 
@@ -549,7 +549,7 @@ public class HTTPClientTCPConnection
 					if(contentLength>=0)	//if there is a content length
 					{
 						assert contentLength<=Integer.MAX_VALUE : "Unsupported content length.";
-						final byte[] responseBody=InputStreamUtilities.getBytes(inputStream, (int)contentLength);
+						final byte[] responseBody=InputStreams.getBytes(inputStream, (int)contentLength);
 						if(responseBody.length==contentLength)	//if we read all the response body
 						{
 							return responseBody;	//return the response body

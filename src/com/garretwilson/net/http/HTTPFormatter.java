@@ -8,12 +8,12 @@ import static java.util.Collections.*;
 import static com.garretwilson.net.http.BasicAuthenticationConstants.*;
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
-import static com.garretwilson.security.MessageDigestUtilities.*;
 
 import com.garretwilson.text.FormatUtilities;
 import static com.garretwilson.text.CharacterEncoding.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.globalmentor.java.Characters.*;
+import static com.globalmentor.security.MessageDigestUtilities.*;
 
 import com.globalmentor.util.Base64;
 import com.globalmentor.util.NameValuePair;

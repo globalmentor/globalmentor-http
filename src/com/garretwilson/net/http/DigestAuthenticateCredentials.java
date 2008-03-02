@@ -4,11 +4,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import static com.garretwilson.net.http.DigestAuthenticationConstants.*;
-import static com.garretwilson.security.MessageDigestUtilities.*;
-import static com.garretwilson.security.SecurityConstants.*;
 import static com.globalmentor.java.Bytes.*;
 import static com.globalmentor.java.Longs.*;
 import static com.globalmentor.java.Objects.checkInstance;
+import static com.globalmentor.security.MessageDigestUtilities.*;
 
 /**An encapsulation of digest authenticate credentials of HTTP Digest Access Authentication,
 <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,
