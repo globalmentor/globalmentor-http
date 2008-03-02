@@ -13,7 +13,7 @@ import com.garretwilson.text.FormatUtilities;
 import static com.garretwilson.text.CharacterEncoding.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.globalmentor.java.Characters.*;
-import static com.globalmentor.security.MessageDigestUtilities.*;
+import static com.globalmentor.security.MessageDigests.*;
 
 import com.globalmentor.util.Base64;
 import com.globalmentor.util.NameValuePair;

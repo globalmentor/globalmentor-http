@@ -15,7 +15,7 @@ import com.garretwilson.text.SyntaxException;
 import com.globalmentor.io.InputStreams;
 import com.globalmentor.io.ParseIOException;
 import com.globalmentor.io.ParseReader;
-import static com.globalmentor.security.MessageDigestUtilities.*;
+import static com.globalmentor.security.MessageDigests.*;
 import com.globalmentor.util.*;
 
 import static com.globalmentor.java.Booleans.*;
