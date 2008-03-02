@@ -12,9 +12,9 @@ import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.security.MessageDigests.*;
 import static com.globalmentor.text.CharacterEncoding.*;
-import static com.globalmentor.text.FormatUtilities.*;
+import static com.globalmentor.text.TextFormatter.*;
 
-import com.globalmentor.text.FormatUtilities;
+import com.globalmentor.text.TextFormatter;
 import com.globalmentor.util.Base64;
 import com.globalmentor.util.NameValuePair;
 
@@ -199,12 +199,12 @@ public class HTTPFormatter
 	@param stringBuilder The string builder into which the result should be placed.
 	@param items The objects to be formatted.
 	@return The string buffer containing the new information.
-	@see FormatUtilities#formatList(StringBuilder, char, Object[])
+	@see TextFormatter#formatList(StringBuilder, char, Object[])
 	@see Object#toString
 	*/
 	public static StringBuilder formatList(final StringBuilder stringBuilder, final Object... items)
 	{
-		return FormatUtilities.formatList(stringBuilder, LIST_DELIMITER, items);	//format the items as a list
+		return TextFormatter.formatList(stringBuilder, LIST_DELIMITER, items);	//format the items as a list
 	}
 
 	/**Appends the string representations of the given objects separated by the HTTP list delimiter character.
@@ -216,7 +216,7 @@ public class HTTPFormatter
 	*/
 	public static StringBuilder formatList(final StringBuilder stringBuilder, final Iterable<?> iterable)
 	{
-		return FormatUtilities.formatList(stringBuilder, LIST_DELIMITER, iterable);	//format the list with a string delimiter
+		return TextFormatter.formatList(stringBuilder, LIST_DELIMITER, iterable);	//format the list with a string delimiter
 	}
 
 }

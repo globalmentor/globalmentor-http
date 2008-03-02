@@ -6,7 +6,7 @@ import static com.garretwilson.net.http.HTTPConstants.*;
 
 import com.globalmentor.util.NameValuePair;
 
-import static com.globalmentor.text.FormatUtilities.*;
+import static com.globalmentor.text.TextFormatter.*;
 
 /**An abstract encapsulation of a challenge to be sent back to client.
 @author Garret Wilson
