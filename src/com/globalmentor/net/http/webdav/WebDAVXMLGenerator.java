@@ -20,11 +20,11 @@ import java.net.URI;
 import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 
 import static com.globalmentor.net.http.webdav.WebDAV.*;
 import static com.globalmentor.text.xml.XML.*;
 import com.globalmentor.text.xml.XMLNamespacePrefixManager;
+import com.globalmentor.util.ConfigurationException;
 
 import org.w3c.dom.*;
 
@@ -38,17 +38,11 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 
 	/**Creates and returns a default document builder for WebDAV, with namespace awareness but no validation.
 	@return A new XML document builder for handling WebDAV XML content.
+	@throws ConfigurationException if a document builder cannot be created which satisfies the configuration requested.
 	*/
 	private static DocumentBuilder createWebDAVDocumentBuilder()
 	{
-		try
-		{
-			return createDocumentBuilder(true);	//create a document builder with namespace awareness
-		}
-		catch(final ParserConfigurationException parserConfigurationException)	//we should always support a namespace-aware DOM implementation
-		{
-			throw new AssertionError(parserConfigurationException);
-		}			
+		return createDocumentBuilder(true);	//create a document builder with namespace awareness
 	}
 
 	/**The document builder used as an XML document factory.*/
