@@ -1,9 +1,24 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http.webdav;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
 import static java.util.Collections.*;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -12,7 +27,7 @@ import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import com.globalmentor.net.http.*;
-import static com.globalmentor.net.http.webdav.WebDAVConstants.*;
+import static com.globalmentor.net.http.webdav.WebDAV.*;
 import com.globalmentor.util.*;
 
 import org.w3c.dom.*;
@@ -114,7 +129,7 @@ public class WebDAVResource extends HTTPResource
 
 	/**Determines the exists state for this resource
 	The value is not retrieved from the cache.
-	If this resource uses a cache, this version invokes the {@value WebDAVConstants#PROPFIND_METHOD} method to determine existence and cache child properties at one time.
+	If this resource uses a cache, this version invokes the {@value WebDAV#PROPFIND_METHOD} method to determine existence and cache child properties at one time.
 	@return The latest determined existence status.
 	@exception IOException if there was an error invoking a method.
 	*/
@@ -163,7 +178,7 @@ public class WebDAVResource extends HTTPResource
 		try
 		{
 			final List<WebDAVProperty> properties=propFind();	//get properties for this resource, which will cache the properties along with the existence and collection states
-			return WebDAVUtilities.isCollection(properties);	//send back whether the resource is a collection
+			return WebDAV.isCollection(properties);	//send back whether the resource is a collection
 		}
 		catch(final HTTPNotFoundException notFoundException)	//404 Not Found
 		{
@@ -350,7 +365,7 @@ public class WebDAVResource extends HTTPResource
 		uncacheInfo(destinationURI);	//remove the cache information of the destination, because this resource replaced it
 	}
 		
-	/**Retrieves properties using the {@value WebDAVConstants#PROPFIND_METHOD} method.
+	/**Retrieves properties using the {@value WebDAV#PROPFIND_METHOD} method.
 	Cached properties are never used for any depth except {@link Depth#ZERO}, although cached properties are updated if caching is enabled.	
 	The URI of each resource is canonicized to be an absolute URI.
 	Returned property values may be <code>null</code>.
@@ -398,7 +413,7 @@ public class WebDAVResource extends HTTPResource
 						for(final NameValuePair<URI, List<WebDAVProperty>> propertyList:propertyLists)	//look at each property list
 						{
 							final List<WebDAVProperty> properties=propertyList.getValue();	//cache the list of properties for this resource
-							final boolean isCollection=WebDAVUtilities.isCollection(properties);	//see if this resource is a collection
+							final boolean isCollection=WebDAV.isCollection(properties);	//see if this resource is a collection
 							final CacheKey cacheKey=new CacheKey(httpClient, propertyList.getName());	//create a key for the caches
 							cachedExistsMap.put(cacheKey, new CachedExists(true));	//show that this resource exists
 							cachedPropertiesMap.put(cacheKey, new CachedProperties(properties, isCollection));	//cache the properties for this resource

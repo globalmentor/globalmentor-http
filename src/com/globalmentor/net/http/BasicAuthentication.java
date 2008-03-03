@@ -16,9 +16,15 @@
 
 package com.globalmentor.net.http;
 
-/**An encapsulation of a challenge to be sent back to client.
+/**Constants for HTTP Digest Access Authentication,
+<a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,
+	"HTTP Authentication: Basic and Digest Access Authentication", which obsoletes
+<a href="http://www.ietf.org/rfc/rfc2069.txt">RFC 2069</a>,
+	"An Extension to HTTP : Digest Access Authentication".
 @author Garret Wilson
 */
-public interface AuthenticateChallenge extends HTTPAuthentication
+public class BasicAuthentication
 {
+	/**The delimiter used when concatenating multiple strings before Base64-encoding.*/
+	public final static char BASIC_DELIMITER=':';
 }

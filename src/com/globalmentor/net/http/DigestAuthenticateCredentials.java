@@ -1,3 +1,19 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http;
 
 import java.security.MessageDigest;
@@ -5,8 +21,8 @@ import java.security.NoSuchAlgorithmException;
 
 import static com.globalmentor.java.Bytes.*;
 import static com.globalmentor.java.Longs.*;
-import static com.globalmentor.java.Objects.checkInstance;
-import static com.globalmentor.net.http.DigestAuthenticationConstants.*;
+import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.http.DigestAuthentication.*;
 import static com.globalmentor.security.MessageDigests.*;
 
 /**An encapsulation of digest authenticate credentials of HTTP Digest Access Authentication,
@@ -227,7 +243,6 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 	*/
 	public boolean isValid(final String method, final char[] password)
 	{
-//G***del Debug.trace("comparing digest", getRequestDigest(method, password), "with received response", getResponse());
 		return getRequestDigest(method, password).equals(getResponse());	//see if what we calculate matches what we already have
 	}
 		
@@ -292,7 +307,7 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 	@param password The user password.
 	@return The hash of the username, realm, and password, with correct delimiters, as specified by RFC 2617.
 	*/
-/*G***fix
+/*TODO fix
 	public static String getUsernameRealmPasswordHash(final String username, final String realm, final char[] password)
 	{
 		final MessageDigest messageDigest=getMessageDigest();	//get the message digest
@@ -348,7 +363,7 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 	This version only returns the realm parameter.
 	Child classes may override this method and append other parameters to the list before returning it.
 	*/
-/*G***del
+/*TODO del
 	public List<NameValuePair<String, String>> getParameters()
 	{
 		final List<NameValuePair<String, String>> parameterList=new ArrayList<NameValuePair<String, String>>();	//create the list of parameters
@@ -358,7 +373,7 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 */
 
 	/**@return A string representation of the challenge.*/
-/*G***del
+/*TODO del
 	public final String toString()
 	{
 		final StringBuilder stringBuilder=new StringBuilder();

@@ -1,3 +1,19 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http;
 
 import java.io.*;
@@ -5,12 +21,9 @@ import java.util.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
 import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.net.http.HTTPConstants.*;
+import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.net.http.HTTPParser.*;
 import static com.globalmentor.text.xml.XML.*;
 
@@ -18,6 +31,9 @@ import com.globalmentor.io.ParseReader;
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.text.xml.XMLSerializer;
 import com.globalmentor.util.*;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**An abstract implementation of an HTTP request or response as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
@@ -162,7 +178,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 		Updates the Content-Length header.
 		@param body The body content.
 		@exception NullPointerException if the given body is <code>null</code>.
-		@see HTTPConstants#CONTENT_LENGTH_HEADER
+		@see HTTP#CONTENT_LENGTH_HEADER
 		*/
 		public void setBody(final byte[] body)
 		{
@@ -181,7 +197,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 
 	/**@return An array of connection tokens indicating whether the connection should be persistent,
 	 	or <code>null</code> if there is no connection header.
-	@see HTTPConstants#CONNECTION_HEADER
+	@see HTTP#CONNECTION_HEADER
 	*/
 	public String[] getConnection()
 	{
@@ -199,8 +215,8 @@ public class AbstractHTTPMessage implements HTTPMessage
 	/**Determines whether the Connection header is present with the token "close".
 	@return	<code>true</code> if the Connection header contains the "close" token.
 	@see #getConnection()
-	@see HTTPConstants#CONNECTION_HEADER
-	@see HTTPConstants#CONNECTION_CLOSE
+	@see HTTP#CONNECTION_HEADER
+	@see HTTP#CONNECTION_CLOSE
 	*/
 	public boolean isConnectionClose()
 	{
@@ -220,8 +236,8 @@ public class AbstractHTTPMessage implements HTTPMessage
 
 	/**Sets the Connection header with the given connection token.
 	@param connection The connection token such as "close".
-	@see HTTPConstants#CONNECTION_HEADER
-	@see HTTPConstants#CONNECTION_CLOSE
+	@see HTTP#CONNECTION_HEADER
+	@see HTTP#CONNECTION_CLOSE
 	*/
 	public void setConnection(final String connection)
 	{
@@ -231,8 +247,8 @@ public class AbstractHTTPMessage implements HTTPMessage
 	/**Sets whether the connection should be closed after the response.
 	@param close <code>true</code> if the connection flagged to be closed after the response.
 	@see #setConnection(String)
-	@see HTTPConstants#CONNECTION_HEADER
-	@see HTTPConstants#CONNECTION_CLOSE
+	@see HTTP#CONNECTION_HEADER
+	@see HTTP#CONNECTION_CLOSE
 	*/
 	public void setConnectionClose(final boolean close)
 	{
@@ -243,7 +259,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 
 	/**@return The content length, or <code>-1</code> if no content length is given.
 	@exception SyntaxException if the content length is given but in an invalid format.
-	@see HTTPConstants#CONTENT_LENGTH_HEADER
+	@see HTTP#CONTENT_LENGTH_HEADER
 	*/
 	public long getContentLength() throws SyntaxException
 	{
@@ -268,7 +284,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 	/**Sets the content length header.
 	@param contentLength The length of the body content.
 	@exception IllegalArgumentException if the given content length is less than zero.
-	@see HTTPConstants#CONTENT_LENGTH_HEADER
+	@see HTTP#CONTENT_LENGTH_HEADER
 	*/
 	public void setContentLength(final long contentLength)
 	{
@@ -282,7 +298,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 	//Transfer-Encoding header
 
 	/**@return An array of specified transfer encodings, or <code>null</code> if no transfer encodings are specified.
-	@see HTTPConstants#TRANSFER_ENCODING_HEADER
+	@see HTTP#TRANSFER_ENCODING_HEADER
 	*/
 	public String[] getTransferEncoding()
 	{

@@ -1,3 +1,19 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http.webdav;
 
 import java.net.*;
@@ -5,9 +21,8 @@ import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static com.globalmentor.net.http.webdav.WebDAVConstants.*;
+import static com.globalmentor.net.http.webdav.WebDAV.*;
 import static com.globalmentor.text.xml.XML.*;
-
 import com.globalmentor.util.*;
 
 import org.w3c.dom.*;
@@ -21,13 +36,13 @@ public class WebDAVXMLProcessor
 {
 
 	/**Retrieves a list of properties parsed from the children of the given XML element, such as a <code>D:propfind</code> element.
-	The {@value WebDAVConstants#ELEMENT_ALLPROP} and {@value WebDAVConstants#ELEMENT_PROPNAME} conditions are supported.
+	The {@value WebDAV#ELEMENT_ALLPROP} and {@value WebDAV#ELEMENT_PROPNAME} conditions are supported.
 	@param request The HTTP request in response to which properties are being retrieved.
 	@param element The XML element parent of the property list.
-	@return A list of all requested properties, or {@link WebDAVConstants#ALL_PROPERTIES} or
-		{@link WebDAVConstants#PROPERTY_NAMES} indicating all properties or all property names, respectively.
-	@see WebDAVConstants#ALL_PROPERTIES
-	@see WebDAVConstants#PROPERTY_NAMES
+	@return A list of all requested properties, or {@link WebDAV#ALL_PROPERTIES} or
+		{@link WebDAV#PROPERTY_NAMES} indicating all properties or all property names, respectively.
+	@see WebDAV#ALL_PROPERTIES
+	@see WebDAV#PROPERTY_NAMES
 	*/
 	public static DecoratorIDedMappedList<URI, WebDAVPropertyName> getPropfindProperties(final HttpServletRequest request, final Element element)
 	{
@@ -38,7 +53,6 @@ public class WebDAVXMLProcessor
 			final Node childNode=childList.item(childIndex);	//get this child node
 			if(childNode.getNodeType()==Node.ELEMENT_NODE)	//if this is an element
 			{
-//G***del				final Element childElement=(Element)childNode;	//get a reference to this element
 				if(WEBDAV_NAMESPACE.equals(childNode.getNamespaceURI()))	//if this is a WebDAV element
 				{
 					final String childLocalName=childNode.getLocalName();	//get the child element's local name
@@ -171,7 +185,6 @@ public class WebDAVXMLProcessor
 			final Node childNode=childList.item(childIndex);	//get this child node
 			if(childNode.getNodeType()==Node.ELEMENT_NODE)	//if this is an element
 			{
-//G***del				final Element childElement=(Element)childNode;	//get a reference to this element
 				if(WEBDAV_NAMESPACE.equals(childNode.getNamespaceURI()))	//if this is a WebDAV element
 				{
 					final String childLocalName=childNode.getLocalName();	//get the child element's local name

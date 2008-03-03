@@ -1,7 +1,22 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http;
 
 import java.io.*;
-import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import static java.util.Collections.*;
@@ -22,8 +37,8 @@ import static com.globalmentor.java.Bytes.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.StringBuilders.*;
-import static com.globalmentor.net.http.DigestAuthenticationConstants.*;
-import static com.globalmentor.net.http.HTTPConstants.*;
+import static com.globalmentor.net.http.DigestAuthentication.*;
+import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.util.Maps.*;
 
 /**Parses HTTP content. 
@@ -48,7 +63,6 @@ public class HTTPParser
 		int value;	//we'll keep track of each value we read
 		while((value=inputStream.read())>=0)	//read another value; while we haven't reached the end of the data stream
 		{
-//G***del Debug.trace("read value", value, "character", (char)value);
 			if(version==null)	//if we're parsing the version
 			{
 				if(value==CR)	//ignore beginning CRLF sequences to compensate for buggy HTTP 1.0 implementations, as per the HTTP 1.1 specifications
@@ -271,7 +285,6 @@ public class HTTPParser
 	protected static String parseHeaderLine(final InputStream inputStream) throws ParseIOException, EOFException, IOException	//TODO make sure our byte-level processing doesn't interfere with any UTF-8 encoding
 	{
 		final ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();	//create a dynamic byte array
-//G***del		byte b;	//we'll keep track of each byte we read
 		int value;	//we'll keep track of each value we read
 		boolean foldingLWS=false;	//whether we are currently folding linear whitespace
 		while((value=inputStream.read())>=0)	//read another value; while we haven't reached the end of the data stream
@@ -305,7 +318,7 @@ public class HTTPParser
 	}
 
 	/**Parses a list of attribute name/value pairs.*/
-/*G***fix
+/*TODO fix
 	public final List<NameValuePair<String, String>> parseList(final String string)
 	{
 		
@@ -318,7 +331,7 @@ public class HTTPParser
 */
 
 	/**Parses a list of */
-/*G***fix
+/*TODO fix
 	public final List<NameValuePair<String, String>> parseList(final String string)
 	{
 		
@@ -488,7 +501,7 @@ public class HTTPParser
 	@param reader The source of the data.
 	@exception IOException if there is an error reading the data.
 	*/
-/*G***fix
+/*TODO fix
 	public List<NameValuePair<String, String>> parseParameters(final ParseReader reader) throws IOException
 	{
 		reader.skipChars(LWS_CHARS);	//skip whitespace
@@ -513,7 +526,7 @@ public class HTTPParser
 	@return The credentials from the authorization header.
 	@exception SyntaxException if the given header was not syntactically correct.
 	@exception IllegalArgumentException if the authorization information is not supported. 
-	@see HTTPConstants#AUTHORIZATION_HEADER
+	@see HTTP#AUTHORIZATION_HEADER
 	*/
 	public static AuthenticateCredentials parseAuthorizationHeader(final CharSequence header) throws SyntaxException, IllegalArgumentException
 	{
@@ -593,7 +606,7 @@ public class HTTPParser
 	@param header The header value.
 	@return The challenge from the authenticate header.
 	@exception SyntaxException if the given header did not contain valid information.
-	@see HTTPConstants#WWW_AUTHENTICATE_HEADER
+	@see HTTP#WWW_AUTHENTICATE_HEADER
 	*/
 	public static AuthenticateChallenge parseWWWAuthenticateHeader(final CharSequence header) throws SyntaxException, IllegalArgumentException
 	{

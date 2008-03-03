@@ -1,3 +1,19 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http;
 
 import java.io.*;
@@ -11,7 +27,7 @@ import com.globalmentor.util.*;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.net.http.HTTPConstants.*;
+import static com.globalmentor.net.http.HTTP.*;
 
 /**A client's view of an HTTP resource on the server.
 For many error conditions, a subclass of {@link HTTPException} will be thrown.
@@ -133,10 +149,9 @@ public class HTTPResource extends DefaultResource
 		{
 			throw new IllegalArgumentException("URI "+referenceURI+" has no host specified.");
 		}
-		final String scheme=referenceURI.getScheme();	//get the URI scheme
-		if(!HTTP_SCHEME.equals(scheme) && !HTTPS_SCHEME.equals(scheme))	//if this isn't a HTTP or HTTPS resource
+		if(!isHTTPURI(referenceURI))	//if this isn't a HTTP or HTTPS resource
 		{
-			throw new IllegalArgumentException("Invalid HTTP scheme "+scheme);
+			throw new IllegalArgumentException("Invalid HTTP scheme "+referenceURI.getScheme());
 		}
 		this.client=checkInstance(client, "Client cannot be null.");	//save the client
 		this.passwordAuthentication=passwordAuthentication;	//save the password authentication
@@ -156,7 +171,7 @@ public class HTTPResource extends DefaultResource
 	}
 
 	/**Determines if a resource exists.
-	This implementation checks for existence by invoking the {@value HTTPConstants#HEAD_METHOD} method if values are not cached.
+	This implementation checks for existence by invoking the {@value HTTP#HEAD_METHOD} method if values are not cached.
 	@return <code>true</code> if the resource is present on the server.
 	@exception IOException if there was an error invoking a method.
 	*/
@@ -181,7 +196,7 @@ public class HTTPResource extends DefaultResource
 
 	/**Determines the exists state for this resource
 	The value is not retrieved from the cache.
-	This version invokes the {@value HTTPConstants#HEAD_METHOD} method to determine existence.
+	This version invokes the {@value HTTP#HEAD_METHOD} method to determine existence.
 	@return The latest determined existence status.
 	@exception IOException if there was an error invoking a method.
 	*/
@@ -212,7 +227,7 @@ public class HTTPResource extends DefaultResource
 		return new ByteArrayInputStream(get());	//return an input stream to the result of the GET method
 	}
 
-	/**Retrieves the contents of a resource using the {@value HTTPConstants#GET_METHOD} method.
+	/**Retrieves the contents of a resource using the {@value HTTP#GET_METHOD} method.
 	The cached existence property is updated if information is being cached.
 	@return The content received from the server.
 	@exception IOException if there was an error invoking the method.
@@ -295,7 +310,6 @@ public class HTTPResource extends DefaultResource
 	*/
 	public void put(final byte[] content) throws IOException
 	{
-//TODO del Debug.trace("ready to put bytes:", content.length);
 		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getURI());	//create a PUT request
 		request.setBody(content);	//set the content of the request 
 		final HTTPResponse response=sendRequest(request);	//get the response
@@ -354,7 +368,7 @@ public class HTTPResource extends DefaultResource
 	protected HTTPResponse sendRequest(final HTTPRequest request) throws IOException	//TODO add connection peristence
 	{
 		final URI referenceURI=getURI();	//get the reference URI
-		final boolean secure=HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
+		final boolean secure=HTTP.HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
 		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
 		try
 		{
@@ -374,7 +388,7 @@ public class HTTPResource extends DefaultResource
 	protected HTTPResponse sendRequest(final HTTPRequest request, final Authenticable authenticator) throws IOException	//TODO add connection peristence
 	{
 		final URI referenceURI=getURI();	//get the reference URI
-		final boolean secure=HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
+		final boolean secure=HTTP.HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
 		final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
 		try
 		{

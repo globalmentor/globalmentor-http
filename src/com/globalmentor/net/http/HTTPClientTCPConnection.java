@@ -1,10 +1,23 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http;
 
 import java.io.*;
 import java.net.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.*;
-import static java.nio.channels.Channels.*;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -12,28 +25,20 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-
-
-import com.garretwilson.swing.BasicOptionPane;
-import com.garretwilson.swing.PasswordPanel;
-
 
 import com.globalmentor.io.*;
 import com.globalmentor.net.*;
 import com.globalmentor.security.DefaultNonce;
 import com.globalmentor.security.Nonce;
-import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.*;
 
-import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.net.http.HTTPConstants.*;
+import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
 import static com.globalmentor.text.CharacterEncoding.*;
@@ -62,18 +67,6 @@ public class HTTPClientTCPConnection
 		/**@return The client with which this connection is associated.*/
 		protected HTTPClient getClient() {return client;}
 
-	/**The URI to connect to, or to which the connection has been permanently directed.*/
-//G***del	private URI uri;
-
-		/**@return The URI to connect to, or to which the connection has been permanently directed.*/
-//G***del		public URI getURI() {return uri;}
-
-	/**The final endpoint URI of the connection, reflecting any temporary redirects.*/
-//G***del	private URI finalURI;
-
-		/**The final endpoint URI of the connection, reflecting any temporary redirects.*/
-//G***del		private URI finalURI;
-
 	/**The host to which to connect.*/
 	private final Host host;
 
@@ -91,13 +84,6 @@ public class HTTPClientTCPConnection
 
 		/**@return The socket to the server.*/
 		private Socket getSocket() {return socket;}
-
-	/**The channel to the server.*/
-//G***del	private SocketChannel channel=null;
-
-		/**@return The channel to the server.*/
-//G***del		private Channel getChannel() {return channel;}
-
 		
 	/**The connection-specific password authentication, or <code>null</code> if this connection specifies no password authentication.*/
 	private final PasswordAuthentication passwordAuthentication;
@@ -136,8 +122,8 @@ public class HTTPClientTCPConnection
 		{
 			disconnect();	//make sure we're disconnected
 			final int port=host.getPort();	//get the port, if any
-//G***fix			final InetSocketAddress socketAddress=new InetSocketAddress(host.getName(), port>=0 ? port : DEFAULT_PORT);	//create a new socket address
-//G***fix			channel=SocketChannel.open(socketAddress);	//open a channel to the address
+//TODO fix			final InetSocketAddress socketAddress=new InetSocketAddress(host.getName(), port>=0 ? port : DEFAULT_PORT);	//create a new socket address
+//TODO fix			channel=SocketChannel.open(socketAddress);	//open a channel to the address
 //		TODO del Debug.trace("ready to make connection, with secure:", isSecure());
 			if(isSecure())	//if this is a secure connection
 			{
@@ -189,8 +175,8 @@ public class HTTPClientTCPConnection
 				socket=new Socket(host.getName(), port>=0 ? port : DEFAULT_PORT);	//open a socket to the host
 			}
 			//TODO later turn on non-blocking access when we have a separate client which will on a separate thread feed requests and retrieve responses
-//G***fix			inputStream=new BufferedInputStream(newInputStream(channel));	//create a new input stream from the channel
-//		G***fix			outputStream=new BufferedOutputStream(newOutputStream(channel));	//create a new output stream to the channel
+//TODO fix			inputStream=new BufferedInputStream(newInputStream(channel));	//create a new input stream from the channel
+//TODO fix			outputStream=new BufferedOutputStream(newOutputStream(channel));	//create a new output stream to the channel
 			inputStream=new BufferedInputStream(socket.getInputStream());	//get an input stream from the socket
 			outputStream=new BufferedOutputStream(socket.getOutputStream());	//get an output stream from the socket
 			if(getClient().isLogged())	//if we're using a logged client
@@ -255,22 +241,22 @@ public class HTTPClientTCPConnection
 		public Queue<HTTPRequest> getRequestQueue() {return requestQueue;}
 
 	/**The queue of outgoing responses.*/
-//G***fix	private final Queue<HTTPRequest> requestQueue=new ConcurrentLinkedQueue<HTTPRequest>();
+//TODO fix	private final Queue<HTTPRequest> requestQueue=new ConcurrentLinkedQueue<HTTPRequest>();
 
 		/**@return The queue of outgoing responses.*/
-//G***fix		public Queue<HTTPRequest> getRequestQueue() {return requestQueue;}
+//TODO fix		public Queue<HTTPRequest> getRequestQueue() {return requestQueue;}
 
 	/**The buffer for writing requests.*/
-//G***fix	private ByteBuffer writeBuffer=ByteBuffer.allocate(16*1024);	//create a 16k buffer
+//TODO fix	private ByteBuffer writeBuffer=ByteBuffer.allocate(16*1024);	//create a 16k buffer
 
 		/**@return The buffer for writing requests.*/
-//	G***fix		protected ByteBuffer getWriteBuffer() {return writeBuffer;}
+//	TODO fix		protected ByteBuffer getWriteBuffer() {return writeBuffer;}
 
 	/**The buffer for reading responses.*/
-//	G***fix	private ByteBuffer readBuffer=ByteBuffer.allocate(16*1024);	//create a 16k buffer
+//	TODO fix	private ByteBuffer readBuffer=ByteBuffer.allocate(16*1024);	//create a 16k buffer
 
 		/**@return The buffer for reading responses.*/
-//	G***fix		protected ByteBuffer getReadBuffer() {return writeBuffer;}
+//	TODO fix		protected ByteBuffer getReadBuffer() {return writeBuffer;}
 
 	/**URI constructor.
 	@param client The client with which this connection is associated.
@@ -278,7 +264,7 @@ public class HTTPClientTCPConnection
 	@exception NullPointerException if the given client is <code>null</code>.
 	@exception IllegalArgumentException if the given URI does not contain a valid host.
 	*/
-/*G***del if not needed
+/*TODO del if not needed
 	HTTPClientTCPConnection(final HTTPClient client, final URI uri)
 	{
 		this.client=client;	//save the client
@@ -335,7 +321,7 @@ public class HTTPClientTCPConnection
 	{
 //	TODO del Debug.trace("getting response");
 		final HTTPRequest request=getRequestQueue().remove();	//get the next request
-		long nonceCount=0;	//G***testing
+		long nonceCount=0;	//TODO testing
 		try
 		{
 					//TODO find a way to store authentication information in the request if we already have it
@@ -383,7 +369,7 @@ public class HTTPClientTCPConnection
 							//TODO make sure that QOP.AUTH is allowed in the challenge
 							if(++nonceCount>3)	//increase our nonce count; only allow three attempts
 							{
-								break;	//G***testing
+								break;	//TODO testing
 							}
 							final AuthenticateCredentials credentials;	//try to get credentials based upon the authentication type
 							if(challenge instanceof BasicAuthenticateChallenge)	//if this is basic authentication
@@ -482,7 +468,7 @@ public class HTTPClientTCPConnection
 			{
 				disconnect();	//always disconnect from the host
 			}
-			else	//G***del
+			else	//TODO del
 			{
 //			TODO del 				Debug.trace("staying alive");
 			}
@@ -588,7 +574,7 @@ public class HTTPClientTCPConnection
 		final Host host=URIs.getHost(uri);	//get the host
 		request.setHost(host);	//set the host header to be identical to the host in our request URI
 		final byte[] requestBody=request.getBody();	//get the request body
-/*G***del when works; maybe check and give an error if the content length doesn't reflect the length of the body
+/*TODO del when works; maybe check and give an error if the content length doesn't reflect the length of the body
 		if(requestBody.length>0)	//if there is a request body
 		{
 			request.setContentLength(requestBody.length);	//set the content length
@@ -598,7 +584,7 @@ public class HTTPClientTCPConnection
 			request.removeHeaders(CONTENT_LENGTH_HEADER);	//remove the content length header
 		}
 */
-/*G***del
+/*TODO del
 		if(requestBody!=null)	//if there is a request body
 		{
 			request.setContentLength(requestBody.length);	//set the content length
@@ -635,7 +621,7 @@ public class HTTPClientTCPConnection
 	@param header The HTTP header to write.
 	@exception IOException if there is an error writing the data.
 	*/
-/*G***del if not needed
+/*TODO del if not needed
 	protected static void writeHeader(final OutputStream outputStream, final NameValuePair<String, String> header) throws IOException
 	{
 		writeLine(outputStream, formatHeader(new StringBuilder(), header));	//format and write out a header line
@@ -647,7 +633,7 @@ public class HTTPClientTCPConnection
 	@param line The line of HTTP content to write.
 	@exception IOException if there is an error writing the data.
 	*/
-/*G***del
+/*TODO del
 	protected static void writeLine(final OutputStream outputStream, final CharSequence line) throws IOException
 	{
 		outputStream.write(getBytes(line));	//write the line
@@ -674,7 +660,7 @@ public class HTTPClientTCPConnection
 	/**Closes the connection.
 	@exception IOException if there is a problem closing the connection.
 	*/
-/*G***del
+/*TODO del
 	public void close() throws IOException
 	{
 		getChannel().close();	//close the channel

@@ -1,15 +1,27 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.net.http.HTTPConstants.*;
+import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
-
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.Debug;
 
@@ -85,7 +97,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	*/
 	public void checkStatus() throws HTTPException
 	{
-//G***del if not needed		checkStatus(getStatusCode(), getReasonPhrase());	//check the status code and reason phrase
+//TODO del if not needed		checkStatus(getStatusCode(), getReasonPhrase());	//check the status code and reason phrase
 		try
 		{
 			final int statusCode=getStatusCode();	//get the status code
@@ -167,7 +179,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	@exception HTTPException if the response code represents a known error condition
 		for which an HTTP exception class is available.
 	*/
-/*G***del if not needed
+/*TODO del if not needed
 	public static void checkStatus(final int statusCode, final String reasonPhrase) throws HTTPException
 	{
 		switch(statusCode)	//see which response code this is
@@ -191,7 +203,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 			   space to record the state of the resource after the execution of this
 			   method.
 */
-/*G***del if not needed
+/*TODO del if not needed
 		}
 	}
 */
@@ -202,7 +214,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 		or <code>null</code> if there is no such header.
 	@exception SyntaxException if the given header was not syntactically correct.
 	@exception IllegalArgumentException if the authorization information is not supported. 
-	@see HTTPConstants#WWW_AUTHENTICATE_HEADER
+	@see HTTP#WWW_AUTHENTICATE_HEADER
 	*/
 	public AuthenticateChallenge getWWWAuthenticate() throws SyntaxException, IllegalArgumentException
 	{
@@ -212,7 +224,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 
 	/**Sets the response header challenging the client to authenticate itself.
 	@param challenge The authenticate challenge to issue to the client.
-	@see HTTPConstants#WWW_AUTHENTICATE_HEADER
+	@see HTTP#WWW_AUTHENTICATE_HEADER
 	*/
 	public void setWWWAuthenticate(final AuthenticateChallenge challenge)
 	{

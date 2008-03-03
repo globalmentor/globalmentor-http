@@ -1,6 +1,22 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http.webdav;
 
-import static com.globalmentor.net.http.webdav.WebDAVConstants.*;
+import static com.globalmentor.net.http.webdav.WebDAV.*;
 
 import java.net.URI;
 
@@ -38,7 +54,7 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 
 	/**Gets the requested depth from the header.
   @return The depth or <code>Depth.INFINITY</code> if an infinite, undefined, or or unrecognized depth is indicated.
-	@see WebDAVConstants#DEPTH_HEADER
+	@see WebDAV#DEPTH_HEADER
 	*/
 	public Depth getDepth()
 	{
@@ -67,7 +83,7 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 
 	/**Sets the depth.
 	@param depth The requested depth.
-	@see WebDAVConstants#DEPTH_HEADER
+	@see WebDAV#DEPTH_HEADER
 	*/
 	public void setDepth(final Depth depth)
 	{
@@ -77,9 +93,9 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 	}
 
 	/**Retrieves the destination URI.
-	@return The URI indicating the destination of a COPY or MOVE,	or <code>null</code> if the {@value WebDAVConstants#DESTINATION_HEADER} header is not present.
+	@return The URI indicating the destination of a COPY or MOVE,	or <code>null</code> if the {@value WebDAV#DESTINATION_HEADER} header is not present.
 	@exception IllegalArgumentException if the destination header value does not represent a valid URI or the represented URI is not absolute.
-	@see WebDAVConstants#DESTINATION_HEADER
+	@see WebDAV#DESTINATION_HEADER
 	*/
 	public URI getDestination()
 	{
@@ -103,7 +119,7 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 	The destination header value is ignored if it does not represennt a valid URI or the represented URI is not absolute.
 	@param destinationURI The absolute URI indicating the destination of a COPY or MOVE.
 	@exception IllegalArgumentException if the given destination URI is not absolute.
-	@see WebDAVConstants#DESTINATION_HEADER
+	@see WebDAV#DESTINATION_HEADER
 	*/
 	public void setDestination(final URI destinationURI)
 	{
@@ -118,11 +134,11 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 	}	
 
 	/**Returns the overwrite status.
-	@return <code>true</code> if the WebDAV {@value WebDAVConstants#OVERWRITE_HEADER} header is missing or {@value WebDAVConstants#OVERWRITE_TRUE}, or <code>false</code> if the value is {@value WebDAVConstants#OVERWRITE_FALSE}.
-	@exception IllegalArgumentException if the overwrite header is present and is not {@value WebDAVConstants#OVERWRITE_TRUE} or {@value WebDAVConstants#OVERWRITE_FALSE}.
-	@see WebDAVConstants#OVERWRITE_HEADER
-	@see WebDAVConstants#OVERWRITE_FALSE
-	@see WebDAVConstants#OVERWRITE_TRUE
+	@return <code>true</code> if the WebDAV {@value WebDAV#OVERWRITE_HEADER} header is missing or {@value WebDAV#OVERWRITE_TRUE}, or <code>false</code> if the value is {@value WebDAV#OVERWRITE_FALSE}.
+	@exception IllegalArgumentException if the overwrite header is present and is not {@value WebDAV#OVERWRITE_TRUE} or {@value WebDAV#OVERWRITE_FALSE}.
+	@see WebDAV#OVERWRITE_HEADER
+	@see WebDAV#OVERWRITE_FALSE
+	@see WebDAV#OVERWRITE_TRUE
 	*/
 	public boolean isOverwrite() throws IllegalArgumentException
 	{
@@ -142,10 +158,10 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 	}
 
 	/**Sets the overwrite status.
-	@param overwrite <code>true</code> if the the WebDAV {@value WebDAVConstants#OVERWRITE_HEADER} should be set to {@value WebDAVConstants#OVERWRITE_TRUE}, else <code>false</code> if it should be set to {@value WebDAVConstants#OVERWRITE_FALSE}.
-	@see WebDAVConstants#OVERWRITE_HEADER
-	@see WebDAVConstants#OVERWRITE_FALSE
-	@see WebDAVConstants#OVERWRITE_TRUE
+	@param overwrite <code>true</code> if the the WebDAV {@value WebDAV#OVERWRITE_HEADER} should be set to {@value WebDAV#OVERWRITE_TRUE}, else <code>false</code> if it should be set to {@value WebDAV#OVERWRITE_FALSE}.
+	@see WebDAV#OVERWRITE_HEADER
+	@see WebDAV#OVERWRITE_FALSE
+	@see WebDAV#OVERWRITE_TRUE
 	*/
 	public void setOverwrite(final boolean overwrite)
 	{

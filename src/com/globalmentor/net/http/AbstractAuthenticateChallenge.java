@@ -1,12 +1,20 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http;
-
-import java.util.*;
-
-
-import com.globalmentor.util.NameValuePair;
-
-import static com.globalmentor.net.http.HTTPConstants.*;
-import static com.globalmentor.text.TextFormatter.*;
 
 /**An abstract encapsulation of a challenge to be sent back to client.
 @author Garret Wilson
@@ -28,28 +36,4 @@ public abstract class AbstractAuthenticateChallenge extends AbstractHTTPAuthenti
 		}
 	}
 
-	/**@return The authorization parameters for this challenge.
-	This version only returns the realm parameter.
-	Child classes may override this method and append other parameters to the list before returning it.
-	*/
-/*G***del
-	public List<NameValuePair<String, String>> getParameters()
-	{
-		final List<NameValuePair<String, String>> parameterList=new ArrayList<NameValuePair<String, String>>();	//create the list of parameters
-		parameterList.add(new NameValuePair<String, String>(REALM_PARAMETER, getRealm()));	//add the realm parameter
-		return parameterList;	//return the list of parameters 
-	}
-*/
-
-	/**@return A string representation of the challenge.*/
-/*G***del
-	public final String toString()
-	{
-		final StringBuilder stringBuilder=new StringBuilder();
-		stringBuilder.append(getScheme()).append(SP);	//authentication scheme
-		final List<NameValuePair<String, String>> parameters=getParameters();	//get the challenge parameters
-		formatAttributes(stringBuilder, parameters.toArray(new NameValuePair[parameters.size()]));	//parameters
-		return stringBuilder.toString();
-	}
-*/
 }

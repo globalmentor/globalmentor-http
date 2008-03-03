@@ -1,6 +1,22 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http;
 
-import static com.globalmentor.java.Floats.*;
+import static com.globalmentor.java.Doubles.*;
 
 import com.globalmentor.java.Objects;
 
@@ -18,17 +34,17 @@ public class WeightedValue<V> implements Comparable<WeightedValue<V>>
 		public V getValue() {return value;}
 
 	/**The weight of the value.*/
-	private final float qvalue;
+	private final double qvalue;
 		
 		/**@return The weight of the value.*/
-		public float getQValue() {return qvalue;}
+		public double getQValue() {return qvalue;}
 
 	/**Value and weight constructor.
 	@param value The weighted value.
 	@param qvalue The weight of the value.
 	@exception IllegalArgumentException if the qvalue is not within the range (0.0, 1.0), inclusive.
 	*/
-	public WeightedValue(final V value, final float qvalue)
+	public WeightedValue(final V value, final double qvalue)
 	{
 		this.value=value;	//save the value
 		this.qvalue=checkRange(qvalue, 0.0f, 1.0f);	//save the qvalue, checking its range
@@ -51,11 +67,9 @@ public class WeightedValue<V> implements Comparable<WeightedValue<V>>
 	@param object The object to be compared.
 	@return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
 	*/
-	public int compareTo(final WeightedValue<V> object)	//TODO improve to sort by value if weighted values are equal, which will often be the case
+	public int compareTo(final WeightedValue<V> object)	//TODO maybe improve to sort by value if weighted values are equal, which will often be the case
 	{
-		final float qvalue1=getQValue();
-		final float qvalue2=object.getQValue();
-		return qvalue1<qvalue2 ? -1 : qvalue1>qvalue2 ? 1 : 0;	//compare the values (subtracting and then casting would incorrectly return zero in many instances)
+		return Double.compare(getQValue(), object.getQValue());	//compare the values
 	}
 
 }

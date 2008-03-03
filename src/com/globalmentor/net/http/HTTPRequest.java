@@ -1,3 +1,19 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http;
 
 import java.net.URI;
@@ -31,13 +47,13 @@ public interface HTTPRequest extends HTTPMessage
 	/**Gets the host information from the header.
 	@return The host name and optional port of the requested resource, or <code>null</code> if there is no host header.
 	@exception SyntaxException if the host header does not contain valid host information. 
-	@see HTTPConstants#HOST_HEADER
+	@see HTTP#HOST_HEADER
 	*/
 	public Host getHost() throws SyntaxException;
 
 	/**Sets the host header.
 	@param host The host name and optional port of the requested resource.
-	@see HTTPConstants#HOST_HEADER
+	@see HTTP#HOST_HEADER
 	*/
 	public void setHost(final Host host);
 
@@ -47,13 +63,13 @@ public interface HTTPRequest extends HTTPMessage
 		or <code>null</code> if there is no such header.
 	@exception SyntaxException if the given header was not syntactically correct.
 	@exception IllegalArgumentException if the authorization information is not supported. 
-	@see HTTPConstants#AUTHORIZATION_HEADER
+	@see HTTP#AUTHORIZATION_HEADER
 	*/
 	public AuthenticateCredentials getAuthorization() throws SyntaxException, IllegalArgumentException;
 
 	/**Sets the response header containing authentication information.
 	@param credentials The authentication credentials to present to the server.
-	@see HTTPConstants#AUTHORIZATION_HEADER
+	@see HTTP#AUTHORIZATION_HEADER
 	*/
 	public void setAuthorization(final AuthenticateCredentials credentials);
 

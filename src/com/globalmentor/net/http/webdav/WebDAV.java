@@ -1,18 +1,36 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http.webdav;
 
 import java.net.URI;
 import java.util.*;
 
+import static com.globalmentor.net.http.webdav.WebDAVPropertyName.*;
+import static com.globalmentor.text.xml.XML.createQualifiedName;
 import com.globalmentor.util.DecoratorIDedMappedList;
 
-import static com.globalmentor.net.http.webdav.WebDAVPropertyName.*;
+import org.w3c.dom.NodeList;
 
-/**Constant values for WebDAV as defined by
+/**Constant values and utilities for WebDAV as defined by
 <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>,	"HTTP Extensions for Distributed Authoring -- WEBDAV".
 <p>Status code declarations and comments used from Tomcat org.apache.catalina.servlets.WebdavServlet by Remy Maucherat Revision: 1.19 $ $Date: 2004/09/19 01:20:10.</p>  
 @author Garret Wilson
 */
-public class WebDAVConstants
+public class WebDAV
 {
 
 	/**The WebDAV COPY method.*/
@@ -162,5 +180,37 @@ public class WebDAVConstants
    * a lock held by another principal.
    */
   public static final int SC_LOCKED = 423;
+
+
+	/**Determines if a resource is a collection based upon given properties
+	@param webdavProperties The properties to examine.
+	@return <code>true</code> if the given properties indicates that the resource is a collection, else <code>false</code>.
+	*/
+	public static boolean isCollection(final List<WebDAVProperty> webdavProperties)
+	{
+		for(final WebDAVProperty webdavProperty:webdavProperties)	//look at each WebDAV property
+		{
+			final WebDAVPropertyName propertyName=webdavProperty.getName();	//get the property name
+			final String propertyNamespace=propertyName.getNamespace();	//get the property namespace
+			if(WEBDAV_NAMESPACE.equals(propertyNamespace))	//if this property is in the WebDAV namespace
+			{
+				final String propertyLocalName=propertyName.getLocalName();	//get the local name of the property
+				if(RESOURCE_TYPE_PROPERTY_NAME.equals(propertyLocalName))	//D:resourcetype
+				{
+					final WebDAVPropertyValue propertyValue=webdavProperty.getValue();	//get the value of the property
+					if(propertyValue instanceof WebDAVDocumentFragmentPropertyValue)	//if the WebDAV property represents a document fragment
+					{
+						final NodeList valueNodes=((WebDAVDocumentFragmentPropertyValue)propertyValue).getDocumentFragment().getChildNodes();	//get the children of the document fragment
+						if(valueNodes.getLength()==1 && COLLECTION_TYPE.equals(createQualifiedName(valueNodes.item(0)).getURI()))	//if there is one child with a reference URI of D:collection
+						{
+							return true;	//indicate that the resource is a collection
+						}
+					}
+					return false;	//if the D:resourcetype property value was not D:collection, the resource is not a collection
+				}
+			}
+		}
+		return false;	//if there is no D:resourcetype property, the resource is not a collection		
+	}
 
 }

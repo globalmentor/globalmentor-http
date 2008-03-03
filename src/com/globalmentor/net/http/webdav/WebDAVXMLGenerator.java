@@ -1,3 +1,19 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http.webdav;
 
 import java.net.URI;
@@ -6,15 +22,11 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-
+import static com.globalmentor.net.http.webdav.WebDAV.*;
+import static com.globalmentor.text.xml.XML.*;
 import com.globalmentor.text.xml.XMLNamespacePrefixManager;
 
-import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.net.http.webdav.WebDAVConstants.*;
-import static com.globalmentor.text.xml.XML.*;
-
 import org.w3c.dom.*;
-
 
 /**Class to generate XML trees for WebDAV as defined by
 <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>,	"HTTP Extensions for Distributed Authoring -- WEBDAV".
@@ -27,7 +39,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	/**Creates and returns a default document builder for WebDAV, with namespace awareness but no validation.
 	@return A new XML document builder for handling WebDAV XML content.
 	*/
-	public static DocumentBuilder createWebDAVDocumentBuilder()	//TODO make private if not needed publicly
+	private static DocumentBuilder createWebDAVDocumentBuilder()
 	{
 		try
 		{
@@ -123,10 +135,10 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 
 	/**Adds property requests to a property element.
 	@param propElement An XML element representing a property element.
-	@param propertyList A list of all requested properties, or {@link WebDAVConstants#ALL_PROPERTIES} or {@link WebDAVConstants#PROPERTY_NAMES} indicating all properties or all property names, respectively.
+	@param propertyList A list of all requested properties, or {@link WebDAV#ALL_PROPERTIES} or {@link WebDAV#PROPERTY_NAMES} indicating all properties or all property names, respectively.
 	@exception DOMException if there is an error creating the child elements.
-	@see WebDAVConstants#ALL_PROPERTIES
-	@see WebDAVConstants#PROPERTY_NAMES
+	@see WebDAV#ALL_PROPERTIES
+	@see WebDAV#PROPERTY_NAMES
 	*/
 	public void addPropertyNames(final Element propElement, final List<WebDAVPropertyName> propertyList) throws DOMException
 	{

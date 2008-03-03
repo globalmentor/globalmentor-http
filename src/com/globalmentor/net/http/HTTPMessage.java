@@ -1,3 +1,19 @@
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.globalmentor.net.http;
 
 import java.io.IOException;
@@ -66,7 +82,7 @@ public interface HTTPMessage
 	Updates the Content-Length header.
 	@param body The body content.
 	@exception NullPointerException if the given body is <code>null</code>.
-	@see HTTPConstants#CONTENT_LENGTH_HEADER
+	@see HTTP#CONTENT_LENGTH_HEADER
 	*/
 	public void setBody(final byte[] body);
 
@@ -74,30 +90,30 @@ public interface HTTPMessage
 
 	/**@return An array of connection tokens indicating whether the connection should be persistent,
 	 	or <code>null</code> if there is no connection header.
-	@see HTTPConstants#CONNECTION_HEADER
+	@see HTTP#CONNECTION_HEADER
 	*/
 	public String[] getConnection();
 
 	/**Determines whether the Connection header is present with the token "close".
 	@return	<code>true</code> if the Connection header contains the "close" token.
 	@see #getConnection()
-	@see HTTPConstants#CONNECTION_HEADER
-	@see HTTPConstants#CONNECTION_CLOSE
+	@see HTTP#CONNECTION_HEADER
+	@see HTTP#CONNECTION_CLOSE
 	*/
 	public boolean isConnectionClose();
 
 	/**Sets the Connection header with the given connection token.
 	@param connection The connection token such as "close".
-	@see HTTPConstants#CONNECTION_HEADER
-	@see HTTPConstants#CONNECTION_CLOSE
+	@see HTTP#CONNECTION_HEADER
+	@see HTTP#CONNECTION_CLOSE
 	*/
 	public void setConnection(final String connection);
 
 	/**Sets whether the connection should be closed after the response.
 	@param close <code>true</code> if the connection flagged to be closed after the response.
 	@see #setConnection(String)
-	@see HTTPConstants#CONNECTION_HEADER
-	@see HTTPConstants#CONNECTION_CLOSE
+	@see HTTP#CONNECTION_HEADER
+	@see HTTP#CONNECTION_CLOSE
 	*/
 	public void setConnectionClose(final boolean close);
 
@@ -117,7 +133,7 @@ public interface HTTPMessage
 	//Transfer-Encoding header
 
 	/**@return An array of specified transfer encodings, or <code>null</code> if no transfer encodings are specified.
-	@see HTTPConstants#TRANSFER_ENCODING_HEADER
+	@see HTTP#TRANSFER_ENCODING_HEADER
 	*/
 	public String[] getTransferEncoding();
 
