@@ -12,7 +12,7 @@ import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.net.http.HTTPParser.*;
 import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.xml.XMLUtilities.*;
+import static com.globalmentor.text.xml.XML.*;
 
 import com.globalmentor.io.ParseReader;
 import com.globalmentor.text.SyntaxException;

@@ -11,7 +11,7 @@ import static com.garretwilson.net.http.webdav.WebDAVConstants.*;
 import com.globalmentor.text.xml.XMLNamespacePrefixManager;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.xml.XMLUtilities.*;
+import static com.globalmentor.text.xml.XML.*;
 
 import org.w3c.dom.*;
 
