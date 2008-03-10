@@ -73,8 +73,6 @@ public class HTTPException extends IOException
 	<dl>
 		<dt>{@link ResourceForbiddenException}</dt> <dd>{@link HTTPForbiddenException}</dd>
 		<dt>{@link ResourceNotFoundException}</dt> <dd>{@link HTTPNotFoundException}</dd>
-		<dt>{@link ResourceMovedTemporarilyException}</dt> <dd>{@link HTTPMovedTemporarilyException}</dd>
-		<dt>{@link ResourceMovedTemporarilyException}</dt> <dd>{@link HTTPMovedTemporarilyException}</dd>
 		<dt>{@link ResourceStateException}</dt> <dd>{@link HTTPPreconditionFailedException}</dd>
 	</dl>
 	All other exceptions are sent back as {@link HTTPInternalServerErrorException}s.
@@ -90,14 +88,6 @@ public class HTTPException extends IOException
 		else if(resourceIOException instanceof ResourceNotFoundException)
 		{
 			return new HTTPNotFoundException(resourceIOException);
-		}
-		else if(resourceIOException instanceof ResourceMovedTemporarilyException)
-		{
-			return new HTTPMovedTemporarilyException(((ResourceMovedTemporarilyException)resourceIOException).getNewResourceURI());
-		}
-		else if(resourceIOException instanceof ResourceMovedPermanentlyException)
-		{
-			return new HTTPMovedPermanentlyException(((ResourceMovedPermanentlyException)resourceIOException).getNewResourceURI());
 		}
 		else if(resourceIOException instanceof ResourceStateException)
 		{
