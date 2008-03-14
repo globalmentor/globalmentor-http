@@ -19,6 +19,7 @@ package com.globalmentor.net.http.webdav;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -487,6 +488,18 @@ public class WebDAVResource extends HTTPResource
 			}
 		}
 		return emptyList();	//return an empty list; for some reason, no properties were returned		
+	}
+
+	/**Removes properties using the PROPPATCH method.
+	If properties are being removed and others are being set at the same time, the {@link #propPatch(Collection, Collection)} method should be used.
+	The cached information is cleared.
+	The URI of each resource is canonicized to be an absolute URI.
+	@param removeProperties The list of properties to remove.
+	@exception IOException if there was an error invoking the method.
+	*/
+	public void removeProperties(final WebDAVPropertyName... removePropertyNames) throws IOException
+	{
+		removeProperties(asList(removePropertyNames));	//remove the given names, wrapped in a list
 	}
 
 	/**Removes properties using the PROPPATCH method.
