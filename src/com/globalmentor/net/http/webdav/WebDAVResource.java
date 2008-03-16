@@ -509,6 +509,7 @@ public class WebDAVResource extends HTTPResource
 	@param removeProperties The list of properties to remove.
 	@exception IOException if there was an error invoking the method.
 	*/
+	@SuppressWarnings("unchecked")
 	public void removeProperties(final Collection<WebDAVPropertyName> removePropertyNames) throws IOException
 	{
 		propPatch(removePropertyNames, (Set<WebDAVProperty>)EMPTY_SET);	//perform a PROPPATCH with no properties to set		
@@ -521,6 +522,7 @@ public class WebDAVResource extends HTTPResource
 	@param setPropertyNames The list of properties and values to set.
 	@exception IOException if there was an error invoking the method.
 	*/
+	@SuppressWarnings("unchecked")
 	public void setProperties(final Collection<WebDAVProperty> setProperties) throws IOException
 	{
 		propPatch((Set<WebDAVPropertyName>)EMPTY_SET, setProperties);	//perform a PROPPATCH with no properties to remove
