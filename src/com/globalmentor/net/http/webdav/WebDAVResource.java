@@ -467,7 +467,7 @@ public class WebDAVResource extends HTTPResource
 	}
 
 	/**Retrieves properties of this resource using the PROPFIND method.
-	This is a convenience method for <code>propFind(Depth)</code>.
+	This is a convenience method for <code>propFind(Depth)</code> with a depth of zero.
 	Cached properties are used if possible.
 	The cached property list is updated.
 	The URI of each resource is canonicized to be an absolute URI.
@@ -532,8 +532,8 @@ public class WebDAVResource extends HTTPResource
 	Rquested properties will first be removed, then requested properties will be set, in that order.
 	The cached information is cleared.
 	The URI of each resource is canonicized to be an absolute URI.
-	@param removeProperties The list of properties to remove.
-	@param setPropertyNames The list of properties and values to set.
+	@param removePropertyNames The list of properties to remove.
+	@param setProperties The list of properties and values to set.
 	@exception IOException if there was an error invoking the method.
 	*/
 	public void propPatch(final Collection<WebDAVPropertyName> removePropertyNames, final Collection<WebDAVProperty> setProperties) throws IOException
