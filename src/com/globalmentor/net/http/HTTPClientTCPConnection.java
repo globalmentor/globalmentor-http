@@ -324,8 +324,19 @@ public class HTTPClientTCPConnection
 		long nonceCount=0;	//TODO testing
 		try
 		{
-					//TODO find a way to store authentication information in the request if we already have it
-
+				//if there is connection-specific password authentication, see if we can send it proactively TODO improve entire caching scheme to cache basic/digest preference in client after first failure; the current technique will fail the first time, anyway, as we don't know the realms
+			PasswordAuthentication passwordAuthentication=getPasswordAuthentication();	//see if password authentication has been specified specifically for this connection
+			if(passwordAuthentication!=null)	//if we have connection-specific password authentication, try to find what realm to use
+			{
+				final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
+				final Set<String> realms=client.getRealms(rootURI);	//get all the known realms for this domain
+				if(!realms.isEmpty())	//if there are any realms we know about
+				{
+					final String realm=realms.iterator().next();	//get the first realm TODO this call can be improved
+					final AuthenticateCredentials credentials=new BasicAuthenticateCredentials(passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword());	//create basic authentication credentials TODO somehow cache in the client whether basic or digest credentials are preferred; improve the entire client caching mechanism 
+					request.setAuthorization(credentials);	//store the credentials in the request
+				}
+			}
 //		TODO del Debug.trace("writing request");
 			writeRequest(request);	//write the request
 //		TODO del Debug.trace("reading response");
@@ -339,13 +350,12 @@ public class HTTPClientTCPConnection
 				if(challenge!=null)	//if there is a challenge
 				{
 //				TODO del Debug.trace("found a challenge");
+					final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
 					final AuthenticationScheme scheme=challenge.getScheme();	//get the scheme
 					if(scheme==AuthenticationScheme.BASIC || scheme==AuthenticationScheme.DIGEST)	//if this is basic or digest authentication
 					{
 //					TODO del Debug.trace("found a basic or digest challenge");
-						final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
 						final String realm=challenge.getRealm();	//get the challenge realm
-						PasswordAuthentication passwordAuthentication=getPasswordAuthentication();	//see if password authentication has been specified specifically for this connection
 						if(passwordAuthentication==null)	//if there is no connection-specific password authentication, try to find some
 						{
 							final HTTPClient client=getClient();	//get the client with which we're associated
