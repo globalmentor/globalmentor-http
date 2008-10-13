@@ -82,19 +82,16 @@ public class WebDAVXMLProcessor
 		return propertyList;	//return our list of properties
 	}
 
-	/**Retrieves lists of property values parsed from the children of the given <code>D:multistatus</code> element.
-	Each name-value pair in the list represents the URI of a resource along with a list of its properties.
+	/**Retrieves maps of property values parsed from the children of the given <code>D:multistatus</code> element.
+	Each name-value pair in the list represents the URI of a resource along with a map of its properties.
 	@param element The XML element parent of the resource and property list designations.
 	@param baseURI The base URI relative to which the URI references should be resolved, or <code>null</code> if the URI references should be returned as provided by the server.
-	@return A list of all properties of all included resources, each representing the URI of the resource paired by a list of its
-		properties, each property representing the qualified name of the property and the value. Each value is either a <code>String</code>
-		or a <code>NameValuePair&lt;QualifiedName, String&gt;</code>, with the name of the name-value pair representing the qualified name of an XML sub-element
-		and the value of the name-value pair representing the text content of that sub-element. 
+	@return A list of all properties of all included resources, each representing the URI of the resource paired by a map of its properties. 
 	*/
-	public static List<NameValuePair<URI, List<WebDAVProperty>>> getMultistatusProperties(final Element element, final URI baseURI)
+	public static List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> getMultistatusProperties(final Element element, final URI baseURI)
 	{
 //	TODO del Debug.trace("looking at multistatus response");
-		final List<NameValuePair<URI, List<WebDAVProperty>>> resourcesPropertyLists=new ArrayList<NameValuePair<URI, List<WebDAVProperty>>>();	//create a list of resource URIs associated with property lists
+		final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> resourcesPropertyMaps=new ArrayList<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>>();	//create a list of resource URIs associated with property maps
 		final NodeList childList=element.getChildNodes();	//get a list of element children
 		for(int childIndex=0; childIndex<childList.getLength(); ++childIndex)	//look at each child node
 		{
@@ -102,28 +99,27 @@ public class WebDAVXMLProcessor
 			if(childNode.getNodeType()==Node.ELEMENT_NODE && WEBDAV_NAMESPACE.equals(childNode.getNamespaceURI()) && ELEMENT_RESPONSE.equals(childNode.getLocalName()))	//D:response
 			{
 //			TODO del Debug.trace("found response element");
-				final NameValuePair<URI, List<WebDAVProperty>> resourceProperties=getResponseProperties((Element)childNode, baseURI);	//get the resource URI and properties
+				final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> resourceProperties=getResponseProperties((Element)childNode, baseURI);	//get the resource URI and properties
 				if(resourceProperties!=null)	//if we got a resource and properties
 				{
-					resourcesPropertyLists.add(resourceProperties);	//add this resource properties pair to the list
+					resourcesPropertyMaps.add(resourceProperties);	//add this resource properties pair to the list
 				}
 			}
 		}
-		return resourcesPropertyLists;	//return the lists of properties
+		return resourcesPropertyMaps;	//return the maps of properties
 	}
 	
-	/**Retrieves a list of WebDAV properties parsed from the children of the given <code>D:response</code> element.
+	/**Retrieves a map of WebDAV properties parsed from the children of the given <code>D:response</code> element.
 	If a base URI is specified, the URI references will be resolved to the base URI to compensate for servers that return relative URIs.
 	@param element The XML element parent of the resource and property list designations.
 	@param baseURI The base URI relative to which the URI references should be resolved, or <code>null</code> if the URI references should be returned as provided by the server.
-	@return A name-value pair of the resource's URI, along with a list of its properties, or <code>null</code> if no resource URI was found.
+	@return A name-value pair of the resource's URI, along with a map of its properties, or <code>null</code> if no resource URI was found.
 	@see <a href="http://www.webdav.org/mod_dav/#imp">mod_dav implementation details</a>
 	*/
-	public static NameValuePair<URI, List<WebDAVProperty>> getResponseProperties(final Element element, final URI baseURI)
+	public static NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> getResponseProperties(final Element element, final URI baseURI)
 	{
-//TODO fix		final NameValuePair<URI, List<NameValuePair<QualifiedName, String>>> propertyListMap=new NameValuePair<URI, List<NameValuePair<QualifiedName, String>>>();
 		URI uri=null;	//we'll try to determine the URI of the resource
-		final List<WebDAVProperty> propertyList=new ArrayList<WebDAVProperty>();	//create a list to hold the properties
+		final Map<WebDAVPropertyName, WebDAVProperty> propertyMap=new HashMap<WebDAVPropertyName, WebDAVProperty>();	//create a map to hold the properties
 		final NodeList childList=element.getChildNodes();	//get a list of element children
 		final int childCount=childList.getLength();	//find out how many children there are
 		for(int childIndex=0; childIndex<childCount; ++childIndex)	//look at each child node
@@ -153,7 +149,7 @@ public class WebDAVXMLProcessor
 					}
 					else if(ELEMENT_PROPSTAT.equals(childLocalName))	//D:propstat
 					{
-						propertyList.addAll(getPropstatProperties(childElement));	//get the properties and add them to our list (there can be multiple propstat properties TODO later perhaps group the propstat properties, each of which can have a status
+						propertyMap.putAll(getPropstatProperties(childElement));	//get the properties and add them to our map (there can be multiple propstat properties) TODO later perhaps group the propstat properties, each of which can have a status
 					}
 /*TODO fix for D:status
 					else	//if we don't understand the response child element
@@ -166,19 +162,19 @@ public class WebDAVXMLProcessor
 		}
 		if(uri!=null)	//if we found a URI
 		{
-			return new NameValuePair<URI, List<WebDAVProperty>>(uri, propertyList);	//return the URI and its associated property list
+			return new NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>(uri, propertyMap);	//return the URI and its associated property map
 		}
 		return null;	//show that no URI was found
 	}
 	
-	/**Retrieves a list of properties parsed from the children of the given XML element, such as a <code>D:propstat</code> element.
+	/**Retrieves a map of properties parsed from the children of the given XML element, such as a <code>D:propstat</code> element.
 	@param element The XML element parent of the property list.
-	@return A list of all requested properties. 
+	@return A map of all requested properties. 
 	*/
-	public static List<WebDAVProperty> getPropstatProperties(final Element element)
+	public static Map<WebDAVPropertyName, WebDAVProperty> getPropstatProperties(final Element element)
 	{
 //TODO del Debug.trace("getting propstat properties");
-		final List<WebDAVProperty> propertyList=new ArrayList<WebDAVProperty>();	//create a list to hold the properties
+		final Map<WebDAVPropertyName, WebDAVProperty> propertyMap=new HashMap<WebDAVPropertyName, WebDAVProperty>();	//create a map to hold the properties
 		final NodeList childList=element.getChildNodes();	//get a list of element children
 		for(int childIndex=0; childIndex<childList.getLength(); ++childIndex)	//look at each child node
 		{
@@ -198,7 +194,8 @@ public class WebDAVXMLProcessor
 							final Node propertyChildNode=propertyChildList.item(propertyChildIndex);	//get this property child node
 							if(propertyChildNode.getNodeType()==Node.ELEMENT_NODE)	//if this is an element
 							{
-								propertyList.add(getProperty((Element)propertyChildNode));	//parse this property it and add it to our list
+								final WebDAVProperty property=getProperty((Element)propertyChildNode);	//parse this property
+								propertyMap.put(property.getName(), property);	//add the property to our map
 							}
 						}
 					}
@@ -207,7 +204,7 @@ public class WebDAVXMLProcessor
 			}
 		}
 		//TODO check the status element
-		return propertyList;	//return our list of properties
+		return propertyMap;	//return our map of properties
 	}
 	
 	/**Retrieves a WebDAV property from an element that is a direct <code>D:prop</code>.

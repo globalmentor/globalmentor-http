@@ -36,6 +36,6 @@ public class ApacheWebDAV
 	This property is defined by mod_dav's default repository, the "filesystem" repository. It corresponds to the "executable" permission flag in most filesystems.
 	This property is not defined on collections. Value values are "T" and "F".
 	*/
-	public final static String EXECUTABLE_PROPERTY_NAME="executable";
+	public final static WebDAVPropertyName EXECUTABLE_PROPERTY_NAME=new WebDAVPropertyName(APACHE_WEBDAV_PROPERTY_NAMESPACE_URI, "executable");
 
 }

@@ -77,26 +77,15 @@ public class WebDAV
 		public final static String OVERWRITE_TRUE="T";
 
 		//property names
-	public final static String CREATION_DATE_PROPERTY_NAME="creationdate";
-	public final static String DISPLAY_NAME_PROPERTY_NAME="displayname";
-	public final static String GET_CONTENT_LANGUAGE_PROPERTY_NAME="getcontentlanguage";
-	public final static String GET_CONTENT_LENGTH_PROPERTY_NAME="getcontentlength";
-	public final static String GET_CONTENT_TYPE_PROPERTY_NAME="getcontenttype";
-	public final static String GET_ETAG_PROPERTY_NAME="getetag";
-	public final static String GET_LAST_MODIFIED_PROPERTY_NAME="getlastmodified";
-	public final static String LOCK_DISCOVERY_PROPERTY_NAME="lockdiscovery";
-	public final static String RESOURCE_TYPE_PROPERTY_NAME="resourcetype";
-
-		//properties TODO change these to property WebDAVPropertyNames, now that we have such a thing
-	public final static URI CREATION_DATE_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, CREATION_DATE_PROPERTY_NAME);
-	public final static URI DISPLAY_NAME_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, DISPLAY_NAME_PROPERTY_NAME);
-	public final static URI GET_CONTENT_LANGUAGE_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, GET_CONTENT_LANGUAGE_PROPERTY_NAME);
-	public final static URI GET_CONTENT_LENGTH_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, GET_CONTENT_LENGTH_PROPERTY_NAME);
-	public final static URI GET_CONTENT_TYPE_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, GET_CONTENT_TYPE_PROPERTY_NAME);
-	public final static URI GET_ETAG_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, GET_ETAG_PROPERTY_NAME);
-	public final static URI GET_LAST_MODIFIED_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, GET_LAST_MODIFIED_PROPERTY_NAME);
-	public final static URI LOCK_DISCOVERY_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, LOCK_DISCOVERY_PROPERTY_NAME);
-	public final static URI RESOURCE_TYPE_PROPERTY=createPropertyURI(WEBDAV_NAMESPACE, RESOURCE_TYPE_PROPERTY_NAME);
+	public final static WebDAVPropertyName CREATION_DATE_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "creationdate");
+	public final static WebDAVPropertyName DISPLAY_NAME_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "displayname");
+	public final static WebDAVPropertyName GET_CONTENT_LANGUAGE_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontentlanguage");
+	public final static WebDAVPropertyName GET_CONTENT_LENGTH_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontentlength");
+	public final static WebDAVPropertyName GET_CONTENT_TYPE_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontenttype");
+	public final static WebDAVPropertyName GET_ETAG_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "getetag");
+	public final static WebDAVPropertyName GET_LAST_MODIFIED_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "getlastmodified");
+	public final static WebDAVPropertyName LOCK_DISCOVERY_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "lockdiscovery");
+	public final static WebDAVPropertyName RESOURCE_TYPE_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "resourcetype");
 
 	/**The constant property list indicating all properties.*/
 	public final static DecoratorIDedMappedList<URI, WebDAVPropertyName> ALL_PROPERTIES=new DecoratorIDedMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
@@ -186,31 +175,22 @@ public class WebDAV
 	@param webdavProperties The properties to examine.
 	@return <code>true</code> if the given properties indicates that the resource is a collection, else <code>false</code>.
 	*/
-	public static boolean isCollection(final List<WebDAVProperty> webdavProperties)
+	public static boolean isCollection(final Map<WebDAVPropertyName, WebDAVProperty> webdavProperties)
 	{
-		for(final WebDAVProperty webdavProperty:webdavProperties)	//look at each WebDAV property
+		final WebDAVProperty resourceTypeProperty=webdavProperties.get(RESOURCE_TYPE_PROPERTY_NAME);	//try to get the value of D:resourcetype
+		if(resourceTypeProperty!=null)	//if there is a resource type indicated
 		{
-			final WebDAVPropertyName propertyName=webdavProperty.getName();	//get the property name
-			final String propertyNamespace=propertyName.getNamespace();	//get the property namespace
-			if(WEBDAV_NAMESPACE.equals(propertyNamespace))	//if this property is in the WebDAV namespace
+			final WebDAVPropertyValue resourceTypePropertyValue=resourceTypeProperty.getValue();	//get the value of the resource type property
+			if(resourceTypePropertyValue instanceof WebDAVDocumentFragmentPropertyValue)	//if the property value represents a document fragment
 			{
-				final String propertyLocalName=propertyName.getLocalName();	//get the local name of the property
-				if(RESOURCE_TYPE_PROPERTY_NAME.equals(propertyLocalName))	//D:resourcetype
+				final NodeList valueNodes=((WebDAVDocumentFragmentPropertyValue)resourceTypePropertyValue).getDocumentFragment().getChildNodes();	//get the children of the document fragment
+				if(valueNodes.getLength()==1 && COLLECTION_TYPE.equals(createQualifiedName(valueNodes.item(0)).getURI()))	//if there is one child with a reference URI of D:collection
 				{
-					final WebDAVPropertyValue propertyValue=webdavProperty.getValue();	//get the value of the property
-					if(propertyValue instanceof WebDAVDocumentFragmentPropertyValue)	//if the WebDAV property represents a document fragment
-					{
-						final NodeList valueNodes=((WebDAVDocumentFragmentPropertyValue)propertyValue).getDocumentFragment().getChildNodes();	//get the children of the document fragment
-						if(valueNodes.getLength()==1 && COLLECTION_TYPE.equals(createQualifiedName(valueNodes.item(0)).getURI()))	//if there is one child with a reference URI of D:collection
-						{
-							return true;	//indicate that the resource is a collection
-						}
-					}
-					return false;	//if the D:resourcetype property value was not D:collection, the resource is not a collection
+					return true;	//indicate that the resource is a collection
 				}
 			}
 		}
-		return false;	//if there is no D:resourcetype property, the resource is not a collection		
+		return false;	//if there is no D:resourcetype property or the D:resourcetype property value was not D:collection, the resource is not a collection
 	}
 
 }

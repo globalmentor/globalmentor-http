@@ -70,6 +70,29 @@ public class WebDAVPropertyName extends DefaultResource implements IDed<URI>
 		this(namespaceURI.toString(), localName);	//create the property name using the string form of the namespace URI
 	}
 
+	/**@return A hash code for this object.*/
+	public int hashCode()
+	{
+		return 31*getNamespace().hashCode()+getLocalName().hashCode();
+	}
+
+	/**Determines if this object is equal to another object.
+	This implementation considers another object equal if it is another WebDAV property name with the same namespace and local name.
+	*/
+	public boolean equals(final Object object)
+	{
+		if(this==object)	//identical objects are always equal
+		{
+			return true;
+		}
+		if(!(object instanceof WebDAVProperty))
+		{
+			return false;
+		}
+		final WebDAVPropertyName webdavPropertyName=(WebDAVPropertyName)object;
+		return getNamespace().equals(webdavPropertyName.getNamespace()) && getLocalName().equals(webdavPropertyName.getLocalName());
+	}
+
 	/**Creates a WebDAV reference URI from a property namespace and local name.
 	Both components are expected to be already encoded for inclusion in a URI.
 	@param propertyNamespace The WebDAV property namespace.

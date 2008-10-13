@@ -240,7 +240,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	public Element addResourceType(final Element element, final String typeNamespace, final String typeLocalName) throws DOMException
 	{
 			//create and append a resource type element
-		final Element resourceTypeElement=appendElementNS(element, WEBDAV_NAMESPACE, createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), RESOURCE_TYPE_PROPERTY_NAME));
+		final Element resourceTypeElement=appendElementNS(element, RESOURCE_TYPE_PROPERTY_NAME.getNamespace(), createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), RESOURCE_TYPE_PROPERTY_NAME.getLocalName()));
 		if(typeNamespace!=null && typeLocalName!=null)	//if a type was given
 		{
 			appendElementNS(resourceTypeElement, typeNamespace, createQualifiedName(getNamespacePrefix(typeNamespace), typeLocalName));	//look up the prefix and create a subelement to represent the resource type

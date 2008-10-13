@@ -19,6 +19,7 @@ package com.globalmentor.net.http.webdav;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
@@ -141,10 +142,10 @@ public class WebDAVResource extends HTTPResource
 			try
 			{
 				final URI resourceURI=getURI();	//get our resource URI
-				final List<NameValuePair<URI, List<WebDAVProperty>>> resourcePropertyLists=propFind(Depth.ONE);	//do a PROPFIND with a depth of one to get all children resource properties, proactively caching their values as well
-				for(final NameValuePair<URI, List<WebDAVProperty>> resourcePropertyList:resourcePropertyLists)	//look at each property list to see if properties were really returned for this resource, as the server might have tried to follow redirects and return properties for other resources
+				final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> resourcePropertyMaps=propFind(Depth.ONE);	//do a PROPFIND with a depth of one to get all children resource properties, proactively caching their values as well
+				for(final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> resourcePropertyMap:resourcePropertyMaps)	//look at each property map to see if properties were really returned for this resource, as the server might have tried to follow redirects and return properties for other resources
 				{
-					if(resourceURI.equals(resourcePropertyList.getName()))	//if this is information about our resource
+					if(resourceURI.equals(resourcePropertyMap.getName()))	//if this is information about our resource
 					{
 						return true;	//we found properties for the resource, so it exists
 					}
@@ -186,7 +187,7 @@ public class WebDAVResource extends HTTPResource
 		}
 		try
 		{
-			final List<WebDAVProperty> properties=propFind();	//get properties for this resource, which will cache the properties along with the existence and collection states
+			final Map<WebDAVPropertyName, WebDAVProperty> properties=propFind();	//get properties for this resource, which will cache the properties along with the existence and collection states
 			return WebDAV.isCollection(properties);	//send back whether the resource is a collection
 		}
 		catch(final HTTPNotFoundException notFoundException)	//404 Not Found
@@ -373,7 +374,31 @@ public class WebDAVResource extends HTTPResource
 		uncacheInfo();	//remove the cache information, because this resource is moving
 		uncacheInfo(destinationURI);	//remove the cache information of the destination, because this resource replaced it
 	}
-		
+
+	/**Retrieves properties of this resource using the PROPFIND method.
+	This is a convenience method for {@link #propFind(Depth)} with a depth of zero.
+	Cached properties are used if possible.
+	The cached property list is updated.
+	The URI of each resource is canonicized to be an absolute URI.
+	Returned property values may be <code>null</code>.
+	@return A map of all properties of this resource.
+	@exception IOException if there was an error invoking the method.
+	@see #propFind(Depth)
+	*/
+	public Map<WebDAVPropertyName, WebDAVProperty> propFind() throws IOException
+	{
+		final URI referenceURI=getURI();	//get the reference URI of this resource
+		final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> propertyMaps=propFind(Depth.ZERO);	//do a propfind with no depth
+		for(final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> propertyMap:propertyMaps)	//look at each property map
+		{
+			if(propertyMap.getName().equals(referenceURI))	//if this property list is for this resource
+			{
+				return propertyMap.getValue();	//return the list of properties for this resource
+			}
+		}
+		return emptyMap();	//return an empty map; for some reason, no properties were returned		
+	}
+
 	/**Retrieves properties using the {@value WebDAV#PROPFIND_METHOD} method.
 	Cached properties are never used for any depth except {@link Depth#ZERO}, although cached properties are updated if caching is enabled.	
 	The URI of each resource is canonicized to be an absolute URI.
@@ -382,10 +407,10 @@ public class WebDAVResource extends HTTPResource
 	for example returning properties for <code>http://www.example.com/collection/</code>
 	if <code>http://www.example.com/collection</code> was requested but no resource exists at that location.
 	@param depth The requested depth.
-	@return A list of all properties of all requested resources, each representing the URI of the resource paired by a list of its properties.
+	@return A list of all properties of all requested resources, each representing the URI of the resource paired by a map of its properties.
 	@exception IOException if there was an error invoking the method.
 	*/
-	public List<NameValuePair<URI, List<WebDAVProperty>>> propFind(final Depth depth) throws IOException
+	public List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> propFind(final Depth depth) throws IOException
 	{
 		final HTTPClient httpClient=getClient();	//get the client we are using
 		final URI referenceURI=getURI();	//get the reference URI of this resource
@@ -396,8 +421,8 @@ public class WebDAVResource extends HTTPResource
 			final CachedProperties cachedProperties=cachedPropertiesMap.get(cacheKey);	//get cached properties from the map
 			if(cachedProperties!=null && !cachedProperties.isStale())	//if we have cached properties that is not stale
 			{
-				final List<NameValuePair<URI, List<WebDAVProperty>>> cachedPropFindList=new ArrayList<NameValuePair<URI, List<WebDAVProperty>>>();
-				cachedPropFindList.add(new NameValuePair<URI, List<WebDAVProperty>>(referenceURI, cachedProperties.getProperties()));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
+				final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> cachedPropFindList=new ArrayList<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>>();
+				cachedPropFindList.add(new NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>(referenceURI, cachedProperties.getProperties()));	//add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
 				return cachedPropFindList;	//return the manufactured property list from our cached properyy list
 			}
 		}
@@ -416,15 +441,15 @@ public class WebDAVResource extends HTTPResource
 			{
 				final Element documentElement=document.getDocumentElement();	//get the document element
 					//TODO check to make sure the document element is correct
-				final List<NameValuePair<URI, List<WebDAVProperty>>> resourcePropertyLists=WebDAVXMLProcessor.getMultistatusProperties(documentElement, referenceURI);	//get the properties from the multistatus document, relative to this resource URI			
+				final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> resourcePropertyMaps=WebDAVXMLProcessor.getMultistatusProperties(documentElement, referenceURI);	//get the properties from the multistatus document, relative to this resource URI			
 				if(isCached())	//if we're caching information, cache the properties for this resource
 				{
 					cacheLock.writeLock().lock();	//lock the cache for writing
 					try
 					{
-						for(final NameValuePair<URI, List<WebDAVProperty>> resourcePropertyList:resourcePropertyLists)	//look at each property list
+						for(final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> resourcePropertyList:resourcePropertyMaps)	//look at each property map
 						{
-							final List<WebDAVProperty> properties=resourcePropertyList.getValue();	//cache the list of properties for this resource
+							final Map<WebDAVPropertyName, WebDAVProperty> properties=resourcePropertyList.getValue();	//cache the map of properties for this resource
 							final boolean isCollection=WebDAV.isCollection(properties);	//see if this resource is a collection
 							final CacheKey cacheKey=new CacheKey(httpClient, resourcePropertyList.getName());	//create a key for the caches
 							cachedExistsMap.put(cacheKey, new CachedExists(true));	//show that this resource exists
@@ -436,7 +461,7 @@ public class WebDAVResource extends HTTPResource
 						cacheLock.writeLock().unlock();	//always release the write lock
 					}					
 				}
-				return resourcePropertyLists;	//return all the properties requested
+				return resourcePropertyMaps;	//return all the properties requested
 			}
 			return emptyList();	//return an empty list, because there was no XML returned
 		}
@@ -464,30 +489,6 @@ public class WebDAVResource extends HTTPResource
 		{
 			throw (IOException)new IOException(saxException.getMessage()).initCause(saxException);			
 		}
-	}
-
-	/**Retrieves properties of this resource using the PROPFIND method.
-	This is a convenience method for <code>propFind(Depth)</code> with a depth of zero.
-	Cached properties are used if possible.
-	The cached property list is updated.
-	The URI of each resource is canonicized to be an absolute URI.
-	Returned property values may be <code>null</code>.
-	@return A list of all properties of this resource.
-	@exception IOException if there was an error invoking the method.
-	@see #propFind(Depth)
-	*/
-	public List<WebDAVProperty> propFind() throws IOException
-	{
-		final URI referenceURI=getURI();	//get the reference URI of this resource
-		final List<NameValuePair<URI, List<WebDAVProperty>>> propertyLists=propFind(Depth.ZERO);	//do a propfind with no depth
-		for(final NameValuePair<URI, List<WebDAVProperty>> propertyList:propertyLists)	//look at each property list
-		{
-			if(propertyList.getName().equals(referenceURI))	//if this property list is for this resource
-			{
-				return propertyList.getValue();	//return the list of properties for this resource
-			}
-		}
-		return emptyList();	//return an empty list; for some reason, no properties were returned		
 	}
 
 	/**Removes properties using the PROPPATCH method.
@@ -566,11 +567,11 @@ public class WebDAVResource extends HTTPResource
 	*/
 	protected static class CachedProperties extends AbstractCachedInfo
 	{
-		/**The cached list of properties.*/
-		private final List<WebDAVProperty> properties;
+		/**The cached map of properties.*/
+		private final Map<WebDAVPropertyName, WebDAVProperty> properties;
 
 			/**@return The cached list of properties.*/
-			public final List<WebDAVProperty> getProperties() {return properties;}
+			public final Map<WebDAVPropertyName, WebDAVProperty> getProperties() {return properties;}
 
 		/**The cached record of whether the resource is a collection.*/
 		private final boolean isCollection;
@@ -579,14 +580,14 @@ public class WebDAVResource extends HTTPResource
 			public boolean isCollection() {return isCollection;}
 
 		/**Constructor.
-		@param properties The list of properties to cache.
+		@param properties The map of properties to cache.
 		@param isCollection Whether the resource is a collection.
-		@exception NullPointerException if the given list of properties is <code>null</code>.
+		@exception NullPointerException if the given map of properties is <code>null</code>.
 		*/
-		public CachedProperties(final List<WebDAVProperty> properties, final boolean isCollection)
+		public CachedProperties(final Map<WebDAVPropertyName, WebDAVProperty> properties, final boolean isCollection)
 		{
 			this.isCollection=isCollection;	//save the cached collection state
-			this.properties=unmodifiableList(checkInstance(properties, "Properties cannot be null."));
+			this.properties=unmodifiableMap(checkInstance(properties, "Properties cannot be null."));
 		}
 	}
 
