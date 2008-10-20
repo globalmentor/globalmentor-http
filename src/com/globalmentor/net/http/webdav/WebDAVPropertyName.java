@@ -85,7 +85,7 @@ public class WebDAVPropertyName extends DefaultResource implements IDed<URI>
 		{
 			return true;
 		}
-		if(!(object instanceof WebDAVProperty))
+		if(!(object instanceof WebDAVPropertyName))
 		{
 			return false;
 		}
