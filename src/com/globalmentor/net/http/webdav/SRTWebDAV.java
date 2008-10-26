@@ -18,6 +18,8 @@ package com.globalmentor.net.http.webdav;
 
 import static com.globalmentor.net.http.webdav.WebDAV.*;
 
+import java.net.URI;
+
 /**WebDrive constants used by South River Technologies, makers of WebDrive.
 Some information gathered from communication with WebDrive tech support representative, e.g. 2007-03-01.
 @author Garret Wilson
@@ -25,6 +27,9 @@ Some information gathered from communication with WebDrive tech support represen
 */
 public class SRTWebDAV
 {
+
+	/**The URI to the Apache WebDAV property namespace.*/
+	public final static URI SRT_WEBDAV_PROPERTY_NAMESPACE_URI=URI.create("http://www.southrivertech.com/");
 
 		//property names deprecated because they were being used in the WebDAV namespace
 	/**The creation time, using the RFC 3339 Internet timestamp ISO 8601 profile, as set by WebDrive.*/
