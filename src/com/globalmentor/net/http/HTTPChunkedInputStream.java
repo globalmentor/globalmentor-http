@@ -20,6 +20,7 @@ import java.io.*;
 import static java.lang.System.*;
 
 import com.globalmentor.java.Bytes;
+import com.globalmentor.util.Debug;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.http.HTTPParser.*;
@@ -219,6 +220,7 @@ public class HTTPChunkedInputStream extends InputStream
   		arraycopy(chunk, index, b, off, count);	//copy from the chunk
   		total+=count;	//increase the total number of bytes read
   		index+=count;	//advance our position in the chunk
+  		off+=count;	//advance the destination position in the buffer
   		len-=count;	//decrease the number of bytes we need to copy
   		if(len>0 && index==chunk.length)	//if we need to read more bytes but we've drained the chunk
   		{
