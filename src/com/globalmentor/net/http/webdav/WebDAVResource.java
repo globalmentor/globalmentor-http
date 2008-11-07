@@ -19,12 +19,10 @@ package com.globalmentor.net.http.webdav;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
-import javax.xml.parsers.ParserConfigurationException;
-
+import com.globalmentor.java.Bytes;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
@@ -33,7 +31,6 @@ import static com.globalmentor.net.http.webdav.WebDAV.*;
 import com.globalmentor.util.*;
 
 import org.w3c.dom.*;
-import org.xml.sax.SAXException;
 
 /**A client's view of a WebDAV resource on the server.
 For many error conditions, a subclass of {@link HTTPException} will be thrown.
@@ -265,7 +262,10 @@ public class WebDAVResource extends HTTPResource
 		}
 		request.setDepth(depth);	//set the depth
 		request.setOverwrite(overwrite);	//set the overwrite option
-		final HTTPResponse response=sendRequest(request);	//get the response
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
+		final HTTPResponse response=connection.sendRequest(request, Bytes.NO_BYTES);	//send the request and get the response
+		connection.readResponseBody(request, response);	//ignore the response body
+		response.checkStatus();	//check the status of the response, throwing an exception if this is an error
 		uncacheInfo(destinationURI);	//remove the cache information of the destination, because a copy of this resource replaced it
 	}
 
@@ -276,7 +276,10 @@ public class WebDAVResource extends HTTPResource
 	public void mkCol() throws IOException
 	{
 		final WebDAVRequest request=new DefaultWebDAVRequest(MKCOL_METHOD, getURI());	//create a MKCOL request
-		final HTTPResponse response=sendRequest(request);	//get the response
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
+		final HTTPResponse response=connection.sendRequest(request, Bytes.NO_BYTES);	//send the request and get the response
+		connection.readResponseBody(request, response);	//ignore the response body
+		response.checkStatus();	//check the status of the response, throwing an exception if this is an error
 	}
 
 	/**Creates the collection path of the URI as needed.
@@ -370,7 +373,10 @@ public class WebDAVResource extends HTTPResource
 		request.setDestination(destinationURI);	//set the destination URI
 		request.setDepth(Depth.INFINITY);	//set the depth to infinity
 		request.setOverwrite(overwrite);	//set the overwrite option
-		final HTTPResponse response=sendRequest(request);	//get the response
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
+		final HTTPResponse response=connection.sendRequest(request, Bytes.NO_BYTES);	//send the request and get the response
+		connection.readResponseBody(request, response);	//ignore the response body
+		response.checkStatus();	//check the status of the response, throwing an exception if this is an error
 		uncacheInfo();	//remove the cache information, because this resource is moving
 		uncacheInfo(destinationURI);	//remove the cache information of the destination, because this resource replaced it
 	}
@@ -433,11 +439,17 @@ public class WebDAVResource extends HTTPResource
 			final WebDAVXMLGenerator webdavXMLGenerator=new WebDAVXMLGenerator();	//create a WebDAV XML generator
 			final Document propfindDocument=webdavXMLGenerator.createPropfindDocument();	//create a propfind document	//TODO check DOM exceptions here
 			webdavXMLGenerator.addPropertyNames(propfindDocument.getDocumentElement(), ALL_PROPERTIES);	//show that we want to know about all properties
-			request.setXML(propfindDocument);	//set the XML in the body of our request
-			final HTTPResponse response=sendRequest(request);	//get the response
-			//TODO check response; expect 207 Multi-Status
-			final Document document=response.getXML(true, false);	//get the XML from the response body, aware of namespaces but not validating
-			if(document!=null)	//if there was an XML document in the request
+
+			final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
+			final HTTPResponse response=connection.sendRequest(request, propfindDocument);	//send the request and get the response
+			if(response.getStatusCode()!=SC_MULTI_STATUS)	//if the operation was not successful
+			{
+				connection.readResponseBody(request, response);	//ignore the response body TODO add special handling for specific WebDAV errors
+				response.checkStatus();	//check the status of the response, throwing an exception if this is an error
+				throw new HTTPException(response.getStatusCode(), response.getReasonPhrase());	//create a generic exception HTTP exception if one of the standard errors wasn't recognized
+			}
+			final Document document=connection.readResponseBodyXML(request, response, true, false);	//get the XML from the response body, aware of namespaces but not validating
+			if(document!=null)	//if there was an XML document in the request TODO probably delete; no XML response is probably an error condition
 			{
 				final Element documentElement=document.getDocumentElement();	//get the document element
 					//TODO check to make sure the document element is correct
@@ -480,14 +492,6 @@ public class WebDAVResource extends HTTPResource
 				cacheExists(false);	//indicate that the resource is permanently missing
 			}
 			throw goneException;	//rethrow the exception
-		}
-		catch(final ParserConfigurationException parserConfigurationException)
-		{
-			throw (IOException)new IOException(parserConfigurationException.getMessage()).initCause(parserConfigurationException);
-		}
-		catch(final SAXException saxException)
-		{
-			throw (IOException)new IOException(saxException.getMessage()).initCause(saxException);			
 		}
 	}
 
@@ -557,9 +561,17 @@ public class WebDAVResource extends HTTPResource
 			final Element propElement=webdavXMLGenerator.addProp(setElement);	//add a property element
 			webdavXMLGenerator.addProperty(propElement, setProperty);	//add the property
 		}
-		request.setXML(propertyupdateDocument);	//set the XML in the body of our request
-		final HTTPResponse response=sendRequest(request);	//get the response
-			//TODO check response; expect 207 Multi-Status
+		final Document document;
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
+		final HTTPResponse response=connection.sendRequest(request, propertyupdateDocument);	//send the request and get the response
+		if(response.getStatusCode()!=SC_MULTI_STATUS)	//if the operation was not successful
+		{
+			connection.readResponseBody(request, response);	//ignore the response body TODO add special handling for specific WebDAV errors
+			response.checkStatus();	//check the status of the response, throwing an exception if this is an error
+			throw new HTTPException(response.getStatusCode(), response.getReasonPhrase());	//create a generic exception HTTP exception if one of the standard errors wasn't recognized
+		}
+		document=connection.readResponseBodyXML(request, response, true, false);	//get the XML from the response body, aware of namespaces but not validating
+		response.checkStatus();	//check the status of the response, throwing an exception if this is an error
 	}
 
 	/**Property information stored in a WebDAV resource cache.

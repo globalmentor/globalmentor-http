@@ -16,15 +16,8 @@
 
 package com.globalmentor.net.http;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.NameValuePair;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**An HTTP request or response as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
@@ -32,9 +25,6 @@ import org.xml.sax.SAXException;
 */
 public interface HTTPMessage
 {
-
-	/**A constant byte array indicating no body.*/
-	public final static byte[] NO_BODY=new byte[0];
 
 	/**@return The HTTP version.*/
 	public HTTPVersion getVersion();
@@ -74,17 +64,6 @@ public interface HTTPMessage
 	@param name The case-insensitive name of the header to remove.
 	*/
 	public void removeHeaders(final String name);
-
-	/**@return The bytes making up the body of the message.*/
-	public byte[] getBody();
-
-	/**Sets the bytes to make up the body of the message.
-	Updates the Content-Length header.
-	@param body The body content.
-	@exception NullPointerException if the given body is <code>null</code>.
-	@see HTTP#CONTENT_LENGTH_HEADER
-	*/
-	public void setBody(final byte[] body);
 
 	//Connection header
 
@@ -137,22 +116,12 @@ public interface HTTPMessage
 	*/
 	public String[] getTransferEncoding();
 
-		//content
-	
-	/**Retrieves an XML document from the body of the HTTP message.
-	@param namespaceAware <code>true</code> if the document should support for XML namespaces, else <code>false</code>.
-	@param validated <code>true</code> if the document should be validated as it is parsed, else <code>false</code>.
-	@return A document representing the XML information, or <code>null</code> if there is no content.
-	@exception IOException if there is an error reading the XML.
-	@exception ParserConfigurationException if an appropriate parser could not be found for parsing the XML.
-	@exception SAXException if there was an error parsing the XML.
+	/**Sets the transfer encoding header.
+	@param transferEncodings The transfer encodings to use.
+	@exception NullPointerException if the given transfer encodings is <code>null</code>.
+	@exception IllegalArgumentException if no transfer encodings are given.
+	@see HTTP#TRANSFER_ENCODING_HEADER
 	*/
-	public Document getXML(final boolean namespaceAware, final boolean validating) throws IOException, ParserConfigurationException, SAXException;
-
-	/**Places an XML document into the body of the HTTP message.
-	@param document The XML document to place into the message.
-	@exception IOException if there is an error writing the XML.
-	*/
-	public void setXML(final Document document) throws IOException;
+	public void setTransferEncoding(final String... transferEncodings);
 
 }

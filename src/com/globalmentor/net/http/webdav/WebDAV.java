@@ -130,7 +130,7 @@ public class WebDAV
    * providing status for multiple independent operations.
    */
   public static final int SC_MULTI_STATUS = 207;
-  // This one colides with HTTP 1.1
+  // This one collides with HTTP 1.1
   // "207 Parital Update OK"
 
 
@@ -139,7 +139,7 @@ public class WebDAV
    * the PATCH method was not understood by the resource.
    */
   public static final int SC_UNPROCESSABLE_ENTITY = 418;
-  // This one colides with HTTP 1.1
+  // This one collides with HTTP 1.1
   // "418 Reauthentication Required"
 
 
@@ -149,7 +149,7 @@ public class WebDAV
    * execution of this method.
    */
   public static final int SC_INSUFFICIENT_SPACE_ON_RESOURCE = 419;
-  // This one colides with HTTP 1.1
+  // This one collides with HTTP 1.1
   // "419 Proxy Reauthentication Required"
 
 

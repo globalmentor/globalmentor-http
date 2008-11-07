@@ -106,7 +106,7 @@ public class HTTPParser
 				if(value==CR)	//if we've reached the end of the reason phrase
 				{
 					parseLF(inputStream);	//make sure there is a following LF, but ignore it
-					final String reasonPhrase=new String(reasonByteArrayOutputStream.toByteArray(), UTF_8);	//conver the reason phrase to a string
+					final String reasonPhrase=new String(reasonByteArrayOutputStream.toByteArray(), HTTP_CHARSET);	//convert the reason phrase to a string
 					return new HTTPStatus(version, statusCode, reasonPhrase);	//return the status we parsed
 				}
 				else	//if we're still collecting reason phrase characters
@@ -171,7 +171,7 @@ public class HTTPParser
 	public static byte[] parseChunk(final InputStream inputStream) throws ParseIOException, EOFException, IOException
 	{
 		final String chunkSizeLine=parseHeaderLine(inputStream);	//parse a header line TODO should this method be renamed?
-		final int extensionDelimiterIndex=chunkSizeLine.indexOf(';');	//see if there is an extension
+		final int extensionDelimiterIndex=chunkSizeLine.indexOf(';');	//see if there is an extension TODO use a constant
 		final String chunkSizeString=extensionDelimiterIndex>=0 ? chunkSizeLine.substring(0, extensionDelimiterIndex) : chunkSizeLine;	//get the chunk size string
 		final int chunkSize;
 		try
@@ -185,7 +185,6 @@ public class HTTPParser
 		if(chunkSize>0)	//if a positive chunk size is given
 		{
 			final byte[] chunk=InputStreams.getBytes(inputStream, chunkSize);	//read this chunk
-//TODO del Debug.trace("read chunk of size", chunkSize, new String(chunk, UTF_8));	//TODO del
 			parseCRLF(inputStream);	//parse a CRLF, but ignore it
 			return chunk;	//return the chunk
 		}
@@ -273,7 +272,7 @@ public class HTTPParser
 		return headerList;	//return the list of headers
 	}
 
-	/**Parses a line of text from a message header, assuming each line ends in CRLF and the content is encoded in UTF-8.
+	/**Parses a line of text from a message header, assuming each line ends in CRLF and the content is encoded in the {@value HTTP#HTTP_URI_SCHEME} charset.
 	All spaces and horizontal tabs are folded into a single space.
 	@param inputStream The source of the HTTP message.
 	@return A line of text without the ending CRLF.
@@ -294,7 +293,7 @@ public class HTTPParser
 			{
 				parseLF(inputStream);	//make sure there is a following LF, but ignore it
 				final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the bytes we collected
-				return new String(bytes, UTF_8);	//return a string from the UTF-8-encoded bytes
+				return new String(bytes, HTTP_CHARSET);	//return a string from the UTF-8-encoded bytes
 			}
 			else if(b==LF)	//if we get a bare LF
 			{

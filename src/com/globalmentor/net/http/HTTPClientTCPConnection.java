@@ -19,30 +19,30 @@ package com.globalmentor.net.http;
 import java.io.*;
 import java.net.*;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.util.*;
-import java.util.concurrent.*;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 
 import com.globalmentor.io.*;
+import com.globalmentor.java.Bytes;
 import com.globalmentor.net.*;
-import com.globalmentor.security.DefaultNonce;
-import com.globalmentor.security.Nonce;
+import com.globalmentor.security.*;
 import com.globalmentor.text.SyntaxException;
+import com.globalmentor.text.xml.XMLSerializer;
 import com.globalmentor.util.*;
 
+import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
-import static com.globalmentor.text.CharacterEncoding.*;
+import static com.globalmentor.text.xml.XML.createDocumentBuilder;
 import static com.globalmentor.util.Arrays.*;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**Represents a connection from a client to a server using HTTP over TCP as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
@@ -181,8 +181,8 @@ public class HTTPClientTCPConnection
 			outputStream=new BufferedOutputStream(socket.getOutputStream());	//get an output stream from the socket
 			if(getClient().isLogged())	//if we're using a logged client
 			{
-				inputStream=new LogInputStream(inputStream);	//log all communication from the input stream
-				outputStream=new LogOutputStream(outputStream);	//log all communication to the output stream
+				inputStream=new DebugInputStream(inputStream);	//log all communication from the input stream
+				outputStream=new DebugOutputStream(outputStream);	//log all communication to the output stream
 			}
 		}
 	}
@@ -234,30 +234,6 @@ public class HTTPClientTCPConnection
 			return outputStream;	//return the output stream
 		}
 
-	/**The queue of outgoing requests.*/
-	private final Queue<HTTPRequest> requestQueue=new ConcurrentLinkedQueue<HTTPRequest>();
-
-		/**@return The queue of outgoing requests.*/
-		public Queue<HTTPRequest> getRequestQueue() {return requestQueue;}
-
-	/**The queue of outgoing responses.*/
-//TODO fix	private final Queue<HTTPRequest> requestQueue=new ConcurrentLinkedQueue<HTTPRequest>();
-
-		/**@return The queue of outgoing responses.*/
-//TODO fix		public Queue<HTTPRequest> getRequestQueue() {return requestQueue;}
-
-	/**The buffer for writing requests.*/
-//TODO fix	private ByteBuffer writeBuffer=ByteBuffer.allocate(16*1024);	//create a 16k buffer
-
-		/**@return The buffer for writing requests.*/
-//	TODO fix		protected ByteBuffer getWriteBuffer() {return writeBuffer;}
-
-	/**The buffer for reading responses.*/
-//	TODO fix	private ByteBuffer readBuffer=ByteBuffer.allocate(16*1024);	//create a 16k buffer
-
-		/**@return The buffer for reading responses.*/
-//	TODO fix		protected ByteBuffer getReadBuffer() {return writeBuffer;}
-
 	/**URI constructor.
 	@param client The client with which this connection is associated.
 	@param uri The URI indicating the host to which to connect.
@@ -292,188 +268,120 @@ public class HTTPClientTCPConnection
 		this.secure=secure;	//save whether the connection should be secure
 	}
 
-	/**Convenience method to sends a request and get a response.
-	@param request The request to send to the server.
-	@return The response to get from the server
-	@exception IOException if there is an error writing the request or reading the response.
-	@exception IllegalStateException If other requests have been queued, and the next response
-		would not correspond to the provided request.
+	/**Writes a request to the output stream along with the given request body.
+	A connection will be made to the appropriate host if needed.
+	The request's {@value HTTP#HOST_HEADER} header will be updated.
+	The request's {@value HTTP#CONTENT_LENGTH_HEADER} header will be updated to the length of the given request body. 
+	The request's {@value HTTP#TRANSFER_ENCODING_HEADER} header, if any, will be removed. 
+	@param request The request to write.
+	@param body The body of the request.
+	@throws NullPointerException if the given request and/or body is <code>null</code>.
+	@throws IOException if there is an error writing the data.
 	*/
-	public HTTPResponse sendRequest(final HTTPRequest request) throws IOException, IllegalStateException
+	public void writeRequest(final HTTPRequest request, final byte[] body) throws IOException
 	{
-		if(getRequestQueue().size()!=0)	//if the request queue is not empty
-		{
-			throw new IllegalStateException("Queued requests prevent retrieval of response for provided request.");
-		}
-		addRequest(request);	//add the request to the queue
-		return getResponse();	//get and return the next response
+		request.setContentLength(body.length);	//set the content length
+		request.removeHeaders(TRANSFER_ENCODING_HEADER);	//remove any transfer encoding
+		writeRequestMessage(request);	//write the request
+		final OutputStream outputStream=getOutputStream();	//get the output stream
+		outputStream.write(body);	//write the request body
+		outputStream.flush();	//flush the data to the server
 	}
 
-	/**Queues an HTTP request for sending.
-	@param request The HTTP request to send.
+	/**Writes a request to the output stream.
+	A connection will be made to the appropriate host if needed.
+	The request's {@value HTTP#HOST_HEADER} header will be updated.
+	The request's {@value HTTP#CONTENT_LENGTH_HEADER} header, if any, will be removed 
+	The request's {@value HTTP#TRANSFER_ENCODING_HEADER} header will be updated to indicate chunked encoding. 
+	The returned output stream should always be closed after reading is finished.
+	@param request The request to write.
+	@throws NullPointerException if the given request is <code>null</code>.
+	@throws IOException if there is an error writing the data.
 	*/
-	public void addRequest(final HTTPRequest request)
+	public OutputStream writeRequest(final HTTPRequest request) throws IOException
 	{
-		getRequestQueue().add(request);	//add this request to our queue of outgoing requests
+		request.removeHeaders(CONTENT_LENGTH_HEADER);
+		request.setTransferEncoding(CHUNKED_TRANSFER_CODING);
+		writeRequest(request);	//write the request
+		return new HTTPChunkedOutputStream(getOutputStream(), false);	//return an output stream encoded as HTTP chunks; don't close the underlying stream when finished
 	}
 
-	public HTTPResponse getResponse() throws IOException, NoSuchElementException
+	/**Writes a request to the output stream along with the given XML as the request body.
+	This is a convenience method that delegates to {@link #writeRequest(HTTPRequest, byte[])}.
+	@param request The request to write.
+	@param body The body of the request.
+	@throws NullPointerException if the given request and/or body is <code>null</code>.
+	@throws IOException if there is an error writing the data.
+	*/
+	public void writeRequest(final HTTPRequest request, final Document document) throws IOException
 	{
-//	TODO del Debug.trace("getting response");
-		final HTTPRequest request=getRequestQueue().remove();	//get the next request
-		long nonceCount=0;	//TODO testing
+		
+		final ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();	//create a byte array output stream to hold our outgoing data
 		try
 		{
-				//if there is connection-specific password authentication, see if we can send it proactively TODO improve entire caching scheme to cache basic/digest preference in client after first failure; the current technique will fail the first time, anyway, as we don't know the realms
-			PasswordAuthentication passwordAuthentication=getPasswordAuthentication();	//see if password authentication has been specified specifically for this connection
-			if(passwordAuthentication!=null)	//if we have connection-specific password authentication, try to find what realm to use
-			{
-				final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
-				final Set<String> realms=client.getRealms(rootURI);	//get all the known realms for this domain
-				if(!realms.isEmpty())	//if there are any realms we know about
-				{
-					final String realm=realms.iterator().next();	//get the first realm TODO this call can be improved
-					final AuthenticateCredentials credentials=new BasicAuthenticateCredentials(passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword());	//create basic authentication credentials TODO somehow cache in the client whether basic or digest credentials are preferred; improve the entire client caching mechanism 
-					request.setAuthorization(credentials);	//store the credentials in the request
-				}
-			}
-//		TODO del Debug.trace("writing request");
-			writeRequest(request);	//write the request
-//		TODO del Debug.trace("reading response");
-			HTTPResponse response=readResponse(request);	//read the response TODO check for redirects
-//		TODO del Debug.trace("response connection header:", response.getConnection());
-			while(response.getStatusCode()==SC_UNAUTHORIZED)	//if the request requires authorization
-			{
-				disconnect();	//disconnect from the server so that the server won't time out while we look for credentials and throw a SocketException TODO improve
-//			TODO del Debug.trace("unauthorized; looking for challenge");
-				final AuthenticateChallenge challenge=response.getWWWAuthenticate();	//get the challenge
-				if(challenge!=null)	//if there is a challenge
-				{
-//				TODO del Debug.trace("found a challenge");
-					final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
-					final AuthenticationScheme scheme=challenge.getScheme();	//get the scheme
-					if(scheme==AuthenticationScheme.BASIC || scheme==AuthenticationScheme.DIGEST)	//if this is basic or digest authentication
-					{
-//					TODO del Debug.trace("found a basic or digest challenge");
-						final String realm=challenge.getRealm();	//get the challenge realm
-						if(passwordAuthentication==null)	//if there is no connection-specific password authentication, try to find some
-						{
-							final HTTPClient client=getClient();	//get the client with which we're associated
-							final Set<String> usernames=client.getUsernames(rootURI, realm);	//get users that are cached for this domain and realm
-							if(usernames.size()==1)	//if we have exactly one user's authentication information
-							{
-								final String username=usernames.iterator().next();	//get the username
-								final char[] password=client.getPassword(rootURI, realm, username);	//get the password for this user
-								if(password!=null)	//if we found a cached password
-								{
-									passwordAuthentication=new PasswordAuthentication(username, password);	//create new password authentication
-								}
-							}
-						}
-						if(passwordAuthentication==null)	//if we have no password authentication, yet, either specified for this connection or cached in the client
-						{
-							passwordAuthentication=askPasswordAuthentication(request, response, challenge);	//ask for a password
-						}
-						if(passwordAuthentication!=null)	//if we got authentication
-						{
-							//TODO make sure that QOP.AUTH is allowed in the challenge
-							if(++nonceCount>3)	//increase our nonce count; only allow three attempts
-							{
-								break;	//TODO testing
-							}
-							final AuthenticateCredentials credentials;	//try to get credentials based upon the authentication type
-							if(challenge instanceof BasicAuthenticateChallenge)	//if this is basic authentication
-							{
-								credentials=new BasicAuthenticateCredentials(passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword());	//create basic authentication credentials
-							}
-							else if(challenge instanceof DigestAuthenticateChallenge)	//if this is digest authentication
-							{
-								final DigestAuthenticateChallenge digestChallenge=(DigestAuthenticateChallenge)challenge;	//get the challenge as a digest challenge
-								final Nonce cnonce=new DefaultNonce(getClass().getName());	//create our own nonce value to send back
-								credentials=new DigestAuthenticateCredentials(request.getMethod(),	//generate credentials for the client
-										passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword(),
-										digestChallenge.getNonce(), request.getRequestURI(), "cnonce", digestChallenge.getOpaque(), QOP.AUTH, nonceCount,
-										digestChallenge.getMessageDigest().getAlgorithm());	//TODO fix cnonce
-							}
-							else	//if we don't recognize the challenge type
-							{
-								throw new AssertionError("Unrecognized challenge type: "+challenge.getClass());
-							}
-							request.setAuthorization(credentials);	//store the credentials in the request
-							writeRequest(request);	//write the modified request
-							response=readResponse(request);	//read the new response
-							if(response.getResponseClass()==HTTPResponseClass.SUCCESS)	//if we succeeded
-							{
-								client.putPassword(rootURI, realm, passwordAuthentication.getUserName(), passwordAuthentication.getPassword());	//cache the username and password in the client
-							}
-							else if(response.getStatusCode()==SC_UNAUTHORIZED)	//if we're still unauthorized
-							{
-								client.removePassword(rootURI, realm, passwordAuthentication.getUserName());	//make sure there is no password cached for this user
-							}
-						}
-						else	//if we can't get a password
-						{
-							break;	//we can't authenticate without a password
-						}
-					}
-					else	//if we don't recognize the scheme
-					{
-						break;	//we can't authenticate ourselves
-					}
-				}
-				else	//if there is no challenge
-				{
-					break;	//we can't authenticate without a challenge
-				}
-			}
-//TODO del Debug.trace("ready to check response status");
-			response.checkStatus();	//check the status of our response before return it
-//TODO del Debug.trace("ready to send back response");			
-			return response;	//return the response we received
+			new XMLSerializer(true).serialize(document, byteArrayOutputStream, UTF_8_CHARSET);	//serialize the document to the byte array with no byte order mark
+			final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the bytes we serialized
+			writeRequest(request, bytes);	//write the request; don't stream the body, because it should be so short that we can deliver it all in one go
 		}
-		catch(final IllegalArgumentException illegalArgumentException)
+		finally
 		{
-			throw (IOException)new IOException(illegalArgumentException.getMessage()).initCause(illegalArgumentException);
+			byteArrayOutputStream.close();	//always close the stream as good practice			
 		}
-		catch(final NoSuchAlgorithmException noSuchAlgorithmException)
-		{
-			throw (IOException)new IOException(noSuchAlgorithmException.getMessage()).initCause(noSuchAlgorithmException);	//TODO decide if this is the best thing to do here
-		}
-		catch(final SyntaxException syntaxException)
-		{
-			throw (IOException)new IOException(syntaxException.getMessage()).initCause(syntaxException);
-		}
+/*alternate method using chunks:
+		new XMLSerializer(true).serialize(document, writeRequest(request), UTF_8_CHARSET);	//serialize the document to the byte array with no byte order mark
+*/
 	}
 
+	/**Writes a request without a body to the output stream.
+	A connection will be made to the appropriate host if needed.
+	The request's {@value HTTP#HOST_HEADER} header will be updated.
+	No message body will be written.
+	@param request The request to write.
+	@throws NullPointerException if the given request is <code>null</code>.
+	@throws IOException if there is an error writing the data.
+	*/
+	protected void writeRequestMessage(final HTTPRequest request) throws IOException
+	{
+		connect();	//connect if needed
+		final URI uri=request.getURI();	//get the URI of the request object
+		final String requestURI=getRawPathQueryFragment(uri);	//get the unencoded path?query#fragment
+		request.setRequestURI(requestURI);	//set the request-uri 
+		final Host host=URIs.getHost(uri);	//get the host
+		request.setHost(host);	//set the host header to be identical to the host in our request URI
+		final StringBuilder headerBuilder=new StringBuilder();	//create a new string builder for formatting the headers
+		formatRequestLine(headerBuilder, request.getMethod(), requestURI, request.getVersion());	//Request-Line
+		for(final NameValuePair<String, String> header:request.getHeaders())	//look at each header
+		{
+			formatHeaderLine(headerBuilder, header);	//format this header line
+		}
+		headerBuilder.append(CRLF);	//append a blank line, signifying the end of the headers
+		connect(host);	//make sure we're connected to the same host as the request
+		final OutputStream outputStream=getOutputStream();	//get the output stream
+		outputStream.write(headerBuilder.toString().getBytes(UTF_8_CHARSET));	//write the header
+		outputStream.flush();	//flush the data to the server
+	}
+	
 	/**Reads a response from the input stream.
 	If persistent connections are not supported, the connection will be disconnected.
-	Written data will be logged if requested by the client.
+	The response body is not read.
 	@param request The request in which the response is a response.
 	@return A response parsed from the input stream data.
 	@exception IOException if there is an error reading the data.
-	@see Client#isLogged()
 	*/
-	protected HTTPResponse readResponse(final HTTPRequest request) throws IOException
+	public HTTPResponse readResponse(final HTTPRequest request) throws IOException
 	{
 		try
 		{
-//TODO del 	Debug.trace("before reading response, are we connected?", isConnected());
 			final InputStream inputStream=getInputStream();	//get the input stream of the response
 			final HTTPStatus status=parseStatusLine(inputStream);	//parse the status line
-//		TODO del 	Debug.trace("response status:", status);
 //TODO do something about errors, such as 400 No Host matches server name
 			final HTTPResponse response=new DefaultHTTPResponse(status.getVersion(), status.getStatusCode(), status.getReasonPhrase());	//create a new response TODO use a factory
-//		TODO del 	Debug.trace("created response; now parsing headers");
 			readHeaders(response);	//read the headers into the response
-			response.setBody(readResponseBody(inputStream, request, response));	//read and set the response body
-			if(getClient().isLogged() && inputStream instanceof LogInputStream)	//if the client wants logging to occur, and the input stream was already logging
-			{
-				Debug.log("HTTP Response:\n", new String(((LogInputStream)inputStream).getLoggedBytes(true), UTF_8));	//get the logged bytes, clearing the buffer, and log the bytes as a UTF-8 string
-			}
 			return response;	//return the response
 		}
 		finally
 		{
+/*TODO put somewhere else
 			if(request.isConnectionClose())	//if the response asks us to close
 			{
 				disconnect();	//always disconnect from the host
@@ -482,6 +390,7 @@ public class HTTPClientTCPConnection
 			{
 //			TODO del 				Debug.trace("staying alive");
 			}
+*/
 		}
 	}
 
@@ -491,27 +400,83 @@ public class HTTPClientTCPConnection
 	*/
 	protected void readHeaders(final HTTPResponse response) throws IOException
 	{
-		for(final NameValuePair<String, String> header:parseHeaders(inputStream))	//parse the headers
+		for(final NameValuePair<String, String> header:parseHeaders(getInputStream()))	//parse the headers
 		{
 //TODO del Debug.trace("header", header.getName(), header.getValue());
 			response.addHeader(header.getName(), header.getValue());	//add this header to the response
 		}
 	}
 
+	/**Retrieves an input stream to read the body of the given response.
+	The returned input stream should always be closed after reading is finished.
+	No content will be return in response to a HEAD request, as per RFC 2616, 9.4.
+	@param request The request in which the response is a response.
+	@param response The response for which a body should be read.
+	@return An input stream providing access to the body of the message.
+	@throws IOException if there was an error getting an input stream to the message body.
+	*/
+	public InputStream getResponseBodyInputStream(final HTTPRequest request, final HTTPResponse response) throws IOException
+	{
+		if(HEAD_METHOD.equals(request.getMethod()))	//if this is the HEAD method
+		{
+			return new ByteArrayInputStream(Bytes.NO_BYTES);	//the HEAD method will never send content, even if there is a Content-Length header TODO make an EmptyInputStream; make a static instance and place it in InputStreams
+		}
+		return getBodyInputStream(response);
+	}
+
+	/**Retrieves an input stream to read the body of the given message.
+	The returned input stream should always be closed after reading is finished.
+	@param message The message for which a body input stream should be retrieved.
+	@return An input stream providing access to the body of the message.
+	@throws IOException if there was an error getting an input stream to the message body.
+	*/
+	protected InputStream getBodyInputStream(final HTTPMessage message) throws IOException
+	{
+		final String[] transferEncoding=message.getTransferEncoding();	//get the list of transfer encodings, which takes precedence over any Content-Length header (RFC 2616 4.4.2)
+		if(transferEncoding!=null && transferEncoding.length>0 && !contains(transferEncoding, IDENTITY_TRANSFER_CODING))	//if the transfer encoding contains anything other than "identity", use the chunked encoding algorithm to get the body contents (RFC 2616 4.4.2)
+		{
+			return new HTTPChunkedInputStream(getInputStream(), false);	//return an input stream to the chunked content; use a stream that doesn't close the underlying input stream when finished
+		}
+		else	//if chunked encoding is not used
+		{
+			long contentLength;
+			try
+			{
+				contentLength=message.getContentLength();	//get the content length
+			}
+			catch(final SyntaxException syntaxException)
+			{
+				throw new IOException(syntaxException);
+			}
+			if(contentLength<0)	//if there is no content length (Tomcat appears to send send back no content length if there is no message in some cases)
+			{
+				contentLength=0;	//assume a content length of zero
+			}
+			if(contentLength>=0)	//if there is a content length
+			{
+				return new FixedLengthInputStream(getInputStream(), contentLength, false);	//return an input stream only to these bytes; don't close the underlying stream when finished
+			}
+			else	//if there is no content length
+			{		
+				throw new UnsupportedOperationException("Missing content length in HTTP response.");
+			}
+		}
+	}
+
 	/**Reads the body of a response from an input stream.
 	No content will be read in response to a HEAD method, as per RFC 2616, 9.4.
-	@param inputStream The input stream containing the response body.
 	@param request The request in which the response is a response.
 	@param response The response for which a body should be read.
 	@return The contents of the response body.
 	@exception EOFException if the end of the stream was unexpectedly reached.
 	@exception IOException if there is an error reading the data.
 	*/
-	protected byte[] readResponseBody(final InputStream inputStream, final HTTPRequest request, final HTTPResponse response) throws EOFException, IOException
+	public byte[] readResponseBody(final HTTPRequest request, final HTTPResponse response) throws EOFException, IOException
 	{
+		final InputStream inputStream=getInputStream();	//get the connection's input stream
 		if(HEAD_METHOD.equals(request.getMethod()))	//if this is the HEAD method
 		{
-			return HTTPMessage.NO_BODY;	//the HEAD method will never send content, even if there is a Content-Length header
+			return Bytes.NO_BYTES;	//the HEAD method will never send content, even if there is a Content-Length header
 		}
 		else	//if this is any other method
 		{
@@ -520,28 +485,22 @@ public class HTTPClientTCPConnection
 				final String[] transferEncoding=response.getTransferEncoding();	//get the list of transfer encodings, which takes precedence over any Content-Length header (RFC 2616 4.4.2)
 				if(transferEncoding!=null && transferEncoding.length>0 && !contains(transferEncoding, IDENTITY_TRANSFER_CODING))	//if the transfer encoding contains anything other than "identity", use the chunked encoding algorithm to get the body contents (RFC 2616 4.4.2)
 				{
-//TODO del Debug.trace("using chunked encoding");
 					final ByteArrayOutputStream bodyBuffer=new ByteArrayOutputStream();	//create a buffer in which to store chunks
 					byte[] chunk;	//we'll store each chunk here as we read it
 					while((chunk=parseChunk(inputStream))!=null)	//read chunks until there are no more chunks
 					{
 						bodyBuffer.write(chunk);	//add this chunk to the buffer
 					}
-//TODO del Debug.trace("reading post-chunk headers");
 					readHeaders(response);	//read any post-chunk headers into the response
 					return bodyBuffer.toByteArray();	//return the body we read as chunks
 				}
 				else	//if chunked encoding is not used
 				{
-//TODO fix					final long contentLength=response.getContentLength();	//get the content length
 					long contentLength=response.getContentLength();	//get the content length
-//TODO del		Debug.trace("content length", contentLength);
-					
 					if(contentLength<0)	//TODO fix; does Tomcat send back no content length if there is no message? even if the response length is set to zero? is this correct?
 					{
 						contentLength=0;
 					}
-
 					if(contentLength>=0)	//if there is a content length
 					{
 						assert contentLength<=Integer.MAX_VALUE : "Unsupported content length.";
@@ -567,106 +526,178 @@ public class HTTPClientTCPConnection
 			}
 		}
 	}
-	
-	/**Writes a request to the output stream.
-	A connection will be made to the appropriate host if needed.
-	The request's Host header will be updated.
-	Written data will be logged if requested by the client.
-	@param request The request to write.
-	@exception IOException if there is an error writing the data.
-	@see Client#isLogged()
-	*/
-	protected void writeRequest(final HTTPRequest request) throws IOException
-	{
-		final URI uri=request.getURI();	//get the URI of the request object
-		final String requestURI=getRawPathQueryFragment(uri);	//get the unencoded path?query#fragment
-		request.setRequestURI(requestURI);	//set the request-uri 
-		final Host host=URIs.getHost(uri);	//get the host
-		request.setHost(host);	//set the host header to be identical to the host in our request URI
-		final byte[] requestBody=request.getBody();	//get the request body
-/*TODO del when works; maybe check and give an error if the content length doesn't reflect the length of the body
-		if(requestBody.length>0)	//if there is a request body
-		{
-			request.setContentLength(requestBody.length);	//set the content length
-		}
-		else	//if there is no request body
-		{
-			request.removeHeaders(CONTENT_LENGTH_HEADER);	//remove the content length header
-		}
-*/
-/*TODO del
-		if(requestBody!=null)	//if there is a request body
-		{
-			request.setContentLength(requestBody.length);	//set the content length
-		}
-		else	//if there is no request body
-		{
-			request.removeHeaders(CONTENT_LENGTH_HEADER);	//remove the content length header
-		}
-*/
-		final StringBuilder headerBuilder=new StringBuilder();	//create a new string builder for formatting the headers
-		formatRequestLine(headerBuilder, request.getMethod(), requestURI, request.getVersion());	//Request-Line
-		for(final NameValuePair<String, String> header:request.getHeaders())	//look at each header
-		{
-			formatHeaderLine(headerBuilder, header);	//format this header line
-		}
-		headerBuilder.append(CRLF);	//append a blank line, signifying the end of the headers
-//TODO del Debug.trace(headerBuilder);
-		connect(host);	//make sure we're connected to the same host as the request
-		final OutputStream outputStream=getOutputStream();	//get the output stream
-		outputStream.write(getBytes(headerBuilder));	//write the header
-		if(requestBody!=null)	//if there is a request body
-		{
-			outputStream.write(requestBody);	//write the body
-		}
-		outputStream.flush();	//flush the data to the server
-		if(getClient().isLogged() && outputStream instanceof LogOutputStream)	//if the client wants logging to occur, and the output stream was already logging
-		{
-			Debug.log("HTTP Request:\n", new String(((LogOutputStream)outputStream).getLoggedBytes(true), UTF_8));	//get the logged bytes, clearing the buffer, and log the bytes as a UTF-8 string
-		}
-	}
 
-	/**Writes a HTTP header to the output stream, followed by CRLF.
-	@param outputStream The data destination.
-	@param header The HTTP header to write.
-	@exception IOException if there is an error writing the data.
+	/**Reads an XML document from the body of an HTTP response.
+	This is a convenience method that delegates to {@link #getResponseBodyInputStream(HTTPRequest, HTTPResponse)}.
+	@param request The request in which the response is a response.
+	@param response The response for which a body should be read.
+	@param namespaceAware <code>true</code> if the document should support for XML namespaces, else <code>false</code>.
+	@param validated <code>true</code> if the document should be validated as it is parsed, else <code>false</code>.
+	@return A document representing the XML information, or <code>null</code> if there is no content.
+	@throws ConfigurationException if a document builder cannot be created which satisfies the configuration requested.
+	@throws IOException if there is an error reading the XML.
 	*/
-/*TODO del if not needed
-	protected static void writeHeader(final OutputStream outputStream, final NameValuePair<String, String> header) throws IOException
-	{
-		writeLine(outputStream, formatHeader(new StringBuilder(), header));	//format and write out a header line
-	}
-*/
-
-	/**Writes a line of HTTP content to the output stream, followed by CRLF.
-	@param outputStream The data destination.
-	@param line The line of HTTP content to write.
-	@exception IOException if there is an error writing the data.
-	*/
-/*TODO del
-	protected static void writeLine(final OutputStream outputStream, final CharSequence line) throws IOException
-	{
-		outputStream.write(getBytes(line));	//write the line
-		outputStream.write(getBytes(CRLF));	//CRLF
-	}
-*/
-	
-	/**Converts a sequence of characters to bytes using the UTF-8 encoding.
-	@param characters The characters to convert to bytes.
-	@return An array of bytes representing the given characters encoded in UTF-8.
-	*/
-	protected static byte[] getBytes(final CharSequence characters)
+	public Document readResponseBodyXML(final HTTPRequest request, final HTTPResponse response, final boolean namespaceAware, final boolean validated) throws ConfigurationException, IOException
 	{
 		try
 		{
-			return characters.toString().getBytes(UTF_8);	//return the characters encoded as UTF-8
+			return createDocumentBuilder(namespaceAware, validated).parse(getResponseBodyInputStream(request, response));	//parse the document
 		}
-		catch(final UnsupportedEncodingException unsupportedEncodingException)	//we should always support UTF-8
+		catch(final SAXException saxException)
 		{
-			throw new AssertionError(unsupportedEncodingException);
-		}		
+			throw new IOException(saxException);			
+		}
 	}
-
+	
+	/**Sends a fixed-length request and gets a response.
+	This convenience method can retry requests with appropriate authorization if necessary.
+	Once the request is successful, the body of the response will still be waiting to be read.
+	If an the response results in a corresponding {@link HTTPException}, the response body will be ignored and will no longer be available in the input stream.
+	@param request The request to send to the server.
+	@param body The body of the request.
+	@return The response to get from the server
+	@throws NullPointerException if the given request and/or body is <code>null</code>.
+	@exception IOException if there is an error writing the request or reading the response.
+	*/
+	public HTTPResponse sendRequest(final HTTPRequest request, final byte[] body) throws IOException
+	{
+		long nonceCount=0;	//TODO testing
+		try
+		{
+				//if there is connection-specific password authentication, see if we can send it proactively TODO improve entire caching scheme to cache basic/digest preference in client after first failure; the current technique will fail the first time, anyway, as we don't know the realms
+			PasswordAuthentication passwordAuthentication=getPasswordAuthentication();	//see if password authentication has been specified specifically for this connection
+			if(passwordAuthentication!=null)	//if we have connection-specific password authentication, try to find what realm to use
+			{
+				final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
+				final Set<String> realms=client.getRealms(rootURI);	//get all the known realms for this domain
+				if(!realms.isEmpty())	//if there are any realms we know about
+				{
+					final String realm=realms.iterator().next();	//get the first realm TODO this call can be improved
+					final AuthenticateCredentials credentials=new BasicAuthenticateCredentials(passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword());	//create basic authentication credentials TODO somehow cache in the client whether basic or digest credentials are preferred; improve the entire client caching mechanism 
+					request.setAuthorization(credentials);	//store the credentials in the request
+				}
+			}
+//		TODO del Debug.trace("writing request");
+			writeRequest(request, body);	//write the request along with the request body
+//		TODO del Debug.trace("reading response");
+			HTTPResponse response=readResponse(request);	//read the response TODO check for redirects
+//		TODO del Debug.trace("response connection header:", response.getConnection());
+			while(response.getStatusCode()==SC_UNAUTHORIZED)	//if the request requires authorization
+			{
+				readResponseBody(request, response);	//skip the response body
+//TODO fix; del if not needed				disconnect();	//disconnect from the server so that the server won't time out while we look for credentials and throw a SocketException TODO improve
+//			TODO del Debug.trace("unauthorized; looking for challenge");
+				final AuthenticateChallenge challenge=response.getWWWAuthenticate();	//get the challenge
+				if(challenge==null)	//if there is no challenge
+				{
+					break;	//we can't authenticate without a challenge
+				}
+				final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
+				final AuthenticationScheme scheme=challenge.getScheme();	//get the scheme
+				if(scheme!=AuthenticationScheme.BASIC && scheme!=AuthenticationScheme.DIGEST)	//if we don't recognize the scheme
+				{
+					break;	//we can't authenticate ourselves
+				}
+				final String realm=challenge.getRealm();	//get the challenge realm
+				if(passwordAuthentication==null)	//if there is no connection-specific password authentication, try to find some
+				{
+					final HTTPClient client=getClient();	//get the client with which we're associated
+					final Set<String> usernames=client.getUsernames(rootURI, realm);	//get users that are cached for this domain and realm
+					if(usernames.size()==1)	//if we have exactly one user's authentication information
+					{
+						final String username=usernames.iterator().next();	//get the username
+						final char[] password=client.getPassword(rootURI, realm, username);	//get the password for this user
+						if(password!=null)	//if we found a cached password
+						{
+							passwordAuthentication=new PasswordAuthentication(username, password);	//create new password authentication
+						}
+					}
+				}
+				if(passwordAuthentication==null)	//if we have no password authentication, yet, either specified for this connection or cached in the client
+				{
+					passwordAuthentication=askPasswordAuthentication(request, response, challenge);	//ask for a password
+				}
+				if(passwordAuthentication==null)	//if we got no authentication
+				{
+					break;	//we can't authenticate without a password
+				}
+				//TODO make sure that QOP.AUTH is allowed in the challenge
+				if(++nonceCount>3)	//increase our nonce count; only allow three attempts
+				{
+					break;	//TODO testing
+				}
+				final AuthenticateCredentials credentials;	//try to get credentials based upon the authentication type
+				if(challenge instanceof BasicAuthenticateChallenge)	//if this is basic authentication
+				{
+					credentials=new BasicAuthenticateCredentials(passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword());	//create basic authentication credentials
+				}
+				else if(challenge instanceof DigestAuthenticateChallenge)	//if this is digest authentication
+				{
+					final DigestAuthenticateChallenge digestChallenge=(DigestAuthenticateChallenge)challenge;	//get the challenge as a digest challenge
+					final Nonce cnonce=new DefaultNonce(getClass().getName());	//create our own nonce value to send back
+					credentials=new DigestAuthenticateCredentials(request.getMethod(),	//generate credentials for the client
+							passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword(),
+							digestChallenge.getNonce(), request.getRequestURI(), "cnonce", digestChallenge.getOpaque(), QOP.AUTH, nonceCount,
+							digestChallenge.getMessageDigest().getAlgorithm());	//TODO fix cnonce
+				}
+				else	//if we don't recognize the challenge type
+				{
+					throw new AssertionError("Unrecognized challenge type: "+challenge.getClass());
+				}
+				request.setAuthorization(credentials);	//store the credentials in the request
+				writeRequest(request, body);	//write the modified request along with the request body
+				response=readResponse(request);	//read the new response
+				if(response.getResponseClass()==HTTPResponseClass.SUCCESS)	//if we succeeded
+				{
+					client.putPassword(rootURI, realm, passwordAuthentication.getUserName(), passwordAuthentication.getPassword());	//cache the username and password in the client
+				}
+				else if(response.getStatusCode()==SC_UNAUTHORIZED)	//if we're still unauthorized
+				{
+					client.removePassword(rootURI, realm, passwordAuthentication.getUserName());	//make sure there is no password cached for this user
+				}
+			}
+			return response;	//return the response we received
+		}
+		catch(final IllegalArgumentException illegalArgumentException)
+		{
+			throw new IOException(illegalArgumentException);
+		}
+		catch(final NoSuchAlgorithmException noSuchAlgorithmException)
+		{
+			throw new IOException(noSuchAlgorithmException);	//TODO decide if this is the best thing to do here
+		}
+		catch(final SyntaxException syntaxException)
+		{
+			throw new IOException(syntaxException);
+		}
+	}
+	
+	/**Sends an XML document as the body of a fixed-length request and gets a response.
+	This convenience method can retry requests with appropriate authorization if necessary.
+	Once the request is successful, the body of the response will still be waiting to be read.
+	If an the response results in a corresponding {@link HTTPException}, the response body will be ignored and will no longer be available in the input stream.
+	This method delegates to {@link #sendRequest(HTTPRequest, byte[])}. 
+	@param request The request to send to the server.
+	@param document The XML document to place in the body of the request.
+	@return The response to get from the server
+	@throws NullPointerException if the given request and/or document is <code>null</code>.
+	@exception IOException if there is an error writing the request or reading the response.
+	*/
+	public HTTPResponse sendRequest(final HTTPRequest request, final Document document) throws IOException
+	{
+		final ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();	//create a byte array output stream to hold our outgoing data
+		try
+		{
+			new XMLSerializer(true).serialize(document, byteArrayOutputStream, UTF_8_CHARSET);	//serialize the document to the byte array with no byte order mark
+			final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the bytes we serialized
+			return sendRequest(request, bytes);	//set the bytes of the XML document into the body of the message
+		}
+		finally
+		{
+			byteArrayOutputStream.close();	//always close the stream as good practice			
+		}
+	}
+	
 	/**Closes the connection.
 	@exception IOException if there is a problem closing the connection.
 	*/
@@ -695,4 +726,18 @@ public class HTTPClientTCPConnection
 		return getClient().getPasswordAuthentication(request.getURI(), promptBuilder.toString());	//ask the client to ask the user for a password
 	}
 
+	/**Cleans up the object upon garbage collection.
+	This version attempts to disconnect if the connection if open.
+	*/
+	protected void finalize() throws Throwable
+	{
+		try
+		{
+			disconnect();	//try to disconnect if we need to
+		}
+		finally
+		{
+			super.finalize();
+		}
+	}
 }

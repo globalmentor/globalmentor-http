@@ -19,21 +19,13 @@ package com.globalmentor.net.http;
 import java.io.*;
 import java.util.*;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import static com.globalmentor.io.Charsets.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.http.HTTP.*;
+import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
-import static com.globalmentor.text.xml.XML.*;
 
 import com.globalmentor.io.ParseReader;
 import com.globalmentor.text.SyntaxException;
-import com.globalmentor.text.xml.XMLSerializer;
 import com.globalmentor.util.*;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**An abstract implementation of an HTTP request or response as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
@@ -125,6 +117,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 	/**Retrieves a list of name-value pairs representing all the headers of this message.
 	@return The header value, or <code>null</code> if no such header is present.
 	*/
+	@SuppressWarnings("unchecked")
 	public NameValuePair<String, String>[] getHeaders()
 	{
 		final List<NameValuePair<String, String>> headerList=new ArrayList<NameValuePair<String, String>>();	//create a new list of name-value pairs
@@ -135,7 +128,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 				headerList.add(new NameValuePair<String, String>(headerNameListPair.getName(), headerValue));	//add a new name-value pair with the header name and value
 			}
 		}
-		return headerList.toArray(new NameValuePair[headerList.size()]);	//return an array of headers from the list
+		return (NameValuePair<String, String>[])headerList.toArray(new NameValuePair[headerList.size()]);	//return an array of headers from the list
 	}
 	
 	/**Adds a header to the list of headers.
@@ -167,31 +160,6 @@ public class AbstractHTTPMessage implements HTTPMessage
 	}
 
 //TODO create a normalizeHeaders() method that converts all multiple headers to single headers
-
-	/**The bytes making up the body of the message.*/
-	private byte[] body=null;
-
-		/**@return The bytes making up the body of the message.*/
-		public byte[] getBody() {return body;}
-	
-		/**Sets the bytes to make up the body of the message.
-		Updates the Content-Length header.
-		@param body The body content.
-		@exception NullPointerException if the given body is <code>null</code>.
-		@see HTTP#CONTENT_LENGTH_HEADER
-		*/
-		public void setBody(final byte[] body)
-		{
-			this.body=checkInstance(body, "Body is null.");	//save the body
-			if(body.length>0)	//if there is a request body
-			{
-				setContentLength(body.length);	//set the content length
-			}
-			else	//if there is no request body
-			{
-				removeHeaders(CONTENT_LENGTH_HEADER);	//remove the content length header
-			}
-		}
 
 	//Connection header
 
@@ -313,42 +281,19 @@ public class AbstractHTTPMessage implements HTTPMessage
 		}		
 	}
 
-	/**Retrieves an XML document from the body of the HTTP message.
-	@param namespaceAware <code>true</code> if the document should support for XML namespaces, else <code>false</code>.
-	@param validated <code>true</code> if the document should be validated as it is parsed, else <code>false</code>.
-	@return A document representing the XML information, or <code>null</code> if there is no content.
-	@exception IOException if there is an error reading the XML.
-	@exception ParserConfigurationException if an appropriate parser could not be found for parsing the XML.
-	@exception SAXException if there was an error parsing the XML.
+	/**Sets the transfer encoding header.
+	@param transferEncodings The transfer encodings to use.
+	@exception NullPointerException if the given transfer encodings is <code>null</code>.
+	@exception IllegalArgumentException if no transfer encodings are given.
+	@see HTTP#TRANSFER_ENCODING_HEADER
 	*/
-	public Document getXML(final boolean namespaceAware, final boolean validated) throws IOException, ParserConfigurationException, SAXException
+	public void setTransferEncoding(final String... transferEncodings)
 	{
-		final byte[] body=getBody();	//get the body of the message
-		if(body!=null)	//if a body was given
+		if(transferEncodings.length==0)	//if no transfer encodings are given
 		{
-			final InputStream xmlInputStream=new ByteArrayInputStream(body);	//create a new input stream from the body bytes
-			return createDocumentBuilder(namespaceAware, validated).parse(xmlInputStream);	//parse the document				
+			throw new IllegalArgumentException("No transfer encodings given.");
 		}
-		return null;	//show that there is no content to return
-	}
-
-	/**Places an XML document into the body of the HTTP message.
-	@param document The XML document to place into the message.
-	@exception IOException if there is an error writing the XML.
-	*/
-	public void setXML(final Document document) throws IOException
-	{
-		final ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();	//create a byte array output stream to hold our outgoing data
-		try
-		{
-			new XMLSerializer(true).serialize(document, byteArrayOutputStream, UTF_8_CHARSET);	//serialize the document to the byte array with no byte order mark
-			final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the bytes we serialized
-			setBody(bytes);	//set the bytes of the XML document into the body of the message
-		}
-		finally
-		{
-			byteArrayOutputStream.close();	//always close the stream as good practice			
-		}
+		setHeader(TRANSFER_ENCODING_HEADER, formatList(new StringBuilder(), (Object[])transferEncodings).toString());	//set the transfer encodings
 	}
 
 }

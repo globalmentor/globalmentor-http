@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.locks.*;
 
 import com.globalmentor.io.*;
+import com.globalmentor.java.Bytes;
 import com.globalmentor.net.*;
 import com.globalmentor.util.*;
 
@@ -35,7 +36,7 @@ This class is not thread safe.
 @author Garret Wilson
 @see HTTPException
 */
-public class HTTPResource extends DefaultResource
+public class HTTPResource extends DefaultResource	//TODO improve by having a persistence timeout, by checking for a server's close request, and by detecting closed connections and preventing socket exceptions
 {
 
 	/**The client used to create a connection to this resource.*/
@@ -157,13 +158,16 @@ public class HTTPResource extends DefaultResource
 		this.passwordAuthentication=passwordAuthentication;	//save the password authentication
 	}
 
-	/**Deletes the resource using the DELETE method.
+	/**Deletes the resource using the {@value HTTP#DELETE_METHOD} method.
 	@exception IOException if there was an error invoking the method.
 	*/
 	public void delete() throws IOException
 	{
 		final HTTPRequest request=new DefaultHTTPRequest(DELETE_METHOD, getURI());	//create a DELETE request
-		final HTTPResponse response=sendRequest(request);	//get the response
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
+		final HTTPResponse response=connection.sendRequest(request, Bytes.NO_BYTES);	//send the request and get the response
+		connection.readResponseBody(request, response);	//ignore the response body
+		response.checkStatus();	//check the status of the response, throwing an exception if this is an error
 		if(isCached())	//if we're caching this resource
 		{
 			cacheExists(false);	//indicate that the resource no longer exists
@@ -202,59 +206,49 @@ public class HTTPResource extends DefaultResource
 	*/
 	protected boolean getExists() throws IOException
 	{
-		try
-		{
-			final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getURI());	//create a HEAD request
-			final HTTPResponse response=sendRequest(request);	//get the response
-			return true;	//if no exceptions were thrown, assume the resource exists
-		}
-		catch(final HTTPNotFoundException notFoundException)	//404 Not Found
+		final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getURI());	//create a HEAD request
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
+		final HTTPResponse response=connection.sendRequest(request, Bytes.NO_BYTES);	//get the response
+		connection.readResponseBody(request, response);	//ignore the response body
+		if(response.getStatusCode()==SC_NOT_FOUND	//404 Not Found
+				|| response.getStatusCode()==SC_GONE)	//410 Gone
 		{
 			return false;	//show that the resource is not there
 		}
-		catch(final HTTPGoneException goneException)	//410 Gone
-		{
-			return false;	//show that the resource is permanently not there
-		}
+		response.checkStatus();	//check the status of the response, throwing an exception if this is an error
+		return true;	//if no exceptions were thrown, assume the resource exists
 	}
 
-	/**Retrieves the contents of a resource using the GET method.
+	/**Retrieves the contents of a resource using the {@value HTTP#GET_METHOD} method.
 	@return An input stream to the server.
 	@exception IOException if there was an error invoking the method.
 	*/
 	public InputStream getInputStream() throws IOException
 	{
-		return new ByteArrayInputStream(get());	//return an input stream to the result of the GET method
-	}
-
-	/**Retrieves the contents of a resource using the {@value HTTP#GET_METHOD} method.
-	The cached existence property is updated if information is being cached.
-	@return The content received from the server.
-	@exception IOException if there was an error invoking the method.
-	@see #cachedExists
-	*/
-	public byte[] get() throws IOException
-	{
 		Boolean exists=null;	//we'll see if we can determine existence
+		final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getURI());	//create a GET request
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
 		try
 		{
+			final HTTPResponse response=connection.sendRequest(request, Bytes.NO_BYTES);	//get the response
 			try
 			{
-				final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getURI());	//create a GET request
-				final HTTPResponse response=sendRequest(request);	//get the response
+				response.checkStatus();	//check the status of the response, throwing an exception if this is an error
 				exists=Boolean.TRUE;	//if GET succeeds, the resource exists
-				return response.getBody();	//return the bytes received from the server
 			}
 			catch(final HTTPNotFoundException notFoundException)	//404 Not Found
 			{
 				exists=Boolean.FALSE;	//show that the resource is not there
+				connection.readResponseBody(request, response);	//skip the response body
 				throw notFoundException;	//rethrow the exception
 			}
 			catch(final HTTPGoneException goneException)	//410 Gone
 			{
 				exists=Boolean.FALSE;	//show that the resource is permanently not there
+				connection.readResponseBody(request, response);	//skip the response body
 				throw goneException;	//rethrow the exception
 			}
+			return connection.getResponseBodyInputStream(request, response);	//get an input stream to the response body
 		}
 		finally
 		{
@@ -268,7 +262,42 @@ public class HTTPResource extends DefaultResource
 		}
 	}
 
-	/**Accesses a resource using the HEAD method.
+	/**Retrieves the contents of a resource using the {@value HTTP#GET_METHOD} method.
+	The cached existence property is updated if information is being cached.
+	@return The content received from the server.
+	@exception IOException if there was an error invoking the method.
+	@see #cachedExists
+	*/
+	public byte[] get() throws IOException
+	{
+		Boolean exists=null;	//we'll see if we can determine existence
+		final HTTPRequest request=new DefaultHTTPRequest(GET_METHOD, getURI());	//create a GET request
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
+		try
+		{
+			final HTTPResponse response=connection.sendRequest(request, Bytes.NO_BYTES);	//get the response
+			if(response.getStatusCode()==SC_NOT_FOUND	//404 Not Found
+					|| response.getStatusCode()==SC_GONE)	//410 Gone
+			{
+				exists=Boolean.FALSE;	//show that the resource is not there
+			}
+			response.checkStatus();	//check the status of the response, throwing an exception if this is an error
+			exists=Boolean.TRUE;	//if GET succeeds, the resource exists
+			return connection.readResponseBody(request, response);	//read and return the response body
+		}
+		finally
+		{
+			if(isCached() && exists!=null)	//if information is being cached and we know the latest existence state
+			{
+				if(isCached())	//if we are caching information
+				{
+					cacheExists(exists.booleanValue());	//update the exists status
+				}
+			}
+		}
+	}
+
+	/**Accesses a resource using the {@value HTTP#HEAD_METHOD} method.
 	The cached existence property is updated.
 	@exception IOException if there was an error invoking the method.
 	@see #cachedExists
@@ -276,24 +305,19 @@ public class HTTPResource extends DefaultResource
 	public void head() throws IOException
 	{
 		Boolean exists=null;	//we'll see if we can determine existence
+		final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getURI());	//create a HEAD request
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
 		try
 		{
-			try
-			{
-				final HTTPRequest request=new DefaultHTTPRequest(HEAD_METHOD, getURI());	//create a HEAD request
-				final HTTPResponse response=sendRequest(request);	//get the response
-				exists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists
-			}
-			catch(final HTTPNotFoundException notFoundException)	//404 Not Found
+			final HTTPResponse response=connection.sendRequest(request, Bytes.NO_BYTES);	//get the response
+			connection.readResponseBody(request, response);	//ignore the response body
+			if(response.getStatusCode()==SC_NOT_FOUND	//404 Not Found
+					|| response.getStatusCode()==SC_GONE)	//410 Gone
 			{
 				exists=Boolean.FALSE;	//show that the resource is not there
-				throw notFoundException;	//rethrow the exception
 			}
-			catch(final HTTPGoneException goneException)	//410 Gone
-			{
-				exists=Boolean.FALSE;	//show that the resource is permanently not there
-				throw goneException;	//rethrow the exception
-			}
+			response.checkStatus();	//check the status of the response, throwing an exception if this is an error
+			exists=Boolean.TRUE;	//if no exceptions were thrown, assume the resource exists
 		}
 		finally
 		{
@@ -304,15 +328,17 @@ public class HTTPResource extends DefaultResource
 		}
 	}
 
-	/**Stores the contents of a resource using the PUT method.
+	/**Stores the contents of a resource using the {@value HTTP#PUT_METHOD} method.
 	@param content The bytes to store at the resource location. 
 	@exception IOException if there was an error invoking the method.
 	*/
 	public void put(final byte[] content) throws IOException
 	{
 		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getURI());	//create a PUT request
-		request.setBody(content);	//set the content of the request 
-		final HTTPResponse response=sendRequest(request);	//get the response
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
+		final HTTPResponse response=connection.sendRequest(request, content);	//get the response
+		connection.readResponseBody(request, response);	//ignore the response body
+		response.checkStatus();	//check the status of the response, throwing an exception if this is an error
 	}
 	
 	/**Reads an object from the resource using HTTP GET with the given I/O support.
@@ -360,11 +386,29 @@ public class HTTPResource extends DefaultResource
 		return new OutputStreamAdapter();	//create and return a new output stream adapter which will accumulate bytes and send them when closed
 	}
 
+	/**The lazily-created connection.*/
+	private HTTPClientTCPConnection connection=null;
+
+	/**Gets a connection to the server.
+	@return A connection to the server.
+	*/
+	protected HTTPClientTCPConnection getConnection()
+	{
+		if(connection==null)	//if no connection has been created
+		{
+			final URI referenceURI=getURI();	//get the reference URI
+			final boolean secure=HTTP.HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
+			connection=getClient().createConnection(getHost(getURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
+		}
+		return connection;
+	}
+
 	/**Sends a request to the server.
 	@param request The request to send to the server.
 	@return The response from the server.
 	@exception IOException if there was an error sending the request or receiving the response.
 	*/
+/*TODO del if not needed
 	protected HTTPResponse sendRequest(final HTTPRequest request) throws IOException	//TODO add connection peristence
 	{
 		final URI referenceURI=getURI();	//get the reference URI
@@ -379,12 +423,14 @@ public class HTTPResource extends DefaultResource
 			connection.disconnect();	//always close the connection
 		}
 	}
+*/
 
 	/**Sends a request to the server using a custom authenticator.
 	@param request The request to send to the server.
 	@return The response from the server.
 	@exception IOException if there was an error sending the request or receiving the response.
 	*/
+/*TODO bring back if needed
 	protected HTTPResponse sendRequest(final HTTPRequest request, final Authenticable authenticator) throws IOException	//TODO add connection peristence
 	{
 		final URI referenceURI=getURI();	//get the reference URI
@@ -399,6 +445,7 @@ public class HTTPResource extends DefaultResource
 			connection.disconnect();	//always close the connection
 		}
 	}
+*/
 
 	/**Creates an output stream that simply collects bytes until closed,
 	 	at which point the data is written to the HTTP resource using the PUT method.
