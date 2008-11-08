@@ -17,6 +17,7 @@
 package com.globalmentor.net.http;
 
 import java.io.*;
+
 import static java.lang.System.*;
 
 import com.globalmentor.java.Bytes;
@@ -25,8 +26,8 @@ import com.globalmentor.util.Debug;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.http.HTTPParser.*;
 
-/**An input stream that reads HTTP chunked content from an existing stream,
-signalling the end of the stream when the chunks are finished, but doesn't close the underlying stream.
+/**An input stream that reads HTTP chunked content from an existing stream, signalling the end of the stream when the chunks are finished.
+<p>This decorator provides convenience methods {@link #beforeClose()} and {@link #afterClose()} called before and after the stream is closed, respectively.</p>
 <p>This stream should always be closed when access is finished; otherwise the underlying stream could be corrupted.</p>
 <p>This implementation ignores chunked trailers.</p>
 <p>This implementation does not support mark and reset.</p>
@@ -390,6 +391,20 @@ public class HTTPChunkedInputStream extends InputStream
   	return false;
 	}
 
+  /**Called before the stream is closed.
+	@exception IOException if an I/O error occurs.
+	*/
+  protected void beforeClose() throws IOException 
+  {
+  }
+
+  /**Called after the stream is successfully closed.
+	@exception IOException if an I/O error occurs.
+	*/
+  protected void afterClose() throws IOException
+  {
+  }
+
 	/**Closes this input stream and releases any system resources associated with the stream.
 	A closed stream cannot perform output operations and cannot be reopened.
 	@exception IOException if an I/O error occurs.
@@ -403,11 +418,13 @@ public class HTTPChunkedInputStream extends InputStream
     		chunk=parseChunk(inputStream);	//parse another chunk from the input stream
   		}
   		parseHeaders(inputStream);	//parse any trailers
+  		beforeClose();	//perform actions before closing
   		if(closeDecoratedStream)	//if we should close the underlying stream
   		{
   			inputStream.close();
   		}
   		inputStream=null;	//release the underlying input stream, but don't close it
+  		afterClose();	//perform actions after closing
   	}
 	}
 }

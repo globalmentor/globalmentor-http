@@ -340,7 +340,19 @@ public class HTTPResource extends DefaultResource	//TODO improve by having a per
 		connection.readResponseBody(request, response);	//ignore the response body
 		response.checkStatus();	//check the status of the response, throwing an exception if this is an error
 	}
-	
+
+	/**Retrieves an output stream to a resource using the {@value HTTP#PUT_METHOD} method.
+	@return An output stream to the resource.
+	@exception IOException if there was an error invoking the method.
+	*/
+	public OutputStream getOutputStream() throws IOException
+	{
+		final HTTPRequest request=new DefaultHTTPRequest(PUT_METHOD, getURI());	//create a PUT request
+		final HTTPClientTCPConnection connection=getConnection();	//get a connection to the server
+		final OutputStream outputStream=connection.writeRequest(request);	//write the request to the server
+		return new ReadResponseOutputStreamDecorator(connection, request, outputStream);	//return a version of the output stream that will read the response when finished
+	}
+
 	/**Reads an object from the resource using HTTP GET with the given I/O support.
 	@param io The I/O support for reading the object.
 	@return The object read from the resource.
@@ -375,15 +387,6 @@ public class HTTPResource extends DefaultResource	//TODO improve by having a per
 		{
 			outputStream.close();	//always close the output stream
 		}
-	}
-
-	/**Retrieves an output stream which, upon closing, will store the contents of a resource using the PUT method.
-	@return An output stream to the resource.
-	@exception IOException if there was an error invoking the method.
-	*/
-	public OutputStream getOutputStream() throws IOException
-	{
-		return new OutputStreamAdapter();	//create and return a new output stream adapter which will accumulate bytes and send them when closed
 	}
 
 	/**The lazily-created connection.*/
@@ -447,33 +450,40 @@ public class HTTPResource extends DefaultResource	//TODO improve by having a per
 	}
 */
 
-	/**Creates an output stream that simply collects bytes until closed,
-	 	at which point the data is written to the HTTP resource using the PUT method.
+	/**Creates an output stream that, after being closed, reads the HTTP response and throws an error if appropriate.
 	@author Garret Wilson
-	@see HTTPResource#put(byte[])
 	*/
-	protected class OutputStreamAdapter extends OutputStreamDecorator<ByteArrayOutputStream>
+	protected class ReadResponseOutputStreamDecorator extends OutputStreamDecorator<OutputStream>
 	{
+
+		private final HTTPClientTCPConnection connection;
+		private final HTTPRequest request;
 	
-		/**Default constructor.*/
-		public OutputStreamAdapter()
+		/**Decorates the given output stream.
+		@param connection The connection to the HTTP server.
+		@param request The request that resulted in the creation of the output stream.
+		@param outputStream The output stream to decorate.
+		@exception NullPointerException if the given connection, request, and/or stream is <code>null</code>.
+		*/
+		public ReadResponseOutputStreamDecorator(final HTTPClientTCPConnection connection, final HTTPRequest request, final OutputStream outputStream)
 		{
-			super(new ByteArrayOutputStream());	//collect bytes in a decorated byte array output stream
+			super(outputStream);	//construct the parent class
+			this.connection=checkInstance(connection, "Connection cannot be null.");
+			this.request=checkInstance(request, "Request cannot be null.");
 		}
 	
-		//TODO maybe improve flush() at some point to actually send data to the HTTP Resource
-
-	  /**Called before the stream is closed.
-	  This version writes the accumulated data to the HTTP resource, and unconditionally releases the accumulated bytes.
+	  /**Called after the stream is successfully closed.
+	  This version reads the HTTP response and throws an error if the response is an error condition.
 		@exception IOException if an I/O error occurs.
 		*/
-	  protected void beforeClose() throws IOException 
+	  protected void afterClose() throws IOException
 	  {
-			final ByteArrayOutputStream byteArrayOutputStream=getOutputStream();	//get the decorated output stream
-			assert byteArrayOutputStream!=null : "Missing decorated stream.";
-			final byte[] bytes=byteArrayOutputStream.toByteArray();	//get the collected bytes
-			put(bytes);	//put the bytes to the HTTP resource
+	  	super.afterClose();
+			final HTTPResponse response=connection.readResponse(request);	//read the response
+			connection.readResponseBody(request, response);	//ignore the response body
+			response.checkStatus();	//check the status of the response, throwing an exception if this is an error
 	  }
+
 	}
 
 	/**A key for cached resource information.

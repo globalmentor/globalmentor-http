@@ -17,6 +17,7 @@
 package com.globalmentor.net.http;
 
 import java.io.*;
+
 import static java.lang.System.*;
 
 import static com.globalmentor.java.Integers.*;
@@ -24,6 +25,7 @@ import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.http.HTTP.*;
 
 /**An output stream that writes HTTP chunked content to an existing stream, but doesn't close the underlying stream when closed.
+<p>This decorator provides convenience methods {@link #beforeClose()} and {@link #afterClose()} called before and after the stream is closed, respectively.</p>
 <p>This implementation only writes complete chunks unless {@link #flush()} is called, in which case all data in the current chunk will be written.</p> 
 <p>This stream should always be closed when access is finished; otherwise the underlying stream could be corrupted.</p>
 <p>This class is not thread safe.</p>
@@ -224,6 +226,20 @@ public class HTTPChunkedOutputStream extends OutputStream
  		outputStream.flush();	//flush the underlying stream
   }
 
+  /**Called before the stream is closed.
+	@exception IOException if an I/O error occurs.
+	*/
+  protected void beforeClose() throws IOException 
+  {
+  }
+
+  /**Called after the stream is successfully closed.
+	@exception IOException if an I/O error occurs.
+	*/
+  protected void afterClose() throws IOException
+  {
+  }
+
 	/**Closes this output stream and releases any system resources associated with this stream. 
 	A closed stream cannot perform output operations and cannot be reopened.
 	@exception IOException if an I/O error occurs.
@@ -237,6 +253,7 @@ public class HTTPChunkedOutputStream extends OutputStream
   	{
   		flush();	//flush the current chunk, if any
   		outputStream.write(("0"+CRLF+CRLF).getBytes(HTTP_CHARSET));	//write an empty chunk, followed by CRLF, followed by a blank line
+  		beforeClose();	//perform actions before closing
   		if(closeDecoratedStream)	//if we should close the underlying stream
   		{
   			outputStream.close();
@@ -246,6 +263,7 @@ public class HTTPChunkedOutputStream extends OutputStream
     		outputStream.flush();	//at least flush the data we sent to the output stream before we release it
   		}
   		outputStream=null;	//release the underlying output stream, but don't close it
+  		afterClose();	//perform actions after closing
   	}
 	}
 }

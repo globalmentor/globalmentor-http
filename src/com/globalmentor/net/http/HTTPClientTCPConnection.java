@@ -271,6 +271,7 @@ public class HTTPClientTCPConnection
 	/**Writes a request to the output stream along with the given request body.
 	A connection will be made to the appropriate host if needed.
 	The request's {@value HTTP#HOST_HEADER} header will be updated.
+	The request's {@value HTTP#AUTHORIZATION_HEADER} header will be set to cached credentials if possible.
 	The request's {@value HTTP#CONTENT_LENGTH_HEADER} header will be updated to the length of the given request body. 
 	The request's {@value HTTP#TRANSFER_ENCODING_HEADER} header, if any, will be removed. 
 	@param request The request to write.
@@ -291,6 +292,7 @@ public class HTTPClientTCPConnection
 	/**Writes a request to the output stream.
 	A connection will be made to the appropriate host if needed.
 	The request's {@value HTTP#HOST_HEADER} header will be updated.
+	The request's {@value HTTP#AUTHORIZATION_HEADER} header will be set to cached credentials if possible.
 	The request's {@value HTTP#CONTENT_LENGTH_HEADER} header, if any, will be removed 
 	The request's {@value HTTP#TRANSFER_ENCODING_HEADER} header will be updated to indicate chunked encoding. 
 	The returned output stream should always be closed after reading is finished.
@@ -302,7 +304,7 @@ public class HTTPClientTCPConnection
 	{
 		request.removeHeaders(CONTENT_LENGTH_HEADER);
 		request.setTransferEncoding(CHUNKED_TRANSFER_CODING);
-		writeRequest(request);	//write the request
+		writeRequestMessage(request);	//write the request
 		return new HTTPChunkedOutputStream(getOutputStream(), false);	//return an output stream encoded as HTTP chunks; don't close the underlying stream when finished
 	}
 
@@ -335,6 +337,7 @@ public class HTTPClientTCPConnection
 	/**Writes a request without a body to the output stream.
 	A connection will be made to the appropriate host if needed.
 	The request's {@value HTTP#HOST_HEADER} header will be updated.
+	The request's {@value HTTP#AUTHORIZATION_HEADER} header will be set to cached credentials if possible.
 	No message body will be written.
 	@param request The request to write.
 	@throws NullPointerException if the given request is <code>null</code>.
@@ -342,6 +345,19 @@ public class HTTPClientTCPConnection
 	*/
 	protected void writeRequestMessage(final HTTPRequest request) throws IOException
 	{
+		//if there is connection-specific password authentication, see if we can send it proactively TODO improve entire caching scheme to cache basic/digest preference in client after first failure; the current technique will fail the first time, anyway, as we don't know the realms
+		PasswordAuthentication passwordAuthentication=getPasswordAuthentication();	//see if password authentication has been specified specifically for this connection
+		if(passwordAuthentication!=null)	//if we have connection-specific password authentication, try to find what realm to use
+		{
+			final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
+			final Set<String> realms=client.getRealms(rootURI);	//get all the known realms for this domain
+			if(!realms.isEmpty())	//if there are any realms we know about
+			{
+				final String realm=realms.iterator().next();	//get the first realm TODO this call can be improved
+				final AuthenticateCredentials credentials=new BasicAuthenticateCredentials(passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword());	//create basic authentication credentials TODO somehow cache in the client whether basic or digest credentials are preferred; improve the entire client caching mechanism 
+				request.setAuthorization(credentials);	//store the credentials in the request
+			}
+		}
 		connect();	//connect if needed
 		final URI uri=request.getURI();	//get the URI of the request object
 		final String requestURI=getRawPathQueryFragment(uri);	//get the unencoded path?query#fragment
@@ -364,7 +380,7 @@ public class HTTPClientTCPConnection
 	/**Reads a response from the input stream.
 	If persistent connections are not supported, the connection will be disconnected.
 	The response body is not read.
-	@param request The request in which the response is a response.
+	@param request The request to which the response is a response.
 	@return A response parsed from the input stream data.
 	@exception IOException if there is an error reading the data.
 	*/
@@ -410,7 +426,7 @@ public class HTTPClientTCPConnection
 	/**Retrieves an input stream to read the body of the given response.
 	The returned input stream should always be closed after reading is finished.
 	No content will be return in response to a HEAD request, as per RFC 2616, 9.4.
-	@param request The request in which the response is a response.
+	@param request The request to which the response is a response.
 	@param response The response for which a body should be read.
 	@return An input stream providing access to the body of the message.
 	@throws IOException if there was an error getting an input stream to the message body.
@@ -465,7 +481,7 @@ public class HTTPClientTCPConnection
 
 	/**Reads the body of a response from an input stream.
 	No content will be read in response to a HEAD method, as per RFC 2616, 9.4.
-	@param request The request in which the response is a response.
+	@param request The request to which the response is a response.
 	@param response The response for which a body should be read.
 	@return The contents of the response body.
 	@exception EOFException if the end of the stream was unexpectedly reached.
@@ -529,7 +545,7 @@ public class HTTPClientTCPConnection
 
 	/**Reads an XML document from the body of an HTTP response.
 	This is a convenience method that delegates to {@link #getResponseBodyInputStream(HTTPRequest, HTTPResponse)}.
-	@param request The request in which the response is a response.
+	@param request The request to which the response is a response.
 	@param response The response for which a body should be read.
 	@param namespaceAware <code>true</code> if the document should support for XML namespaces, else <code>false</code>.
 	@param validated <code>true</code> if the document should be validated as it is parsed, else <code>false</code>.
@@ -564,19 +580,6 @@ public class HTTPClientTCPConnection
 		long nonceCount=0;	//TODO testing
 		try
 		{
-				//if there is connection-specific password authentication, see if we can send it proactively TODO improve entire caching scheme to cache basic/digest preference in client after first failure; the current technique will fail the first time, anyway, as we don't know the realms
-			PasswordAuthentication passwordAuthentication=getPasswordAuthentication();	//see if password authentication has been specified specifically for this connection
-			if(passwordAuthentication!=null)	//if we have connection-specific password authentication, try to find what realm to use
-			{
-				final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
-				final Set<String> realms=client.getRealms(rootURI);	//get all the known realms for this domain
-				if(!realms.isEmpty())	//if there are any realms we know about
-				{
-					final String realm=realms.iterator().next();	//get the first realm TODO this call can be improved
-					final AuthenticateCredentials credentials=new BasicAuthenticateCredentials(passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword());	//create basic authentication credentials TODO somehow cache in the client whether basic or digest credentials are preferred; improve the entire client caching mechanism 
-					request.setAuthorization(credentials);	//store the credentials in the request
-				}
-			}
 //		TODO del Debug.trace("writing request");
 			writeRequest(request, body);	//write the request along with the request body
 //		TODO del Debug.trace("reading response");
@@ -599,6 +602,7 @@ public class HTTPClientTCPConnection
 					break;	//we can't authenticate ourselves
 				}
 				final String realm=challenge.getRealm();	//get the challenge realm
+				PasswordAuthentication passwordAuthentication=getPasswordAuthentication();	//see if password authentication has been specified specifically for this connection
 				if(passwordAuthentication==null)	//if there is no connection-specific password authentication, try to find some
 				{
 					final HTTPClient client=getClient();	//get the client with which we're associated
