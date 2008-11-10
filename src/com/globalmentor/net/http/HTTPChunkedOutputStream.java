@@ -187,6 +187,7 @@ public class HTTPChunkedOutputStream extends OutputStream
     	{
     		flush();	//flush the chunk
     	}
+    	off+=count;	//indicate that we'll next start copying from data that occurs later in the buffer
   		len-=count;	//indicate that we have fewer bytes to write, now
   	}
   }
