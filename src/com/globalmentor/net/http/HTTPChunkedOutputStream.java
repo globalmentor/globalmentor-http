@@ -181,7 +181,7 @@ public class HTTPChunkedOutputStream extends OutputStream
   	while(len>0)	//keep writing chunks until we run out of data
   	{
   		final int count=Math.min(len, chunk.length-length);	//for this go-around, don't write more information than our chunk has room for
-  		arraycopy(b, 0, chunk, 0, count);	//write the bytes to the chunk
+  		arraycopy(b, off, chunk, length, count);	//write the bytes to the chunk
   		length+=count;	//keep track of how many bytes are in the chunk
     	if(length==chunk.length)	//if the chunk is full
     	{
