@@ -19,6 +19,7 @@ package com.globalmentor.net.http;
 import java.net.PasswordAuthentication;
 
 import com.globalmentor.net.*;
+import com.globalmentor.util.*;
 
 /**Represents the identify of a group of related HTTP connections.
 Keeps a cache of authentication information for visited domains and realms.
@@ -27,6 +28,11 @@ Keeps a cache of authentication information for visited domains and realms.
 public class HTTPClient extends AbstractClient
 {
 
+	/**The map of connections we have available for certain hosts.
+	A connection will be released if memory requires and it is not being used.
+	*/	//TODO create a daemon thread that will release old, unused connections
+//TODO del if not needed	private final ReadWriteLockMap<Host, HTTPClientTCPConnection> hostConnectionMap=new DecoratorReadWriteLockMap<Host, HTTPClientTCPConnection>(new PurgeOnWriteSoftValueHashMap<Host, HTTPClientTCPConnection>());
+
 	/**The default instance of the HTTP client.*/
 	private static HTTPClient instance=null;
 
@@ -34,7 +40,7 @@ public class HTTPClient extends AbstractClient
 	protected AbstractClient getDefaultInstance() {return instance;}
 
 	/**@return The default instance of the HTTP client.*/
-	public static HTTPClient getInstance()
+	public static HTTPClient getInstance()	//TODO fix race condition
 	{
 		if(instance==null)	//if we have not yet created an instance
 		{
@@ -58,27 +64,30 @@ public class HTTPClient extends AbstractClient
 	}
 
 	/**Creates an unsecure connection to a host.
+	Ultimately delegates to {@link #createConnection(Host, PasswordAuthentication, boolean)}.
 	@param host The host to which to connect.
 	*/
-	public HTTPClientTCPConnection createConnection(final Host host)
+	public final HTTPClientTCPConnection createConnection(final Host host)
 	{
 		return createConnection(host, false);	//create and return a connection that is not secure
 	}
 
 	/**Creates an unsecure connection to a host, using connection-specific password authentication.
+	Ultimately delegates to {@link #createConnection(Host, PasswordAuthentication, boolean)}.
 	@param host The host to which to connect.
 	@param passwordAuthentication The connection-specific password authentication, or <code>null</code> if there should be no connection-specific password authentication.
 	*/
-	public HTTPClientTCPConnection createConnection(final Host host, final PasswordAuthentication passwordAuthentication)
+	public final HTTPClientTCPConnection createConnection(final Host host, final PasswordAuthentication passwordAuthentication)
 	{
 		return createConnection(host, passwordAuthentication, false);	//create and return a connection that is not secure
 	}
 
 	/**Creates a connection to a host that is optionally secure.
+	Ultimately delegates to {@link #createConnection(Host, PasswordAuthentication, boolean)}.
 	@param host The host to which to connect.
 	@param secure Whether the connection should be secure.
 	*/
-	public HTTPClientTCPConnection createConnection(final Host host, final boolean secure)
+	public final HTTPClientTCPConnection createConnection(final Host host, final boolean secure)
 	{
 		return createConnection(host, null, secure);	//create and return an optionally secure connection with no connection-specific authentication
 	}

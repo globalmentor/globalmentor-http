@@ -17,19 +17,25 @@
 package com.globalmentor.net.http;
 
 import java.io.*;
+
 import java.net.*;
 
 import java.security.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.*;
 
 import com.globalmentor.io.*;
 import com.globalmentor.java.Bytes;
 import com.globalmentor.net.*;
+import com.globalmentor.net.http.webdav.WebDAVResource;
 import com.globalmentor.security.*;
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.text.xml.XMLSerializer;
+import com.globalmentor.urf.URFResourceAlteration;
 import com.globalmentor.util.*;
 
 import static com.globalmentor.io.Charsets.*;
@@ -40,6 +46,7 @@ import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
 import static com.globalmentor.text.xml.XML.createDocumentBuilder;
 import static com.globalmentor.util.Arrays.*;
+import static java.util.Arrays.fill;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -54,12 +61,35 @@ If authentication is needed, authentication is attempted to be retrieved from th
 	<li>The {@link Authenticable}, if any, specified by the associated client.</li>
 	<li>The {@link Authenticable}, if any, specified by the default client.</li>
 </ol>
+<p>This connection also provides a lock that can be used by callallows callers to ensure that only one 
 @author Garret Wilson
 @see HTTPClient
 @see Client#isLogged()
 */
 public class HTTPClientTCPConnection
 {
+
+	/**The atomic value indicating whether this connections is in the middle of a request/response exchange.*/
+	private final AtomicBoolean exchanging;
+
+		/**@return Whether this connections is in the middle of a request/response exchange.*/
+		public boolean isExchanging() {return exchanging.get();}
+
+		/**Atomically begins a request/response exchange.
+		@return <code>true</code> if an exchange was started, or <code>false</code> if an exchange was already started.
+		*/
+		public boolean beginExchange()
+		{
+			return exchanging.compareAndSet(false, true);
+		}
+
+		/**Atomically and unconditionally ends a request/response exchange.
+		@return <code>true</code> if an exchange was in progress, or <code>false</code> if the exchange was already ended.
+		*/
+		public boolean endExchange()
+		{
+			return exchanging.getAndSet(false);
+		}
 
 	/**The client with which this connection is associated.*/
 	private final HTTPClient client;
@@ -262,6 +292,7 @@ public class HTTPClientTCPConnection
 	*/
 	HTTPClientTCPConnection(final HTTPClient client, final Host host, final PasswordAuthentication passwordAuthentication, final boolean secure)
 	{
+		this.exchanging=new AtomicBoolean(false);	//by default the connection is not exchanging
 		this.client=checkInstance(client, "Client cannot be null");	//save the client
 		this.host=checkInstance(host, "Host cannot be null");	//save the host
 		this.passwordAuthentication=passwordAuthentication;	//save the authentication, if any
@@ -426,18 +457,22 @@ public class HTTPClientTCPConnection
 	/**Retrieves an input stream to read the body of the given response.
 	The returned input stream should always be closed after reading is finished.
 	No content will be return in response to a HEAD request, as per RFC 2616, 9.4.
+	The returned input stream will honor the {@value HTTP#CONNECTION_HEADER} response header by closing the connection if appropriate.
+	The returned input stream will end the exchange if auto-exchange is enabled.
 	@param request The request to which the response is a response.
 	@param response The response for which a body should be read.
 	@return An input stream providing access to the body of the message.
 	@throws IOException if there was an error getting an input stream to the message body.
+	@see #disconnect()
+	@see #endExchange()
 	*/
 	public InputStream getResponseBodyInputStream(final HTTPRequest request, final HTTPResponse response) throws IOException
 	{
 		if(HEAD_METHOD.equals(request.getMethod()))	//if this is the HEAD method
 		{
-			return new ByteArrayInputStream(Bytes.NO_BYTES);	//the HEAD method will never send content, even if there is a Content-Length header TODO make an EmptyInputStream; make a static instance and place it in InputStreams
+			return new ResponseBodyInputStreamDecorator(new ByteArrayInputStream(Bytes.NO_BYTES), response);	//the HEAD method will never send content, even if there is a Content-Length header TODO make an EmptyInputStream; make a static instance and place it in InputStreams
 		}
-		return getBodyInputStream(response);
+		return new ResponseBodyInputStreamDecorator(getBodyInputStream(response), response);
 	}
 
 	/**Retrieves an input stream to read the body of the given message.
@@ -508,6 +543,7 @@ public class HTTPClientTCPConnection
 						bodyBuffer.write(chunk);	//add this chunk to the buffer
 					}
 					readHeaders(response);	//read any post-chunk headers into the response
+					afterReadBody(response);	//clean up the connection
 					return bodyBuffer.toByteArray();	//return the body we read as chunks
 				}
 				else	//if chunked encoding is not used
@@ -521,6 +557,7 @@ public class HTTPClientTCPConnection
 					{
 						assert contentLength<=Integer.MAX_VALUE : "Unsupported content length.";
 						final byte[] responseBody=InputStreams.getBytes(inputStream, (int)contentLength);
+						afterReadBody(response);	//clean up the connection
 						if(responseBody.length==contentLength)	//if we read all the response body
 						{
 							return responseBody;	//return the response body
@@ -744,4 +781,65 @@ public class HTTPClientTCPConnection
 			super.finalize();
 		}
 	}
+
+
+	/**Cleans up the connection after reading a response body.
+	The connection is closed if requested.
+	If auto-exchange is enabled, the exhange is ended.
+	@param response The response in an HTTP exchange for which this input stream reads the body.
+	@throws NullPointerException if the given response is <code>null</code>.
+	@throws IOException if there is an error cleaning up the connection.
+	@see #disconnect()
+	@see #endExchange()
+	*/
+	protected void afterReadBody(final HTTPResponse response) throws IOException
+	{
+		if(response.isConnectionClose())	//if the response asks us to close
+		{
+			disconnect();	//disconnect from the host
+		}
+  	if(true/*TODO fix: isAutoExchange()*/)	//if auto-exchange is turned on
+  	{
+  		endExchange();	//end the request/response exchange
+  	}
+	}
+
+	/**Creates an output stream that cleans up the connection after reading a response body.
+	The connection is closed if requested.
+	If auto-exchange is enabled, the exhange is ended.
+	@see HTTPClientTCPConnection#afterReadBody(HTTPResponse)
+	@author Garret Wilson
+	*/
+	protected class ResponseBodyInputStreamDecorator extends InputStreamDecorator<InputStream>
+	{
+
+		/**The response in an HTTP exchange for which this input stream reads the body.*/
+		private final HTTPResponse response;
+
+			/**@return The response in an HTTP exchange for which this input stream reads the body.*/
+			public HTTPResponse getResponse() {return response;}
+	
+		/**Decorates the given output stream.
+		@param outputStream The output stream to decorate
+		@param response The response in an HTTP exchange for which this input stream reads the body.
+		@throws NullPointerException if the given output stream and/or response is <code>null</code>.
+		*/
+		public ResponseBodyInputStreamDecorator(final InputStream outputStream, final HTTPResponse response)
+		{
+			super(outputStream);	//construct the parent class
+			this.response=checkInstance(response, "Response cannot be null.");
+		}
+	
+	  /**Called after the stream is successfully closed.
+		This version closes the connection if requested.
+		If auto-exchange is enabled, the exhange is ended.
+		@throws IOException if there is an error cleaning up the connection.
+		@see HTTPClientTCPConnection#afterReadBody(HTTPResponse)
+		*/
+	  protected void afterClose() throws IOException
+	  {
+	  	afterReadBody(response);	//clean up the connection
+	  }
+	}
+
 }

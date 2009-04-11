@@ -17,6 +17,7 @@
 package com.globalmentor.net.http;
 
 import java.io.*;
+import java.text.ParseException;
 import java.util.*;
 
 import static com.globalmentor.net.http.HTTP.*;
@@ -115,7 +116,7 @@ public class AbstractHTTPMessage implements HTTPMessage
 	}
 
 	/**Retrieves a list of name-value pairs representing all the headers of this message.
-	@return The header value, or <code>null</code> if no such header is present.
+	@return The header names and values.
 	*/
 	@SuppressWarnings("unchecked")
 	public NameValuePair<String, String>[] getHeaders()
@@ -263,6 +264,45 @@ public class AbstractHTTPMessage implements HTTPMessage
 		setHeader(CONTENT_LENGTH_HEADER, Long.toString(contentLength));	//set the content length
 	}
 
+	//Content-MD5 header
+
+	/**@return The Base64 encoding of the 128-bit MD5 digest of the message body as per RFC 1864, or <code>null</code> if no content MD5 digest is given.
+	@see HTTP#CONTENT_MD5_HEADER
+	*/
+	public String getContentMD5()
+	{
+		return getHeader(CONTENT_MD5_HEADER);	//return the content MD5 value, if any
+	}
+
+	//Date header
+
+	/**@return The date of message, or <code>null</code> if there is no date header.
+	@exception SyntaxException if the date header does not contain a valid RFC 1123 date. 
+	@see HTTP#DATE_HEADER
+	*/
+	public Date getDate() throws SyntaxException
+	{
+		final String dateHeader=getHeader(DATE_HEADER);	//get the date header
+		try
+		{
+			return dateHeader!=null ? new HTTPDateFormat(HTTPDateFormat.Style.RFC1123).parse(dateHeader) : null;	//parse the date, if there is a date header
+		}
+		catch(final ParseException parseException)
+		{
+			throw new SyntaxException(parseException, dateHeader);
+		}		
+	}
+
+	/**Sets the date of the message.
+	@param date The date to set.
+	@throws NullPointerException if the given date is <code>null</code>.
+	@see HTTP#DATE_HEADER
+	*/
+	public void setDate(final Date date)
+	{
+		setHeader(DATE_HEADER, new HTTPDateFormat(HTTPDateFormat.Style.RFC1123).format(date));	//set the date header with the given date
+	}
+	
 	//Transfer-Encoding header
 
 	/**@return An array of specified transfer encodings, or <code>null</code> if no transfer encodings are specified.

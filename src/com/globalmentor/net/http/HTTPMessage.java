@@ -16,6 +16,8 @@
 
 package com.globalmentor.net.http;
 
+import java.util.Date;
+
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.NameValuePair;
 
@@ -42,7 +44,7 @@ public interface HTTPMessage
 	public String getHeader(final String name);
 
 	/**Retrieves a list of name-value pairs representing all the headers of this message.
-	@return The header value, or <code>null</code> if no such header is present.
+	@return The header names and values.
 	*/
 	public NameValuePair<String, String>[] getHeaders();
 
@@ -108,6 +110,28 @@ public interface HTTPMessage
 	@exception IllegalArgumentException if the given content length is less than zero.
 	*/
 	public void setContentLength(final long contentLength);
+
+	//Content-MD5 header
+
+	/**@return The Base64 encoding of the 128-bit MD5 digest of the message body as per RFC 1864, or <code>null</code> if no content MD5 digest is given.
+	@see HTTP#CONTENT_MD5_HEADER
+	*/
+	public String getContentMD5();
+
+	//Date header
+
+	/**@return The date of message, or <code>null</code> if there is no date header.
+	@exception SyntaxException if the date header does not contain a valid RFC 1123 date. 
+	@see HTTP#DATE_HEADER
+	*/
+	public Date getDate() throws SyntaxException;
+
+	/**Sets the date of the message.
+	@param date The date to set.
+	@throws NullPointerException if the given date is <code>null</code>.
+	@see HTTP#DATE_HEADER
+	*/
+	public void setDate(final Date date);
 
 	//Transfer-Encoding header
 
