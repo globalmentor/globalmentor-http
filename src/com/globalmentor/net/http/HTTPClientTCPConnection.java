@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.*;
 
+import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Bytes;
 import com.globalmentor.net.*;

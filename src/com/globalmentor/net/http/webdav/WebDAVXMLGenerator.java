@@ -23,8 +23,9 @@ import javax.xml.parsers.DocumentBuilder;
 
 import static com.globalmentor.net.http.webdav.WebDAV.*;
 import static com.globalmentor.text.xml.XML.*;
+
+import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.text.xml.XMLNamespacePrefixManager;
-import com.globalmentor.util.ConfigurationException;
 
 import org.w3c.dom.*;
 
