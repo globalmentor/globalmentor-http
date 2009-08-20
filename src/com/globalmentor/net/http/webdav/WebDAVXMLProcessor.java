@@ -23,6 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import static com.globalmentor.net.http.webdav.WebDAV.*;
 import static com.globalmentor.text.xml.XML.*;
+
+import com.globalmentor.collections.DecoratorIDedMappedList;
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.util.*;
 
 import org.w3c.dom.*;

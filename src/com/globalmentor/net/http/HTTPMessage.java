@@ -18,8 +18,8 @@ package com.globalmentor.net.http;
 
 import java.util.Date;
 
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.text.SyntaxException;
-import com.globalmentor.util.NameValuePair;
 
 /**An HTTP request or response as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".

@@ -16,7 +16,7 @@
 
 package com.globalmentor.net.http.webdav;
 
-import com.globalmentor.util.ObjectDecorator;
+import com.globalmentor.model.ObjectDecorator;
 
 /**A literal WebDAV value of a resource property.
 The literal value of the resource can be returned using {@link #toString()} or {@link #getText()}.

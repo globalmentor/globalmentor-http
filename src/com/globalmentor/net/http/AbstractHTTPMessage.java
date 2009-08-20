@@ -24,7 +24,10 @@ import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
 
+import com.globalmentor.collections.DecoratorIDedMappedList;
+import com.globalmentor.collections.MappedList;
 import com.globalmentor.io.ParseReader;
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.*;
 

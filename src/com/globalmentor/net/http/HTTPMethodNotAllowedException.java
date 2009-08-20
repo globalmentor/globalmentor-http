@@ -18,8 +18,8 @@ package com.globalmentor.net.http;
 
 import java.util.*;
 
+import static com.globalmentor.collections.Collections.*;
 import static com.globalmentor.net.http.HTTP.*;
-import static com.globalmentor.util.Collections.*;
 
 /**Indicates that method specified in the HTTP request line is not allowed for the
    resource identified by the request URI. 

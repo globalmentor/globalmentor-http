@@ -25,6 +25,8 @@ import java.util.regex.Matcher;
 import com.globalmentor.io.InputStreams;
 import com.globalmentor.io.ParseIOException;
 import com.globalmentor.io.ParseReader;
+import com.globalmentor.model.NameValuePair;
+
 import static com.globalmentor.security.MessageDigests.*;
 import static com.globalmentor.text.CharacterEncoding.*;
 
@@ -32,6 +34,7 @@ import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.*;
 
+import static com.globalmentor.collections.Maps.*;
 import static com.globalmentor.java.Booleans.*;
 import static com.globalmentor.java.Bytes.*;
 import static com.globalmentor.java.CharSequences.*;
@@ -39,7 +42,6 @@ import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.StringBuilders.*;
 import static com.globalmentor.net.http.DigestAuthentication.*;
 import static com.globalmentor.net.http.HTTP.*;
-import static com.globalmentor.util.Maps.*;
 
 /**Parses HTTP content. 
 @author Garret Wilson

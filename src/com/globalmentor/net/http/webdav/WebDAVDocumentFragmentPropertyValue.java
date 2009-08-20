@@ -16,8 +16,8 @@
 
 package com.globalmentor.net.http.webdav;
 
+import com.globalmentor.model.ObjectDecorator;
 import com.globalmentor.text.xml.XML;
-import com.globalmentor.util.ObjectDecorator;
 
 import org.w3c.dom.DocumentFragment;
 

@@ -18,7 +18,7 @@ package com.globalmentor.net.http.webdav;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.globalmentor.util.NameValuePair;
+import com.globalmentor.model.NameValuePair;
 
 /**A WebDAV property, representing a WebDAV property name and a value (such as a literal string value or a document fragment value).
 @author Garret Wilson

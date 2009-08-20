@@ -21,7 +21,8 @@ import java.util.*;
 
 import static com.globalmentor.net.http.webdav.WebDAVPropertyName.*;
 import static com.globalmentor.text.xml.XML.createQualifiedName;
-import com.globalmentor.util.DecoratorIDedMappedList;
+
+import com.globalmentor.collections.DecoratorIDedMappedList;
 
 import org.w3c.dom.NodeList;
 

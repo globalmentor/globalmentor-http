@@ -20,8 +20,8 @@ import java.net.URI;
 
 import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.model.IDed;
 import com.globalmentor.net.DefaultResource;
-import com.globalmentor.util.IDed;
 
 /**The name of a WebDAV property, consisting of a property namespace and a property local name.
 The reference URI indicates the concatenation of the namespace and the local name.

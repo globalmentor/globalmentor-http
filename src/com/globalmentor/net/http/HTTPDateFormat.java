@@ -20,7 +20,7 @@ import java.text.*;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import static com.globalmentor.util.TimeZones.*;
+import static com.globalmentor.model.TimeZones.*;
 
 /**Class for formatting dates and times according to one of the HTTP styles indicated in
  	"3.3.1 Full Date" of <a href="http://www.ietf.org/rfc/rfc2068.txt">RFC 2068</a>,

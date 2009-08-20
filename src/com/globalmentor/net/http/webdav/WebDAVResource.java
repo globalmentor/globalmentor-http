@@ -22,10 +22,14 @@ import java.util.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
+import com.globalmentor.collections.DecoratorReadWriteLockMap;
+import com.globalmentor.collections.PurgeOnWriteSoftValueHashMap;
 import com.globalmentor.java.Bytes;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
+
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.http.*;
 import static com.globalmentor.net.http.webdav.WebDAV.*;
 import com.globalmentor.util.*;

@@ -31,6 +31,7 @@ import javax.net.ssl.*;
 import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Bytes;
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.*;
 import com.globalmentor.net.http.webdav.WebDAVResource;
 import com.globalmentor.security.*;
@@ -39,6 +40,7 @@ import com.globalmentor.text.xml.XMLSerializer;
 import com.globalmentor.urf.URFResourceAlteration;
 import com.globalmentor.util.*;
 
+import static com.globalmentor.collections.Arrays.*;
 import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
@@ -46,7 +48,6 @@ import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
 import static com.globalmentor.text.xml.XML.createDocumentBuilder;
-import static com.globalmentor.util.Arrays.*;
 import static java.util.Arrays.fill;
 
 import org.w3c.dom.Document;

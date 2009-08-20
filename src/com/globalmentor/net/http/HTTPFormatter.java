@@ -28,9 +28,9 @@ import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.text.CharacterEncoding.*;
 import static com.globalmentor.text.TextFormatter.*;
 
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.text.TextFormatter;
 import com.globalmentor.util.Base64;
-import com.globalmentor.util.NameValuePair;
 
 /**Class that knows how to format HTTP information.
 @author Garret Wilson
