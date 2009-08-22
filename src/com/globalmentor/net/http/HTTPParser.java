@@ -531,7 +531,7 @@ public class HTTPParser
 	*/
 	public static AuthenticateCredentials parseAuthorizationHeader(final CharSequence header) throws SyntaxException, IllegalArgumentException
 	{
-//TODO del Debug.trace("parsing authorization header", header);
+//TODO del Log.trace("parsing authorization header", header);
 		try
 		{
 			final int schemeDelimiterIndex=indexOf(header, SP);	//find the space between the scheme and the rest of the credentials
@@ -544,7 +544,7 @@ public class HTTPParser
 					case DIGEST:
 						{
 							final Map<String, String> parameterMap=parseParameterMap(new ParseReader(parameters));	//parse the parameters into a map
-//						TODO del 		Debug.trace("parameter map", parameterMap);
+//						TODO del 		Log.trace("parameter map", parameterMap);
 							final String username=parameterMap.get(USERNAME_PARAMETER);	//get the username
 							if(username==null)	//if no username is present
 							{
@@ -623,7 +623,7 @@ public class HTTPParser
 					case BASIC:
 						{
 							final Map<String, String> parameterMap=parseParameterMap(new ParseReader(parameters));	//parse the parameters into a map
-//TODO del Debug.trace("parameter map", parameterMap);
+//TODO del Log.trace("parameter map", parameterMap);
 							final String realm=parameterMap.get(REALM_PARAMETER);	//get the realm
 							if(realm==null)	//if no realm is present
 							{
@@ -635,7 +635,7 @@ public class HTTPParser
 					case DIGEST:
 					{
 						final Map<String, String> parameterMap=parseParameterMap(new ParseReader(parameters));	//parse the parameters into a map
-//TODO del Debug.trace("parameter map", parameterMap);
+//TODO del Log.trace("parameter map", parameterMap);
 						final String realm=parameterMap.get(REALM_PARAMETER);	//get the realm
 						if(realm==null)	//if no realm is present
 						{

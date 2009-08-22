@@ -156,7 +156,7 @@ public class HTTPClientTCPConnection
 			final int port=host.getPort();	//get the port, if any
 //TODO fix			final InetSocketAddress socketAddress=new InetSocketAddress(host.getName(), port>=0 ? port : DEFAULT_PORT);	//create a new socket address
 //TODO fix			channel=SocketChannel.open(socketAddress);	//open a channel to the address
-//		TODO del Debug.trace("ready to make connection, with secure:", isSecure());
+//		TODO del Log.trace("ready to make connection, with secure:", isSecure());
 			if(isSecure())	//if this is a secure connection
 			{
 					//TODO testing ignore all certificate problems
@@ -213,8 +213,8 @@ public class HTTPClientTCPConnection
 			outputStream=new BufferedOutputStream(socket.getOutputStream());	//get an output stream from the socket
 			if(getClient().isLogged())	//if we're using a logged client
 			{
-				inputStream=new DebugInputStream(inputStream);	//log all communication from the input stream
-				outputStream=new DebugOutputStream(outputStream);	//log all communication to the output stream
+				inputStream=new LogInputStream(inputStream);	//log all communication from the input stream
+				outputStream=new LogOutputStream(outputStream);	//log all communication to the output stream
 			}
 		}
 	}
@@ -437,7 +437,7 @@ public class HTTPClientTCPConnection
 			}
 			else	//TODO del
 			{
-//			TODO del 				Debug.trace("staying alive");
+//			TODO del 				Log.trace("staying alive");
 			}
 */
 		}
@@ -451,7 +451,7 @@ public class HTTPClientTCPConnection
 	{
 		for(final NameValuePair<String, String> header:parseHeaders(getInputStream()))	//parse the headers
 		{
-//TODO del Debug.trace("header", header.getName(), header.getValue());
+//TODO del Log.trace("header", header.getName(), header.getValue());
 			response.addHeader(header.getName(), header.getValue());	//add this header to the response
 		}
 	}
@@ -619,16 +619,16 @@ public class HTTPClientTCPConnection
 		long nonceCount=0;	//TODO testing
 		try
 		{
-//		TODO del Debug.trace("writing request");
+//		TODO del Log.trace("writing request");
 			writeRequest(request, body);	//write the request along with the request body
-//		TODO del Debug.trace("reading response");
+//		TODO del Log.trace("reading response");
 			HTTPResponse response=readResponse(request);	//read the response TODO check for redirects
-//		TODO del Debug.trace("response connection header:", response.getConnection());
+//		TODO del Log.trace("response connection header:", response.getConnection());
 			while(response.getStatusCode()==SC_UNAUTHORIZED)	//if the request requires authorization
 			{
 				readResponseBody(request, response);	//skip the response body
 //TODO fix; del if not needed				disconnect();	//disconnect from the server so that the server won't time out while we look for credentials and throw a SocketException TODO improve
-//			TODO del Debug.trace("unauthorized; looking for challenge");
+//			TODO del Log.trace("unauthorized; looking for challenge");
 				final AuthenticateChallenge challenge=response.getWWWAuthenticate();	//get the challenge
 				if(challenge==null)	//if there is no challenge
 				{

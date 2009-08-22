@@ -19,11 +19,11 @@ package com.globalmentor.net.http;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.globalmentor.log.Log;
 import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
 import com.globalmentor.text.SyntaxException;
-import com.globalmentor.util.Debug;
 
 /**The default implementation of an HTTP response as defined by
 <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,	"Hypertext Transfer Protocol -- HTTP/1.1".
@@ -115,7 +115,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 							}
 							catch(final URISyntaxException uriSyntaxException)	//if the location wasn't in the correct format
 							{
-								Debug.warn(uriSyntaxException);
+								Log.warn(uriSyntaxException);
 							}
 						}
 						throw new HTTPMovedPermanentlyException(locationURI);	//throw a new permanent redirection exception
@@ -132,7 +132,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 						}
 						catch(final URISyntaxException uriSyntaxException)	//if the location wasn't in the correct format
 						{
-							Debug.warn(uriSyntaxException);
+							Log.warn(uriSyntaxException);
 						}
 					}
 					throw new HTTPMovedTemporarilyException(locationURI);	//throw a new temporary redirection exception

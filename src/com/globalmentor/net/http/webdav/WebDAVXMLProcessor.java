@@ -21,9 +21,9 @@ import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.globalmentor.log.Log;
 import static com.globalmentor.net.http.webdav.WebDAV.*;
 import static com.globalmentor.text.xml.XML.*;
-
 import com.globalmentor.collections.DecoratorIDedMappedList;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.util.*;
@@ -93,7 +93,7 @@ public class WebDAVXMLProcessor
 	*/
 	public static List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> getMultistatusProperties(final Element element, final URI baseURI)
 	{
-//	TODO del Debug.trace("looking at multistatus response");
+//	TODO del Log.trace("looking at multistatus response");
 		final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> resourcesPropertyMaps=new ArrayList<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>>();	//create a list of resource URIs associated with property maps
 		final NodeList childList=element.getChildNodes();	//get a list of element children
 		for(int childIndex=0; childIndex<childList.getLength(); ++childIndex)	//look at each child node
@@ -101,7 +101,7 @@ public class WebDAVXMLProcessor
 			final Node childNode=childList.item(childIndex);	//get this child node
 			if(childNode.getNodeType()==Node.ELEMENT_NODE && WEBDAV_NAMESPACE.equals(childNode.getNamespaceURI()) && ELEMENT_RESPONSE.equals(childNode.getLocalName()))	//D:response
 			{
-//			TODO del Debug.trace("found response element");
+//			TODO del Log.trace("found response element");
 				final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> resourceProperties=getResponseProperties((Element)childNode, baseURI);	//get the resource URI and properties
 				if(resourceProperties!=null)	//if we got a resource and properties
 				{
@@ -147,7 +147,7 @@ public class WebDAVXMLProcessor
 						}
 						catch(final URISyntaxException uriSyntaxException)	//if the URI is not in proper form
 						{
-							Debug.warn(uriSyntaxException);	//TODO return an appropriate error
+							Log.warn(uriSyntaxException);	//TODO return an appropriate error
 						}
 					}
 					else if(ELEMENT_PROPSTAT.equals(childLocalName))	//D:propstat
@@ -157,7 +157,7 @@ public class WebDAVXMLProcessor
 /*TODO fix for D:status
 					else	//if we don't understand the response child element
 					{
-						Debug.warn("Unexpected response child element "+childLocalName);
+						Log.warn("Unexpected response child element "+childLocalName);
 					}
 */
 				}
@@ -176,7 +176,7 @@ public class WebDAVXMLProcessor
 	*/
 	public static Map<WebDAVPropertyName, WebDAVProperty> getPropstatProperties(final Element element)
 	{
-//TODO del Debug.trace("getting propstat properties");
+//TODO del Log.trace("getting propstat properties");
 		final Map<WebDAVPropertyName, WebDAVProperty> propertyMap=new HashMap<WebDAVPropertyName, WebDAVProperty>();	//create a map to hold the properties
 		final NodeList childList=element.getChildNodes();	//get a list of element children
 		for(int childIndex=0; childIndex<childList.getLength(); ++childIndex)	//look at each child node
@@ -189,7 +189,7 @@ public class WebDAVXMLProcessor
 					final String childLocalName=childNode.getLocalName();	//get the child element's local name
 					if(ELEMENT_PROP.equals(childLocalName))	//D:prop
 					{
-//TODO del Debug.trace("found D:prop");
+//TODO del Log.trace("found D:prop");
 						final NodeList propertyChildList=childNode.getChildNodes();	//get a list of property element children
 						final int propertyChildCount=propertyChildList.getLength();	//find out how many property children there are
 						for(int propertyChildIndex=0; propertyChildIndex<propertyChildCount; ++propertyChildIndex)	//look at each property child node

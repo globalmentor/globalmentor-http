@@ -21,8 +21,6 @@ import java.io.*;
 import static java.lang.System.*;
 
 import com.globalmentor.java.Bytes;
-import com.globalmentor.util.Debug;
-
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.http.HTTPParser.*;
 

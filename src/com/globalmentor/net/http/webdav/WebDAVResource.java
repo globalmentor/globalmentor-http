@@ -330,11 +330,11 @@ public class WebDAVResource extends HTTPResource
 				try
 				{
 					final URI segmentURI=new URI(uriBuilder.toString());	//create a URI for this segment of the path
-//				TODO del Debug.trace("looking at segment URI", segmentURI);
+//				TODO del Log.trace("looking at segment URI", segmentURI);
 					final WebDAVResource segmentWebDAVResource=new WebDAVResource(segmentURI, getClient());	//create a WebDAV resource for this segment of the path, using the same client
 					if(!segmentWebDAVResource.exists())	//if this segment collection doesn't exist //TODO later use an isCollection() or something
 					{
-//					TODO del Debug.trace("making collection for segment URI", segmentURI);
+//					TODO del Log.trace("making collection for segment URI", segmentURI);
 						segmentWebDAVResource.mkCol();	//make this collection
 					}
 				}
