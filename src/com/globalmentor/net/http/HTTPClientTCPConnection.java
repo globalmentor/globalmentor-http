@@ -632,13 +632,13 @@ public class HTTPClientTCPConnection
 				final AuthenticateChallenge challenge=response.getWWWAuthenticate();	//get the challenge
 				if(challenge==null)	//if there is no challenge
 				{
-					break;	//we can't authenticate without a challenge
+					response.checkStatus();	//we can't authenticate without a challenge, so throw an exception (we've already read the message body, so we can't just return)
 				}
 				final URI rootURI=getRootURI(request.getURI());	//get the root URI of the host we were trying to connect to
 				final AuthenticationScheme scheme=challenge.getScheme();	//get the scheme
 				if(scheme!=AuthenticationScheme.BASIC && scheme!=AuthenticationScheme.DIGEST)	//if we don't recognize the scheme
 				{
-					break;	//we can't authenticate ourselves
+					response.checkStatus();	//we can't authenticate ourselves, so throw an exception (we've already read the message body, so we can't just return)
 				}
 				final String realm=challenge.getRealm();	//get the challenge realm
 				PasswordAuthentication passwordAuthentication=getPasswordAuthentication();	//see if password authentication has been specified specifically for this connection
@@ -662,12 +662,12 @@ public class HTTPClientTCPConnection
 				}
 				if(passwordAuthentication==null)	//if we got no authentication
 				{
-					break;	//we can't authenticate without a password
+					response.checkStatus();	//we can't authenticate without a password, so throw an exception (we've already read the message body, so we can't just return)
 				}
 				//TODO make sure that QOP.AUTH is allowed in the challenge
 				if(++nonceCount>3)	//increase our nonce count; only allow three attempts
 				{
-					break;	//TODO testing
+					response.checkStatus();	//throw an exception (we've already read the message body, so we can't just return)
 				}
 				final AuthenticateCredentials credentials;	//try to get credentials based upon the authentication type
 				if(challenge instanceof BasicAuthenticateChallenge)	//if this is basic authentication
