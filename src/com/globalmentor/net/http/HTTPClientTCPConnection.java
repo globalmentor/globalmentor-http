@@ -31,6 +31,7 @@ import javax.net.ssl.*;
 import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Bytes;
+import com.globalmentor.log.Log;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.*;
 import com.globalmentor.net.http.webdav.WebDAVResource;
@@ -239,6 +240,7 @@ public class HTTPClientTCPConnection
 					}
 					++tryCount;	//indicate we're trying again
 					retryDelay+=REQUEST_RETRY_BACKOFF_DELAY;	//increase the amount of time we wait between retrying
+					Log.debug("Retrying connection to "+host+" (try "+tryCount+").");
 				}
 			} while(!connected);
 			//TODO later turn on non-blocking access when we have a separate client which will on a separate thread feed requests and retrieve responses
