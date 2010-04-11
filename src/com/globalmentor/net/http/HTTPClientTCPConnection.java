@@ -71,6 +71,12 @@ If authentication is needed, authentication is attempted to be retrieved from th
 public class HTTPClientTCPConnection
 {
 
+	/**The number of times to try a request if there is an error connecting.*/
+	private final static int MAX_REQUEST_TRIES=5;
+	
+	/**The number of extra milliseconds to back each time off when retrying connections.*/
+	private final static int REQUEST_RETRY_BACKOFF_DELAY=500;
+
 	/**The atomic value indicating whether this connections is in the middle of a request/response exchange.*/
 	private final AtomicBoolean exchanging;
 
@@ -141,7 +147,7 @@ public class HTTPClientTCPConnection
 	{
 		connect(getHost());	//connect to the host
 	}
-	
+
 	/**Connects to a specified host.
 	Useful for when the connection needs to redirect to another host.
 	If the connection is already connected to the same host, no action is taken.
@@ -157,55 +163,84 @@ public class HTTPClientTCPConnection
 //TODO fix			final InetSocketAddress socketAddress=new InetSocketAddress(host.getName(), port>=0 ? port : DEFAULT_PORT);	//create a new socket address
 //TODO fix			channel=SocketChannel.open(socketAddress);	//open a channel to the address
 //		TODO del Log.trace("ready to make connection, with secure:", isSecure());
-			if(isSecure())	//if this is a secure connection
+			
+			
+			int tryCount=1;	//keep track of the number of tries
+			int retryDelay=REQUEST_RETRY_BACKOFF_DELAY;	//keep track of the amount of time to delay
+			boolean connected=false;	//we'll set this flag to true when the connection succeeds
+			do
 			{
-					//TODO testing ignore all certificate problems
-			  TrustManager[] trustAllCerts = new TrustManager[]{
-		        new X509TrustManager() {
-		            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-		                return null;
-		            }
-		            public void checkClientTrusted(
-		                java.security.cert.X509Certificate[] certs, String authType) {
-		            }
-		            public void checkServerTrusted(
-		                java.security.cert.X509Certificate[] certs, String authType) {
-		            }
-		        }
-		    };
-		    
-		    // Install the all-trusting trust manager
-			  
-			  //TODO see http://www.javaalmanac.com/egs/javax.net.ssl/TrustAll.html
-			  try
-			  {
-	        SSLContext sc = SSLContext.getInstance("SSL");
-	        sc.init(null, trustAllCerts, new java.security.SecureRandom());
-					final SSLSocketFactory sslSocketFactory=sc.getSocketFactory();
-					socket=sslSocketFactory.createSocket(host.getName(), port>=0 ? port : DEFAULT_SECURE_PORT);	//open a secure socket to the host
-		    }
-			  catch(final NoSuchAlgorithmException noSuchAlgorithmException)	//we should always recognize SSL
-			  {
-			  	throw new AssertionError(noSuchAlgorithmException);
-		    }
-			  catch(final KeyManagementException keyManagementException)
-			  {
-			  	throw new AssertionError(keyManagementException);
-			  }
-/*TODO fix when certificate is renewed
-				final SSLSocketFactory sslSocketFactory=(SSLSocketFactory)SSLSocketFactory.getDefault();	//get the default SSL Socket factory TODO maybe keep one of these around for multiple use
-				socket=sslSocketFactory.createSocket(host.getName(), port>=0 ? port : DEFAULT_SECURE_PORT);	//open a secure socket to the host
-*/
-//TODO do extra certificate checks
-//TODO see to disable certificate checks: http://www.javaalmanac.com/egs/javax.net.ssl/TrustAll.html
-//TODO see http://javaboutique.internet.com/resources/books/JavaNut/javanut3_1.html
-//TODO see http://jirc.hick.org/cgi-bin/raffi.cgi?ACTION=VIEW&PAGE=SSL_Java
-//TODO see http://javaalmanac.com/egs/javax.net.ssl/Client.html?l=rel
-			}
-			else	//if this is not a secure connection
-			{
-				socket=new Socket(host.getName(), port>=0 ? port : DEFAULT_PORT);	//open a socket to the host
-			}
+				try
+				{
+					if(isSecure())	//if this is a secure connection
+					{
+							//TODO testing ignore all certificate problems
+					  TrustManager[] trustAllCerts = new TrustManager[]{
+				        new X509TrustManager() {
+				            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				                return null;
+				            }
+				            public void checkClientTrusted(
+				                java.security.cert.X509Certificate[] certs, String authType) {
+				            }
+				            public void checkServerTrusted(
+				                java.security.cert.X509Certificate[] certs, String authType) {
+				            }
+				        }
+				    };
+				    
+				    // Install the all-trusting trust manager
+					  
+					  //TODO see http://www.javaalmanac.com/egs/javax.net.ssl/TrustAll.html
+					  try
+					  {
+			        SSLContext sc = SSLContext.getInstance("SSL");
+			        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+							final SSLSocketFactory sslSocketFactory=sc.getSocketFactory();
+							socket=sslSocketFactory.createSocket(host.getName(), port>=0 ? port : DEFAULT_SECURE_PORT);	//open a secure socket to the host
+				    }
+					  catch(final NoSuchAlgorithmException noSuchAlgorithmException)	//we should always recognize SSL
+					  {
+					  	throw new AssertionError(noSuchAlgorithmException);
+				    }
+					  catch(final KeyManagementException keyManagementException)
+					  {
+					  	throw new AssertionError(keyManagementException);
+					  }
+		/*TODO fix when certificate is renewed
+						final SSLSocketFactory sslSocketFactory=(SSLSocketFactory)SSLSocketFactory.getDefault();	//get the default SSL Socket factory TODO maybe keep one of these around for multiple use
+						socket=sslSocketFactory.createSocket(host.getName(), port>=0 ? port : DEFAULT_SECURE_PORT);	//open a secure socket to the host
+		*/
+		//TODO do extra certificate checks
+		//TODO see to disable certificate checks: http://www.javaalmanac.com/egs/javax.net.ssl/TrustAll.html
+		//TODO see http://javaboutique.internet.com/resources/books/JavaNut/javanut3_1.html
+		//TODO see http://jirc.hick.org/cgi-bin/raffi.cgi?ACTION=VIEW&PAGE=SSL_Java
+		//TODO see http://javaalmanac.com/egs/javax.net.ssl/Client.html?l=rel
+					}
+					else	//if this is not a secure connection
+					{
+						socket=new Socket(host.getName(), port>=0 ? port : DEFAULT_PORT);	//open a socket to the host
+					}
+					connected=true;	//if we reach this point, we connected successfully
+				}
+				catch(final ConnectException connectException)	//if we encounter an error while connecting (typically a timeout)
+				{
+					if(tryCount==MAX_REQUEST_TRIES)	//if we've already tried enough times
+					{
+						throw connectException;	//rethrow the exception and stop trying
+					}
+					try
+					{
+						Thread.sleep(retryDelay);	//delay the indicated amount of time before retrying 
+					}
+					catch(final InterruptedException interruptedException)	//if we are interrupted while delaying
+					{
+						throw connectException;	//rethrow the exception and stop trying
+					}
+					++tryCount;	//indicate we're trying again
+					retryDelay+=REQUEST_RETRY_BACKOFF_DELAY;	//increase the amount of time we wait between retrying
+				}
+			} while(!connected);
 			//TODO later turn on non-blocking access when we have a separate client which will on a separate thread feed requests and retrieve responses
 //TODO fix			inputStream=new BufferedInputStream(newInputStream(channel));	//create a new input stream from the channel
 //TODO fix			outputStream=new BufferedOutputStream(newOutputStream(channel));	//create a new output stream to the channel
@@ -391,7 +426,6 @@ public class HTTPClientTCPConnection
 				request.setAuthorization(credentials);	//store the credentials in the request
 			}
 		}
-		connect();	//connect if needed
 		final URI uri=request.getURI();	//get the URI of the request object
 		final String requestURI=getRawPathQueryFragment(uri);	//get the unencoded path?query#fragment
 		request.setRequestURI(requestURI);	//set the request-uri 
@@ -404,7 +438,7 @@ public class HTTPClientTCPConnection
 			formatHeaderLine(headerBuilder, header);	//format this header line
 		}
 		headerBuilder.append(CRLF);	//append a blank line, signifying the end of the headers
-		connect(host);	//make sure we're connected to the same host as the request
+		connect(host);	//make sure we're connected to the same host as the request TODO why do we even keep the host around in the class? verify and document
 		final OutputStream outputStream=getOutputStream();	//get the output stream
 		outputStream.write(headerBuilder.toString().getBytes(UTF_8_CHARSET));	//write the header
 		outputStream.flush();	//flush the data to the server
