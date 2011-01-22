@@ -26,7 +26,7 @@ import static com.globalmentor.net.http.webdav.WebDAV.*;
 import static com.globalmentor.text.xml.XML.*;
 import com.globalmentor.collections.DecoratorIDedMappedList;
 import com.globalmentor.model.NameValuePair;
-import com.globalmentor.util.*;
+import static com.globalmentor.net.URIs.*;
 
 import org.w3c.dom.*;
 
@@ -142,7 +142,7 @@ public class WebDAVXMLProcessor
 							uri=new URI(uriString);	//create a URI from the value
 							if(baseURI!=null)	//if we have a base URI
 							{
-								uri=baseURI.resolve(uri);	//resolve the URI to the base URI to compensate for servers that return relative URIs
+								uri=resolve(baseURI, uri);	//resolve the URI to the base URI to compensate for servers that return relative URIs
 							}
 						}
 						catch(final URISyntaxException uriSyntaxException)	//if the URI is not in proper form
