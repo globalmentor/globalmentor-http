@@ -352,7 +352,7 @@ public class HTTPParser
 		reader.skipCh
 */
 		reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
-		while(!reader.isEOF())	//while we haven't reached the end of the file
+		while(!reader.isEnd())	//while we haven't reached the end of the file
 		{
 			final String element=parseListElement(reader);	//parse the next element
 			elementList.add(element);	//add this element
@@ -373,7 +373,7 @@ public class HTTPParser
 	{
 		final List<WeightedValue<String>> elementList=new ArrayList<WeightedValue<String>>();	//create a new list to hold our list elements
 		reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
-		while(!reader.isEOF())	//while we haven't reached the end of the file
+		while(!reader.isEnd())	//while we haven't reached the end of the file
 		{
 			final String element=parseListElement(reader);	//parse the next element
 			final Matcher weightMatcher=LIST_ELEMENT_WEIGHT_PATTERN.matcher(element);	//match on the element
@@ -437,7 +437,7 @@ public class HTTPParser
 		reader.skipCh
 */
 		reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
-		while(!reader.isEOF())	//while we haven't reached the end of the file
+		while(!reader.isEnd())	//while we haven't reached the end of the file
 		{
 			final NameValuePair<String, String> parameter=parseParameter(reader);	//parse the next parameter
 			parameterList.add(parameter);	//add this parameter
