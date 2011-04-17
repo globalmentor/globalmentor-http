@@ -46,7 +46,7 @@ import static com.globalmentor.net.http.HTTP.*;
 /**Parses HTTP content. 
 @author Garret Wilson
 */
-public class HTTPParser
+public class HTTPParser	//TODO convert to use new parsing routines and Characters throughout
 {
 	
 	/**Parses the HTTP status line.
@@ -244,9 +244,9 @@ public class HTTPParser
 		while(lineBuilder.length()>0)	//while we haven't hit the empty line (originally containing only CRLF)
 		{
 			final StringBuilder nextLineBuilder=new StringBuilder(parseHeaderLine(inputStream));	//get the next line
-			if(startsWithChar(nextLineBuilder, LWS_CHARS))	//if the new line begins with linear whitespace
+			if(startsWithChar(nextLineBuilder, LWS_CHARACTERS))	//if the new line begins with linear whitespace
 			{
-				trimBeginning(nextLineBuilder, LWS_CHARS);	//remove all beginning linear whitespace from the new line
+				trimBeginning(nextLineBuilder, LWS_CHARACTERS);	//remove all beginning linear whitespace from the new line
 				if(!endsWith(lineBuilder, SP))	//if the last line didn't end with a space
 				{
 					lineBuilder.append(SP);	//add a space to our line builder, as we're collapsing LWS into a single SP
@@ -255,12 +255,12 @@ public class HTTPParser
 			}
 			else	//if the next line doesn't start with whitespace, it's a true new header (or the empty line); parse the last line 
 			{
-				final int delimiterIndex=charIndexOf(lineBuilder, DELIMITER_CHARS);	//get the index of the first delimiter
+				final int delimiterIndex=charIndexOf(lineBuilder, DELIMITER_CHARACTERS);	//get the index of the first delimiter
 				if(delimiterIndex>=0 && lineBuilder.charAt(delimiterIndex)==HEADER_SEPARATOR)	//if we found the separator
 				{
 					final String name=lineBuilder.substring(0, delimiterIndex);	//find the name
 					lineBuilder.delete(0, delimiterIndex+1);	//remove everything up to and including the delimiter
-					trim(lineBuilder, LWS_CHARS);	//trim beginning and ending whitespace
+					trim(lineBuilder, LWS_CHARACTERS);	//trim beginning and ending whitespace
 					final String value=lineBuilder.toString();	//the value is whatever is remaining between the whitespace, if any
 					headerList.add(new NameValuePair<String, String>(name, value));	//create a new name-value pair and add it to the list
 					lineBuilder=nextLineBuilder;	//we'll start from the begining processing the next line next time
@@ -301,7 +301,7 @@ public class HTTPParser
 			{
 				throw new ParseIOException("Unexpected LF.");					
 			}
-			if(contains(LWS_CHARS, (char)b))	//if this byte is linear white space
+			if(LWS_CHARACTERS.contains((char)b))	//if this byte is linear white space
 			{
 				if(!foldingLWS)	//if we haven't started folding linear whitespace, yet
 				{
@@ -351,12 +351,12 @@ public class HTTPParser
 		reader.skipCharsEOF(LWS_CHARS);	//skip whitespace until we reach a character or the end of the file
 		reader.skipCh
 */
-		reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+		reader.skipCharsEOF(LWS_CHARACTERS.toString()+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		while(!reader.isEnd())	//while we haven't reached the end of the file
 		{
 			final String element=parseListElement(reader);	//parse the next element
 			elementList.add(element);	//add this element
-			reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+			reader.skipCharsEOF(LWS_CHARACTERS.toString()+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		}
 		return elementList.toArray(new String[elementList.size()]);	//return the list of elements we parsed
 	}
@@ -372,7 +372,7 @@ public class HTTPParser
 	public static WeightedValue<String>[] parseWeightedList(final ParseReader reader) throws IOException
 	{
 		final List<WeightedValue<String>> elementList=new ArrayList<WeightedValue<String>>();	//create a new list to hold our list elements
-		reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+		reader.skipCharsEOF(LWS_CHARACTERS.toString()+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		while(!reader.isEnd())	//while we haven't reached the end of the file
 		{
 			final String element=parseListElement(reader);	//parse the next element
@@ -382,7 +382,7 @@ public class HTTPParser
 				final String value=weightMatcher.group(1);	//the first group is the value
 				final String qvalueString=weightMatcher.group(2);	//the second group is the qvalue, if any
 				elementList.add(new WeightedValue<String>(value, qvalueString!=null ? Float.valueOf(qvalueString) : 1.0f));	//add this element, defaulting to 1.0 if no qvalue is specified (we don't need to check for a number format exception, as the regular expression ensures the correct format)
-				reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+				reader.skipCharsEOF(LWS_CHARACTERS.toString()+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 			}
 			else	//if the element doesn't match (this should never happen, because the matcher accepts zero or more occurrences of any character
 			{
@@ -400,8 +400,8 @@ public class HTTPParser
 	*/
 	public static String parseListElement(final ParseReader reader) throws IOException	//TODO fix to handle embedded quotes
 	{
-		reader.skipChars(LWS_CHARS);	//skip whitespace
-		return reader.readStringUntilCharEOF(LWS_CHARS+LIST_DELIMITER);	//read until we hit a delimiter or the end of the file
+		reader.skipChars(LWS_CHARACTERS.toString());	//skip whitespace
+		return reader.readStringUntilCharEOF(LWS_CHARACTERS.toString()+LIST_DELIMITER);	//read until we hit a delimiter or the end of the file
 	}
 
 	/**Parses a list of attribute name/value pair from the given reader, reading until the end of the reader is reached.
@@ -436,12 +436,12 @@ public class HTTPParser
 		reader.skipCharsEOF(LWS_CHARS);	//skip whitespace until we reach a character or the end of the file
 		reader.skipCh
 */
-		reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+		reader.skipCharsEOF(LWS_CHARACTERS.toString()+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		while(!reader.isEnd())	//while we haven't reached the end of the file
 		{
 			final NameValuePair<String, String> parameter=parseParameter(reader);	//parse the next parameter
 			parameterList.add(parameter);	//add this parameter
-			reader.skipCharsEOF(LWS_CHARS+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
+			reader.skipCharsEOF(LWS_CHARACTERS.toString()+LIST_DELIMITER);	//skip whitespace and the list delimiter, if there is one (or two or however many)
 		}
 		return parameterList;	//return the list of parameters we parsed
 	}
@@ -454,10 +454,10 @@ public class HTTPParser
 	*/
 	public static NameValuePair<String, String> parseParameter(final ParseReader reader) throws IOException
 	{
-		reader.skipChars(LWS_CHARS);	//skip whitespace
-		final String name=reader.readStringUntilChar(LWS_CHARS+EQUALS_SIGN_CHAR);	//name
+		reader.skipChars(LWS_CHARACTERS.toString());	//skip whitespace
+		final String name=reader.readStringUntilChar(LWS_CHARACTERS.toString()+EQUALS_SIGN_CHAR);	//name
 		reader.readExpectedChar(EQUALS_SIGN_CHAR);	//=
-		reader.skipChars(LWS_CHARS);	//skip whitespace
+		reader.skipChars(LWS_CHARACTERS.toString());	//skip whitespace
 		final String value;
 		if(reader.peekChar()==QUOTE)	//if this value is quoted
 		{
@@ -465,7 +465,7 @@ public class HTTPParser
 		}
 		else	//if the value isn't quoted
 		{
-			value=reader.readStringUntilCharEOF(DELIMITER_CHARS);	//read until we hit a delimiter or the end of the file TODO make sure this is the correct constant
+			value=reader.readStringUntilCharEOF(DELIMITER_CHARACTERS.toString());	//read until we hit a delimiter or the end of the file TODO make sure this is the correct constant
 		}
 		return new NameValuePair<String, String>(name, value);	//return the name and value we parsed
 	}
