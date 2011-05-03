@@ -403,7 +403,7 @@ public class HTTPResource extends DefaultResource	//TODO improve by having a per
 		if(connection==null)	//if no connection has been created
 		{
 			final URI referenceURI=getURI();	//get the reference URI
-			final boolean secure=HTTP.HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
+			final boolean secure=HTTP.HTTPS_URI_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
 			connection=getClient().createConnection(getHost(getURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
 		}
 		return connection;
