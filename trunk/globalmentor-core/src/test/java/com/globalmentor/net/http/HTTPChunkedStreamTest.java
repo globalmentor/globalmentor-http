@@ -19,8 +19,8 @@ package com.globalmentor.net.http;
 import java.io.*;
 import java.util.Arrays;
 
-import com.globalmentor.io.InputStreams;
-import com.globalmentor.io.StreamTest;
+import com.globalmentor.io.Streams;
+import com.globalmentor.io.StreamsTest;
 
 import static junit.framework.Assert.*;
 
@@ -36,14 +36,14 @@ public class HTTPChunkedStreamTest
 	@Test
 	public void testHTTPChunkedRoundTrip() throws IOException
 	{
-		final byte[] testData=StreamTest.generateSequentialTestData(HTTPChunkedOutputStream.DEFAULT_CHUNK_SIZE*5/2);	//use a buffer size that tests around two and a half chunks
+		final byte[] testData=StreamsTest.generateSequentialTestData(HTTPChunkedOutputStream.DEFAULT_CHUNK_SIZE*5/2);	//use a buffer size that tests around two and a half chunks
 		final ByteArrayOutputStream temp=new ByteArrayOutputStream();
 		final OutputStream outputStream=new HTTPChunkedOutputStream(temp);	//write the test data to a temporary buffer chunk-encoded
 		outputStream.write(testData);
 		outputStream.close();
 		final InputStream inputStream=new HTTPChunkedInputStream(new ByteArrayInputStream(temp.toByteArray()));	//read the chunked data back back out
 		final ByteArrayOutputStream copy=new ByteArrayOutputStream();
-		InputStreams.copy(inputStream, copy);
+		Streams.copy(inputStream, copy);
 		inputStream.close();
 		assertTrue("HTTP chunked output stream did not correctly write data.", Arrays.equals(testData, copy.toByteArray()));
 	}
