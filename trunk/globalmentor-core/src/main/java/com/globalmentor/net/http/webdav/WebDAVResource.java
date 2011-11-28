@@ -32,6 +32,8 @@ import static com.globalmentor.net.URIs.*;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.http.*;
 import static com.globalmentor.net.http.webdav.WebDAV.*;
+
+import com.globalmentor.servlet.http.webdav.WebDAVXMLProcessor;
 import com.globalmentor.util.*;
 
 import org.w3c.dom.*;
