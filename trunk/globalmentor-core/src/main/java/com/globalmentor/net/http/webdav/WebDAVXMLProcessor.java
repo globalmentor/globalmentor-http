@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.globalmentor.servlet.http.webdav;
+package com.globalmentor.net.http.webdav;
 
 import java.net.*;
 import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
 
 import com.globalmentor.log.Log;
 import static com.globalmentor.net.http.webdav.WebDAV.*;
 import static com.globalmentor.text.xml.XML.*;
 import com.globalmentor.collections.DecoratorIDedMappedList;
 import com.globalmentor.model.NameValuePair;
-import com.globalmentor.net.http.webdav.*;
-
 import static com.globalmentor.net.URIs.*;
 
 import org.w3c.dom.*;
@@ -42,14 +38,13 @@ public class WebDAVXMLProcessor
 
 	/**Retrieves a list of properties parsed from the children of the given XML element, such as a <code>D:propfind</code> element.
 	The {@value WebDAV#ELEMENT_ALLPROP} and {@value WebDAV#ELEMENT_PROPNAME} conditions are supported.
-	@param request The HTTP request in response to which properties are being retrieved.
 	@param element The XML element parent of the property list.
 	@return A list of all requested properties, or {@link WebDAV#ALL_PROPERTIES} or
 		{@link WebDAV#PROPERTY_NAMES} indicating all properties or all property names, respectively.
 	@see WebDAV#ALL_PROPERTIES
 	@see WebDAV#PROPERTY_NAMES
 	*/
-	public static DecoratorIDedMappedList<URI, WebDAVPropertyName> getPropfindProperties(final HttpServletRequest request, final Element element)
+	public static DecoratorIDedMappedList<URI, WebDAVPropertyName> getPropfindProperties(final Element element)
 	{
 		final DecoratorIDedMappedList<URI, WebDAVPropertyName> propertyList=new DecoratorIDedMappedList<URI, WebDAVPropertyName>(new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());	//create a list of WebDAV property names
 		final NodeList childList=element.getChildNodes();	//get a list of element children
