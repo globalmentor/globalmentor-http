@@ -20,8 +20,8 @@ import java.io.*;
 
 import static java.lang.System.*;
 
-import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.java.Preconditions.*;
 import static com.globalmentor.net.http.HTTP.*;
 
 /**An output stream that writes HTTP chunked content to an existing stream, but doesn't close the underlying stream when closed.
@@ -92,7 +92,7 @@ public class HTTPChunkedOutputStream extends OutputStream
 	{
 		this.outputStream=checkInstance(outputStream, "Output stream cannot be null.");	//save the decorated output stream
 		this.closeDecoratedStream=closeDecoratedStream;
-		chunk=new byte[checkMinimum(chunkSize, 1)];
+		chunk=new byte[checkArgumentMinimum(chunkSize, 1)];
 		length=0;
 	}
 

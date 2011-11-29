@@ -41,8 +41,8 @@ import com.globalmentor.text.xml.XMLSerializer;
 import com.globalmentor.urf.URFResourceAlteration;
 import com.globalmentor.util.*;
 
-import static com.globalmentor.collections.Arrays.*;
 import static com.globalmentor.io.Charsets.*;
+import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.http.HTTP.*;
