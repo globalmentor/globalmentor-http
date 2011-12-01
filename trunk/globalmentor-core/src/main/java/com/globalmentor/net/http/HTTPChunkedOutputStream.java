@@ -21,7 +21,7 @@ import java.io.*;
 import static java.lang.System.*;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.java.Preconditions.*;
+import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.http.HTTP.*;
 
 /**An output stream that writes HTTP chunked content to an existing stream, but doesn't close the underlying stream when closed.
