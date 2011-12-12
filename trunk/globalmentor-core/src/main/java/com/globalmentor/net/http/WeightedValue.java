@@ -53,7 +53,7 @@ public class WeightedValue<V> implements Comparable<WeightedValue<V>>
 	/**@return A hash code for the object.*/
 	public int hashCode()
 	{
-		return Objects.hashCode(getValue(), getQValue());
+		return Objects.getHashCode(getValue(), getQValue());
 	}
 
 	/**@return A string representation of the object in the form <code><var>value</var>;q=<var>qvalue</var></code>.*/
