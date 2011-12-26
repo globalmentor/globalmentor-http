@@ -35,12 +35,12 @@ public class SRTWebDAV
 	/**The creation time, using the RFC 3339 Internet timestamp ISO 8601 profile, as set by WebDrive; deprecated by South River Technologies because it uses the standard WebDAV namespace.*/
 	public final static WebDAVPropertyName DEPRECATED_CREATION_TIME_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "srt_creationtime");
 
-	/**The last modifed time, using the RFC 3339 Internet timestamp ISO 8601 profile, as set by WebDrive; deprecated by South River Technologies because it uses the standard WebDAV namespace.*/
+	/**The last modified time, using the RFC 3339 Internet timestamp ISO 8601 profile, as set by WebDrive; deprecated by South River Technologies because it uses the standard WebDAV namespace.*/
 	public final static WebDAVPropertyName DEPRECATED_MODIFIED_TIME_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "srt_modifiedtime");
 
-	/**The server's last modifed time, using the RFC 3339 Internet timestamp ISO 8601 profile, last known to WebDrive as reported by the {@value WebDAV#GET_LAST_MODIFIED_PROPERTY_NAME} property;
+	/**The server's last modified time, using the RFC 3339 Internet timestamp ISO 8601 profile, last known to WebDrive as reported by the {@value WebDAV#GET_LAST_MODIFIED_PROPERTY_NAME} property;
 	deprecated by South River Technologies because it uses the standard WebDAV namespace.
-	Webdrive stores this as a duplicate time value so that it will know if any other software modified the file without WebDrive's knowledge.
+	WebDrive stores this as a duplicate time value so that it will know if any other software modified the file without WebDrive's knowledge.
 	If the value of this property matches the {@value WebDAV#GET_LAST_MODIFIED_PROPERTY_NAME} property, WebDrive will assume that {@value #DEPRECATED_MODIFIED_TIME_PROPERTY_NAME} stores the correct last modified time set by WebDrive.
 	*/
 	public final static WebDAVPropertyName DEPRECATED_TIMESTAMP_PROPERTY_NAME=new WebDAVPropertyName(WEBDAV_NAMESPACE, "srt_proptimestamp");
