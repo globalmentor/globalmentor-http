@@ -16,12 +16,14 @@
 
 package com.globalmentor.net.http;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static java.util.Collections.*;
 
 import static com.globalmentor.java.Characters.*;
+import static com.globalmentor.java.Conditions.unexpected;
 import static com.globalmentor.net.http.BasicAuthentication.*;
 import static com.globalmentor.net.http.DigestAuthentication.*;
 import static com.globalmentor.net.http.HTTP.*;
@@ -91,7 +93,14 @@ public class HTTPFormatter
 	*/
 	public static StringBuilder formatAttributeList(final StringBuilder stringBuilder, final Set<?> unquotedNames, final NameValuePair<?, ?>... attributes)
 	{
-		return formatAttributes(stringBuilder, LIST_DELIMITER, EQUALS_SIGN_CHAR, QUOTE, unquotedNames, attributes);	//format the attributes using HTTP's list formatting characters
+		try
+		{
+			return formatAttributes(stringBuilder, LIST_DELIMITER, EQUALS_SIGN_CHAR, QUOTE, unquotedNames, attributes);	//format the attributes using HTTP's list formatting characters
+		}
+		catch(final IOException ioException)	//TODO convert this class to use appendables
+		{
+			throw unexpected(ioException);
+		}
 	}
 
 	/**Formats the Authorization header with credentials.
@@ -218,7 +227,14 @@ public class HTTPFormatter
 	*/
 	public static StringBuilder formatList(final StringBuilder stringBuilder, final Object... items)
 	{
-		return TextFormatter.formatList(stringBuilder, LIST_DELIMITER, items);	//format the items as a list
+		try
+		{
+			return TextFormatter.formatList(stringBuilder, LIST_DELIMITER, items);	//format the items as a list
+		}
+		catch(final IOException ioException)	//TODO convert this class to use appendables
+		{
+			throw unexpected(ioException);
+		}
 	}
 
 	/**Appends the string representations of the given objects separated by the HTTP list delimiter character.
@@ -230,7 +246,14 @@ public class HTTPFormatter
 	*/
 	public static StringBuilder formatList(final StringBuilder stringBuilder, final Iterable<?> iterable)
 	{
-		return TextFormatter.formatList(stringBuilder, LIST_DELIMITER, iterable);	//format the list with a string delimiter
+		try
+		{
+			return TextFormatter.formatList(stringBuilder, LIST_DELIMITER, iterable);	//format the list with a string delimiter
+		}
+		catch(final IOException ioException)	//TODO convert this class to use appendables
+		{
+			throw unexpected(ioException);
+		}
 	}
 
 }

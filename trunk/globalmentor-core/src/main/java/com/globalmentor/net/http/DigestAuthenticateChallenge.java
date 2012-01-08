@@ -47,7 +47,7 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 		/**@return The hashed nonce value.*/
 		public String getNonceDigest()
 		{
-			return formatHex(new StringBuilder(), digest(getMessageDigest(), getNonce())).toString();	//calculate the nonce digest
+			return formatHex(digest(getMessageDigest(), getNonce()));	//calculate the nonce digest
 		}
 
 	/**The opaque challenge data, or <code>null</code> for no opaque data.*/
