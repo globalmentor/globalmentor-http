@@ -263,7 +263,7 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 					trim(lineBuilder, LWS_CHARACTERS);	//trim beginning and ending whitespace
 					final String value=lineBuilder.toString();	//the value is whatever is remaining between the whitespace, if any
 					headerList.add(new NameValuePair<String, String>(name, value));	//create a new name-value pair and add it to the list
-					lineBuilder=nextLineBuilder;	//we'll start from the begining processing the next line next time
+					lineBuilder=nextLineBuilder;	//we'll start from the beginning processing the next line next time
 				}
 				else	//if we didn't find the header separator
 				{

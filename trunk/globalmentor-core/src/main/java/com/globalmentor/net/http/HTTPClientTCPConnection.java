@@ -1,5 +1,5 @@
 /*
- * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 1996-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,12 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.*;
+import javax.xml.parsers.DocumentBuilder;
 
 import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Bytes;
+import com.globalmentor.java.Characters;
 import com.globalmentor.log.Log;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.*;
@@ -42,13 +44,15 @@ import com.globalmentor.urf.URFResourceAlteration;
 import com.globalmentor.util.*;
 
 import static com.globalmentor.io.Charsets.*;
+import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Arrays.*;
+import static com.globalmentor.java.Characters.END_OF_TRANSMISSION_SYMBOL;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
-import static com.globalmentor.text.xml.XML.createDocumentBuilder;
+import static com.globalmentor.text.xml.XML.*;
 import static java.util.Arrays.fill;
 
 import org.w3c.dom.Document;
@@ -246,13 +250,15 @@ public class HTTPClientTCPConnection
 			//TODO later turn on non-blocking access when we have a separate client which will on a separate thread feed requests and retrieve responses
 //TODO fix			inputStream=new BufferedInputStream(newInputStream(channel));	//create a new input stream from the channel
 //TODO fix			outputStream=new BufferedOutputStream(newOutputStream(channel));	//create a new output stream to the channel
-			inputStream=new BufferedInputStream(socket.getInputStream());	//get an input stream from the socket
-			outputStream=new BufferedOutputStream(socket.getOutputStream());	//get an output stream from the socket
+			inputStream=socket.getInputStream();	//get an input stream from the socket
+			outputStream=socket.getOutputStream();	//get an output stream from the socket
 			if(getClient().isLogged())	//if we're using a logged client
 			{
 				inputStream=new LogInputStream(inputStream);	//log all communication from the input stream
 				outputStream=new LogOutputStream(outputStream);	//log all communication to the output stream
 			}
+			inputStream=new BufferedInputStream(inputStream);	//wrap the streams in buffered streams after adding logging, so larger chunks will be written to the log
+			outputStream=new BufferedOutputStream(outputStream);
 		}
 	}
 
@@ -506,11 +512,16 @@ public class HTTPClientTCPConnection
 	*/
 	public InputStream getResponseBodyInputStream(final HTTPRequest request, final HTTPResponse response) throws IOException
 	{
+		final InputStream bodyInputStream;
 		if(HEAD_METHOD.equals(request.getMethod()))	//if this is the HEAD method
 		{
-			return new ResponseBodyInputStreamDecorator(new ByteArrayInputStream(Bytes.NO_BYTES), response);	//the HEAD method will never send content, even if there is a Content-Length header TODO make an EmptyInputStream; make a static instance and place it in InputStreams
+			bodyInputStream=EMPTY_INPUT_STREAM;	//the HEAD method will never send content, even if there is a Content-Length header
 		}
-		return new ResponseBodyInputStreamDecorator(getBodyInputStream(response), response);
+		else	//for all other methods
+		{
+			bodyInputStream=getBodyInputStream(response);
+		}
+		return new ResponseBodyInputStreamDecorator(bodyInputStream, response);
 	}
 
 	/**Retrieves an input stream to read the body of the given message.
@@ -630,14 +641,20 @@ public class HTTPClientTCPConnection
 	*/
 	public Document readResponseBodyXML(final HTTPRequest request, final HTTPResponse response, final boolean namespaceAware, final boolean validated) throws ConfigurationException, IOException
 	{
+		final InputStream inputStream=getResponseBodyInputStream(request, response);	//get an input stream to the body contents
+		final DocumentBuilder documentBuilder=createDocumentBuilder(namespaceAware, validated);	//create a document builder
+		final Document document;
 		try
 		{
-			return createDocumentBuilder(namespaceAware, validated).parse(getResponseBodyInputStream(request, response));	//parse the document
+			document=documentBuilder.parse(inputStream);	//parse the document
+			inputStream.close();	//close the input stream
 		}
-		catch(final SAXException saxException)
+		catch(final SAXException saxException)	//if there was a parsing error (no use trying to close the stream with an I/O exception---that will probably cause another I/O exception
 		{
+			inputStream.close();	//close the input stream
 			throw new IOException(saxException);			
 		}
+		return document;
 	}
 	
 	/**Sends a fixed-length request and gets a response.
@@ -823,7 +840,7 @@ public class HTTPClientTCPConnection
 
 	/**Cleans up the connection after reading a response body.
 	The connection is closed if requested.
-	If auto-exchange is enabled, the exhange is ended.
+	If auto-exchange is enabled, the exchange is ended.
 	@param response The response in an HTTP exchange for which this input stream reads the body.
 	@throws NullPointerException if the given response is <code>null</code>.
 	@throws IOException if there is an error cleaning up the connection.
@@ -844,7 +861,7 @@ public class HTTPClientTCPConnection
 
 	/**Creates an output stream that cleans up the connection after reading a response body.
 	The connection is closed if requested.
-	If auto-exchange is enabled, the exhange is ended.
+	If auto-exchange is enabled, the exchange is ended.
 	@see HTTPClientTCPConnection#afterReadBody(HTTPResponse)
 	@author Garret Wilson
 	*/
@@ -870,7 +887,7 @@ public class HTTPClientTCPConnection
 	
 	  /**Called after the stream is successfully closed.
 		This version closes the connection if requested.
-		If auto-exchange is enabled, the exhange is ended.
+		If auto-exchange is enabled, the exchange is ended.
 		@throws IOException if there is an error cleaning up the connection.
 		@see HTTPClientTCPConnection#afterReadBody(HTTPResponse)
 		*/
