@@ -30,6 +30,7 @@ import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.http.*;
+
 import static com.globalmentor.net.http.webdav.WebDAV.*;
 
 import org.w3c.dom.*;
@@ -146,9 +147,9 @@ public class WebDAVResource extends HTTPResource
 	{
 		if(isCached()) //if we are caching values, let's cache all we can
 		{
+			final URI resourceURI = getURI(); //get our resource URI
 			try
 			{
-				final URI resourceURI = getURI(); //get our resource URI
 				final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> resourcePropertyMaps = propFind(Depth.ONE); //do a PROPFIND with a depth of one to get all children resource properties, proactively caching their values as well
 				for(final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> resourcePropertyMap : resourcePropertyMaps) //look at each property map to see if properties were really returned for this resource, as the server might have tried to follow redirects and return properties for other resources
 				{
@@ -158,6 +159,14 @@ public class WebDAVResource extends HTTPResource
 					}
 				}
 				return false; //even though we succeeded in retrieving information for *some* resource, it apparently wasn't exactly the one we requested---perhaps it was http://www.example.com/collection/ instead of http://www.example.com/collection, the latter of which (the one we requested) doesn't exist 
+			}
+			catch(final HTTPBadRequestException httpBadRequestException) //if the WebDAV server thinks this was a bad request
+			{
+				if(isCollectionURI(resourceURI))	//Apache sends back a 400 Bad Request for a non-existent collection shadowed by a resource with the same name (but no trailing slash)
+				{
+					return false;
+				}
+				throw httpBadRequestException;	//if this wasn't a request for a collection, maybe the request really was bad
 			}
 			catch(final HTTPNotFoundException notFoundException) //404 Not Found
 			{
