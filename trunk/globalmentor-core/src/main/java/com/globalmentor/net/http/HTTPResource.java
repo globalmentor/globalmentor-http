@@ -87,6 +87,12 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	protected final static Map<CacheKey, CachedExists> cachedExistsMap = new DecoratorReadWriteLockMap<CacheKey, CachedExists>(
 			new PurgeOnWriteSoftValueHashMap<CacheKey, CachedExists>(), cacheLock);
 
+	/** Clears all information from the caches. This version clears all cached exists information. */
+	protected void clearCache()
+	{
+		cachedExistsMap.clear();
+	}
+
 	/**
 	 * Caches the given exists status for this resource.
 	 * @param exists The existence status.
@@ -191,7 +197,24 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		response.checkStatus(); //check the status of the response, throwing an exception if this is an error
 		if(isCached()) //if we're caching this resource
 		{
-			cacheExists(false); //indicate that the resource no longer exists
+			if(isCollectionURI(getURI())) //if this is a collection, we may have information cached for child resources
+			{
+				clearCache(); //dump all our cache; this is a drastic measure, but we can't have cached information for children that no longer exist TODO improve to be more selective
+			}
+			else
+			//for non-collection resources
+			{
+				cacheLock.writeLock().lock(); //lock the cache for writing
+				try
+				{
+					uncacheInfo(); //uncache our info for this resource
+					cacheExists(false); //indicate that the resource no longer exists
+				}
+				finally
+				{
+					cacheLock.writeLock().unlock(); //always release the write lock
+				}
+			}
 		}
 	}
 
@@ -276,10 +299,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		{
 			if(isCached() && exists != null) //if information is being cached and we know the latest existence state
 			{
-				if(isCached()) //if we are caching information
-				{
-					cacheExists(exists.booleanValue()); //update the exists status
-				}
+				cacheExists(exists.booleanValue()); //update the exists status
 			}
 		}
 	}
@@ -311,10 +331,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		{
 			if(isCached() && exists != null) //if information is being cached and we know the latest existence state
 			{
-				if(isCached()) //if we are caching information
-				{
-					cacheExists(exists.booleanValue()); //update the exists status
-				}
+				cacheExists(exists.booleanValue()); //update the exists status
 			}
 		}
 	}
@@ -362,7 +379,19 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		final HTTPResponse response = connection.sendRequest(request, content); //get the response
 		connection.readResponseBody(request, response); //ignore the response body
 		response.checkStatus(); //check the status of the response, throwing an exception if this is an error
-		cacheExists(true); //we just put content with no errors, so it should now exist
+		if(isCached()) //if we're caching this resource
+		{
+			cacheLock.writeLock().lock(); //lock the cache for writing
+			try
+			{
+				uncacheInfo(); //uncache our info for this resource; the new content could change properties such as content-length
+				cacheExists(true); //we just put content with no errors, so it should now exist
+			}
+			finally
+			{
+				cacheLock.writeLock().unlock(); //always release the write lock
+			}
+		}
 	}
 
 	/**
@@ -375,7 +404,19 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		final HTTPRequest request = new DefaultHTTPRequest(PUT_METHOD, getURI()); //create a PUT request
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final OutputStream outputStream = connection.writeRequest(request); //write the request to the server
-		cacheExists(true); //just writing the PUT request will probably create something, so we assume the resource exists, even if we later don't succeed in writing all the bytes
+		if(isCached()) //if we're caching this resource
+		{
+			cacheLock.writeLock().lock(); //lock the cache for writing
+			try
+			{
+				uncacheInfo(); //uncache our info for this resource; the new content could change properties such as content-length
+				cacheExists(true); //just writing the PUT request will probably create something, so we assume the resource exists, even if we later don't succeed in writing all the bytes
+			}
+			finally
+			{
+				cacheLock.writeLock().unlock(); //always release the write lock
+			}
+		}
 		return new ReadResponseOutputStreamDecorator(connection, request, outputStream); //return a version of the output stream that will read the response when finished
 	}
 
@@ -527,7 +568,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	{
 
 		/**
-		 * HTTP client and resource URI contstructor.
+		 * HTTP client and resource URI constructor.
 		 * @param httpClient The HTTP client.
 		 * @param resourceURI The resource URI.
 		 * @throws NullPointerException if the given HTTP client and/or resource URI is <code>null</code>.

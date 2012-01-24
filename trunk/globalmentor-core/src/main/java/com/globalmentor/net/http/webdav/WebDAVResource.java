@@ -47,6 +47,23 @@ public class WebDAVResource extends HTTPResource
 	protected final static Map<CacheKey, CachedProperties> cachedPropertiesMap = new DecoratorReadWriteLockMap<CacheKey, CachedProperties>(
 			new PurgeOnWriteSoftValueHashMap<CacheKey, CachedProperties>(), cacheLock);
 
+	/** {@inheritDoc} This version also clears all cached properties. */
+	@Override
+	protected void clearCache()
+	{
+		cacheLock.writeLock().lock(); //lock the cache for writing
+		try
+		{
+
+			super.clearCache(); //clear the cache normally
+			cachedPropertiesMap.clear(); //clear our properties cache
+		}
+		finally
+		{
+			cacheLock.writeLock().unlock(); //always release the write lock
+		}
+	}
+
 	/**
 	 * Caches the given exists status for this resource. This version removes cached properties if the new exists status is <code>false</code>.
 	 * @param exists The existence status.
@@ -162,11 +179,11 @@ public class WebDAVResource extends HTTPResource
 			}
 			catch(final HTTPBadRequestException httpBadRequestException) //if the WebDAV server thinks this was a bad request
 			{
-				if(isCollectionURI(resourceURI))	//Apache sends back a 400 Bad Request for a non-existent collection shadowed by a resource with the same name (but no trailing slash)
+				if(isCollectionURI(resourceURI)) //Apache sends back a 400 Bad Request for a non-existent collection shadowed by a resource with the same name (but no trailing slash)
 				{
 					return false;
 				}
-				throw httpBadRequestException;	//if this wasn't a request for a collection, maybe the request really was bad
+				throw httpBadRequestException; //if this wasn't a request for a collection, maybe the request really was bad
 			}
 			catch(final HTTPNotFoundException notFoundException) //404 Not Found
 			{
@@ -289,8 +306,11 @@ public class WebDAVResource extends HTTPResource
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //send the request and get the response
 		connection.readResponseBody(request, response); //ignore the response body
+		if(isCached()) //if we're caching this resource
+		{
+			uncacheInfo(destinationURI); //remove the cache information of the destination, because a copy of this resource replaced it
+		}
 		response.checkStatus(); //check the status of the response, throwing an exception if this is an error
-		uncacheInfo(destinationURI); //remove the cache information of the destination, because a copy of this resource replaced it
 	}
 
 	/**
@@ -304,8 +324,20 @@ public class WebDAVResource extends HTTPResource
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //send the request and get the response
 		connection.readResponseBody(request, response); //ignore the response body
+		if(isCached()) //if we're caching this resource
+		{
+			cacheLock.writeLock().lock(); //lock the cache for writing
+			try
+			{
+				uncacheInfo(); //uncache our info for this resource; the new content could change properties
+				cacheExists(true); //we just created the collection with no errors, so it should now exist
+			}
+			finally
+			{
+				cacheLock.writeLock().unlock(); //always release the write lock
+			}
+		}
 		response.checkStatus(); //check the status of the response, throwing an exception if this is an error
-		cacheExists(true);	//we just created the collection with no errors, so it should now exist
 	}
 
 	/**
@@ -401,9 +433,28 @@ public class WebDAVResource extends HTTPResource
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //send the request and get the response
 		connection.readResponseBody(request, response); //ignore the response body
+		if(isCached()) //if we're caching this resource
+		{
+			if(isCollectionURI(getURI())) //if this is a collection, we may have information cached for child resources
+			{
+				clearCache(); //dump all our cache; this is a drastic measure, but we can't have cached information for children that no longer exist TODO improve to be more selective
+			}
+			else
+			//for non-collection resources
+			{
+				cacheLock.writeLock().lock(); //lock the cache for writing
+				try
+				{
+					uncacheInfo(); //remove the cache information, because this resource is moving
+					uncacheInfo(destinationURI); //remove the cache information of the destination, because this resource replaced it
+				}
+				finally
+				{
+					cacheLock.writeLock().unlock(); //always release the write lock
+				}
+			}
+		}
 		response.checkStatus(); //check the status of the response, throwing an exception if this is an error
-		uncacheInfo(); //remove the cache information, because this resource is moving
-		uncacheInfo(destinationURI); //remove the cache information of the destination, because this resource replaced it
 	}
 
 	/**
@@ -557,7 +608,7 @@ public class WebDAVResource extends HTTPResource
 	}
 
 	/**
-	 * Updates properties using the PROPPATCH method. Rquested properties will first be removed, then requested properties will be set, in that order. The cached
+	 * Updates properties using the PROPPATCH method. Requested properties will first be removed, then requested properties will be set, in that order. The cached
 	 * information is cleared. The URI of each resource is canonicized to be an absolute URI.
 	 * @param removePropertyNames The list of properties to remove.
 	 * @param setProperties The list of properties and values to set.
