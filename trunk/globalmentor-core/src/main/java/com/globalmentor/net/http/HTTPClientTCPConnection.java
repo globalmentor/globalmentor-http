@@ -40,7 +40,6 @@ import com.globalmentor.net.http.webdav.WebDAVResource;
 import com.globalmentor.security.*;
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.text.xml.XMLSerializer;
-import com.globalmentor.urf.URFResourceAlteration;
 import com.globalmentor.util.*;
 
 import static com.globalmentor.io.Charsets.*;
@@ -55,6 +54,7 @@ import static com.globalmentor.net.http.HTTPParser.*;
 import static com.globalmentor.text.xml.XML.*;
 import static java.util.Arrays.fill;
 
+import org.urframework.URFResourceAlteration;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
