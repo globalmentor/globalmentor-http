@@ -54,7 +54,6 @@ import static com.globalmentor.net.http.HTTPParser.*;
 import static com.globalmentor.text.xml.XML.*;
 import static java.util.Arrays.fill;
 
-import org.urframework.URFResourceAlteration;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
