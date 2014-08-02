@@ -25,7 +25,7 @@ public abstract class AbstractAuthenticateChallenge extends AbstractHTTPAuthenti
 	/**Constructs a authentication challenge.
 	@param scheme The authentication scheme with which to challenge the client.
 	@param realm The realm for which authentication is requested.
-	@exception NullPointerException if the authentication scheme and/or realm is <code>null</code>.
+	@throws NullPointerException if the authentication scheme and/or realm is <code>null</code>.
 	*/
 	public AbstractAuthenticateChallenge(final AuthenticationScheme scheme, final String realm)
 	{

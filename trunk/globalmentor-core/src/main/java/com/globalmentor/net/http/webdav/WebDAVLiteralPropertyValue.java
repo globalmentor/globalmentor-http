@@ -27,7 +27,7 @@ public class WebDAVLiteralPropertyValue extends ObjectDecorator<String> implemen
 
 	/**String literal constructor.
 	@param literal The literal string this value represents.
-	@exception NullPointerException if the given literal is <code>null</code>.
+	@throws NullPointerException if the given literal is <code>null</code>.
 	*/
 	public WebDAVLiteralPropertyValue(final String literal)
 	{

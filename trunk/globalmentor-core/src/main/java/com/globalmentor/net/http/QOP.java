@@ -44,8 +44,8 @@ public enum QOP
 	/**Determines the enumeration value matching the given string.
 	@param string The string value.
 	@return The enumeration value corresponding to the string.
-	@exception IllegalArgumentException if the enum has no constant with the specified name.
-	@exception NullPointerException if the string is <code>null</code>.
+	@throws IllegalArgumentException if the enum has no constant with the specified name.
+	@throws NullPointerException if the string is <code>null</code>.
 	@see #toString()
 	*/
 	public static QOP valueOfString(final String string)	//TODO improve by storing values in a map

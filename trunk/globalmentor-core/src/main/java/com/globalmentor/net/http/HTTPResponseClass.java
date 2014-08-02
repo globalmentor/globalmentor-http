@@ -50,7 +50,7 @@ public enum HTTPResponseClass
 	/**Returns the response class of a given status code.
 	@param statusCode The status code of a response.
 	@return The class of a response with the given status code.
-	@exception IllegalArgumentException if the given status code does not fall
+	@throws IllegalArgumentException if the given status code does not fall
 		within one of the response classes defined by RFC 2616.
 	*/
 	public static HTTPResponseClass fromStatusCode(final int statusCode)

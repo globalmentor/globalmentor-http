@@ -122,9 +122,9 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	
 	/**Reads a byte expected to be an LF.
 	@param inputStream The source of the second half of a CRLF sequence.
-	@exception EOFException If there is no more data in the input stream.
-	@exception ParseIOException if the next character read is not an LF.
-	@exception IOException if there is an error reading the content.
+	@throws EOFException If there is no more data in the input stream.
+	@throws ParseIOException if the next character read is not an LF.
+	@throws IOException if there is an error reading the content.
 	*/
 	protected static void parseLF(final InputStream inputStream) throws EOFException, ParseIOException, IOException	//TODO make sure our byte-level processing doesn't interfere with any UTF-8 encoding
 	{
@@ -133,9 +133,9 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 
 	/**Reads a byte sequence expected to be CRLF.
 	@param inputStream The source of the second half of a CRLF sequence.
-	@exception EOFException If there is no more data in the input stream.
-	@exception ParseIOException if the next character read is not an LF.
-	@exception IOException if there is an error reading the content.
+	@throws EOFException If there is no more data in the input stream.
+	@throws ParseIOException if the next character read is not an LF.
+	@throws IOException if there is an error reading the content.
 	*/
 	protected static void parseCRLF(final InputStream inputStream) throws EOFException, ParseIOException, IOException	//TODO make sure our byte-level processing doesn't interfere with any UTF-8 encoding
 	{
@@ -146,9 +146,9 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	/**Reads an expected byte from an input stream.
 	@param inputStream The source of the the byte.
 	@param byteValue The byte to expect.
-	@exception EOFException If there is no more data in the input stream.
-	@exception ParseIOException if the next character read is not an the expected character.
-	@exception IOException if there is an error reading the content.
+	@throws EOFException If there is no more data in the input stream.
+	@throws ParseIOException if the next character read is not an the expected character.
+	@throws IOException if there is an error reading the content.
 	*/
 	protected static void parseExpectedByte(final InputStream inputStream, final int byteValue) throws EOFException, ParseIOException, IOException	//TODO make sure our byte-level processing doesn't interfere with any UTF-8 encoding
 	{
@@ -166,9 +166,9 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	/**Parses the next chunk in a chunked transfer coding sequence.
 	@param inputStream The source of the second half of a CRLF sequence.
 	@return The next chunk read, or <code>null</code> if the ending, empty chunk was reached.
-	@exception EOFException If there is no more data in the input stream.
-	@exception ParseIOException if the next character read is not an LF.
-	@exception IOException if there is an error reading the content.
+	@throws EOFException If there is no more data in the input stream.
+	@throws ParseIOException if the next character read is not an LF.
+	@throws IOException if there is an error reading the content.
 	*/
 	public static byte[] parseChunk(final InputStream inputStream) throws ParseIOException, EOFException, IOException
 	{
@@ -278,10 +278,10 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	All spaces and horizontal tabs are folded into a single space.
 	@param inputStream The source of the HTTP message.
 	@return A line of text without the ending CRLF.
-	@exception ParseIOException if the line is not properly formatted.
-	@exception EOFException If the end of the data string was unexpected reached
+	@throws ParseIOException if the line is not properly formatted.
+	@throws EOFException If the end of the data string was unexpected reached
 		while searching for the end of the line.
-	@exception IOException if there is an error reading the content.
+	@throws IOException if there is an error reading the content.
 	*/
 	protected static String parseHeaderLine(final InputStream inputStream) throws ParseIOException, EOFException, IOException	//TODO make sure our byte-level processing doesn't interfere with any UTF-8 encoding
 	{
@@ -341,7 +341,7 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 
 	/**Parses a list of strings, reading until the end of the reader is reached.
 	@param reader The source of the data.
-	@exception IOException if there is an error reading the data.
+	@throws IOException if there is an error reading the data.
 	@return A list of list element string values.
 	*/
 	public static String[] parseList(final ParseReader reader) throws IOException
@@ -366,7 +366,7 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	Any data after a qvalue in each list element is ignored.
 	The returned values are returned in order sorted by weight from lowest to highest.
 	@param reader The source of the data.
-	@exception IOException if there is an error reading the data.
+	@throws IOException if there is an error reading the data.
 	*/
 	@SuppressWarnings("unchecked")	//we cast to an array of generic objects we have created, which Java cannot check at runtime
 	public static WeightedValue<String>[] parseWeightedList(final ParseReader reader) throws IOException
@@ -395,7 +395,7 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 
 	/**Parses a list element from the given reader.
 	@param reader The source of the data.
-	@exception IOException if there is an error reading the data.
+	@throws IOException if there is an error reading the data.
 	@return A string list element.
 	*/
 	public static String parseListElement(final ParseReader reader) throws IOException	//TODO fix to handle embedded quotes
@@ -408,8 +408,8 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	Quotes are removed from quoted values.
 	The parameters are mapped by name and returned.
 	@param reader The source of the data.
-	@exception IOException if there is an error reading the data.
-	@exception IllegalArgumentException if more than one parameter with the same
+	@throws IOException if there is an error reading the data.
+	@throws IllegalArgumentException if more than one parameter with the same
 		name was exists.
 	*/
 	public static Map<String, String> parseParameterMap(final ParseReader reader) throws IOException, IllegalArgumentException
@@ -427,7 +427,7 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	/**Parses a list of attribute name/value pair from the given reader, reading until the end of the reader is reached.
 	Quotes are removed from quoted values. 
 	@param reader The source of the data.
-	@exception IOException if there is an error reading the data.
+	@throws IOException if there is an error reading the data.
 	*/
 	public static List<NameValuePair<String, String>> parseParameters(final ParseReader reader) throws IOException
 	{
@@ -449,7 +449,7 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	/**Parses a attribute name/value pair from the given reader.
 	Quotes are removed from quoted values. 
 	@param reader The source of the data.
-	@exception IOException if there is an error reading the data.
+	@throws IOException if there is an error reading the data.
 	@return A name/value pair representing a parameter.
 	*/
 	public static NameValuePair<String, String> parseParameter(final ParseReader reader) throws IOException
@@ -473,7 +473,7 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	/**Parses a quoted string from the reader and returns the value within the quotes.
 	Escaped quotes are correctly parsed.
 	@param reader The source of the data.
-	@exception IOException if there is an error reading the data.
+	@throws IOException if there is an error reading the data.
 	*/
 	public static String parseQuotedString(final ParseReader reader) throws IOException
 	{
@@ -500,7 +500,7 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	/**Parses a list of attribute name/value pair from the given reader.
 	Quoted values are 
 	@param reader The source of the data.
-	@exception IOException if there is an error reading the data.
+	@throws IOException if there is an error reading the data.
 	*/
 /*TODO fix
 	public List<NameValuePair<String, String>> parseParameters(final ParseReader reader) throws IOException
@@ -525,8 +525,8 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	This method does not allow the wildcard '*' request-URI for the digest URI parameter.
 	@param header The header value.
 	@return The credentials from the authorization header.
-	@exception SyntaxException if the given header was not syntactically correct.
-	@exception IllegalArgumentException if the authorization information is not supported. 
+	@throws SyntaxException if the given header was not syntactically correct.
+	@throws IllegalArgumentException if the authorization information is not supported. 
 	@see HTTP#AUTHORIZATION_HEADER
 	*/
 	public static AuthenticateCredentials parseAuthorizationHeader(final CharSequence header) throws SyntaxException, IllegalArgumentException
@@ -606,7 +606,7 @@ public class HTTPParser	//TODO convert to use new parsing routines and Character
 	/**Parses an HTTP header and returns the WWW-Authenticate challenge.
 	@param header The header value.
 	@return The challenge from the authenticate header.
-	@exception SyntaxException if the given header did not contain valid information.
+	@throws SyntaxException if the given header did not contain valid information.
 	@see HTTP#WWW_AUTHENTICATE_HEADER
 	*/
 	public static AuthenticateChallenge parseWWWAuthenticateHeader(final CharSequence header) throws SyntaxException, IllegalArgumentException

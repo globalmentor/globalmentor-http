@@ -30,8 +30,8 @@ public class WebDAVDocumentFragmentPropertyValue extends ObjectDecorator<Documen
 
 	/**Document fragment constructor.
 	@param documentFragment The document fragment this value represents.
-	@exception NullPointerException if the given document fragment is <code>null</code>.
-	@exception IllegalArgumentException if the given document fragment has no child nodes.
+	@throws NullPointerException if the given document fragment is <code>null</code>.
+	@throws IllegalArgumentException if the given document fragment has no child nodes.
 	*/
 	public WebDAVDocumentFragmentPropertyValue(final DocumentFragment documentFragment)
 	{

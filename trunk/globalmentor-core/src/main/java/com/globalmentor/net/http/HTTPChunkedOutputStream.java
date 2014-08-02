@@ -108,7 +108,7 @@ public class HTTPChunkedOutputStream extends OutputStream
    * implementation for this method. 
    *
    * @param      b   the <code>byte</code>.
-   * @exception  IOException  if an I/O error occurs. In particular, 
+   * @throws  IOException  if an I/O error occurs. In particular, 
    *             an <code>IOException</code> may be thrown if the 
    *             output stream has been closed.
    */
@@ -132,7 +132,7 @@ public class HTTPChunkedOutputStream extends OutputStream
    * <code>write(b, 0, b.length)</code>.
    *
    * @param      b   the data.
-   * @exception  IOException  if an I/O error occurs.
+   * @throws  IOException  if an I/O error occurs.
    * @see        java.io.OutputStream#write(byte[], int, int)
    */
   public final void write(byte b[]) throws IOException
@@ -168,7 +168,7 @@ public class HTTPChunkedOutputStream extends OutputStream
    * @param      b     the data.
    * @param      off   the start offset in the data.
    * @param      len   the number of bytes to write.
-   * @exception  IOException  if an I/O error occurs. In particular, 
+   * @throws  IOException  if an I/O error occurs. In particular, 
    *             an <code>IOException</code> is thrown if the output 
    *             stream is closed.
    */
@@ -208,7 +208,7 @@ public class HTTPChunkedOutputStream extends OutputStream
    * <p>
    * The <code>flush</code> method of <code>OutputStream</code> does nothing.
    *
-   * @exception  IOException  if an I/O error occurs.
+   * @throws  IOException  if an I/O error occurs.
    */
   public void flush() throws IOException
 	{
@@ -228,14 +228,14 @@ public class HTTPChunkedOutputStream extends OutputStream
   }
 
   /**Called before the stream is closed.
-	@exception IOException if an I/O error occurs.
+	@throws IOException if an I/O error occurs.
 	*/
   protected void beforeClose() throws IOException 
   {
   }
 
   /**Called after the stream is successfully closed.
-	@exception IOException if an I/O error occurs.
+	@throws IOException if an I/O error occurs.
 	*/
   protected void afterClose() throws IOException
   {
@@ -243,7 +243,7 @@ public class HTTPChunkedOutputStream extends OutputStream
 
 	/**Closes this output stream and releases any system resources associated with this stream. 
 	A closed stream cannot perform output operations and cannot be reopened.
-	@exception IOException if an I/O error occurs.
+	@throws IOException if an I/O error occurs.
 	@see #beforeClose()
 	@see #afterClose()
 	@see #close(boolean)

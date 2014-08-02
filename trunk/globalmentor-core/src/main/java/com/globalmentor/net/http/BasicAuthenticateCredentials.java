@@ -50,7 +50,7 @@ public class BasicAuthenticateCredentials extends AbstractHTTPAuthentication imp
 	@param username The username of the principal submitting the credentials
 	@param realm The realm for which authentication is requested.
 	@param password The user password.
-	@exception NullPointerException if the username, realm, and/or password <code>null</code>.
+	@throws NullPointerException if the username, realm, and/or password <code>null</code>.
 	*/
 	protected BasicAuthenticateCredentials(final String username, final String realm, final char[] password)
 	{

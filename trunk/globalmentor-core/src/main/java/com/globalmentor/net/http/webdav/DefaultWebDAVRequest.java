@@ -33,7 +33,7 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 	/**Constructs a request with a method, address, and the default HTTP version, 1.1.
 	@param method The HTTP method.
 	@param uri The absolute URI of the request.
-	@exception IllegalArgumentException if the given URI does not represent an absolute URI with an absolute path.
+	@throws IllegalArgumentException if the given URI does not represent an absolute URI with an absolute path.
 	@see #DEFAULT_VERSION
 	*/
 	public DefaultWebDAVRequest(final String method, final URI uri)
@@ -45,7 +45,7 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 	@param method The HTTP method.
 	@param uri The absolute URI of the request.
 	@param version The HTTP version being used.
-	@exception IllegalArgumentException if the given URI does not represent an absolute URI with an absolute path.
+	@throws IllegalArgumentException if the given URI does not represent an absolute URI with an absolute path.
 	*/
 	public DefaultWebDAVRequest(final String method, final URI uri, final HTTPVersion version)
 	{
@@ -94,7 +94,7 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 
 	/**Retrieves the destination URI.
 	@return The URI indicating the destination of a COPY or MOVE,	or <code>null</code> if the {@value WebDAV#DESTINATION_HEADER} header is not present.
-	@exception IllegalArgumentException if the destination header value does not represent a valid URI or the represented URI is not absolute.
+	@throws IllegalArgumentException if the destination header value does not represent a valid URI or the represented URI is not absolute.
 	@see WebDAV#DESTINATION_HEADER
 	*/
 	public URI getDestination()
@@ -118,7 +118,7 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 	/**Sets the destination URI.
 	The destination header value is ignored if it does not represennt a valid URI or the represented URI is not absolute.
 	@param destinationURI The absolute URI indicating the destination of a COPY or MOVE.
-	@exception IllegalArgumentException if the given destination URI is not absolute.
+	@throws IllegalArgumentException if the given destination URI is not absolute.
 	@see WebDAV#DESTINATION_HEADER
 	*/
 	public void setDestination(final URI destinationURI)
@@ -135,7 +135,7 @@ public class DefaultWebDAVRequest extends DefaultHTTPRequest implements WebDAVRe
 
 	/**Returns the overwrite status.
 	@return <code>true</code> if the WebDAV {@value WebDAV#OVERWRITE_HEADER} header is missing or {@value WebDAV#OVERWRITE_TRUE}, or <code>false</code> if the value is {@value WebDAV#OVERWRITE_FALSE}.
-	@exception IllegalArgumentException if the overwrite header is present and is not {@value WebDAV#OVERWRITE_TRUE} or {@value WebDAV#OVERWRITE_FALSE}.
+	@throws IllegalArgumentException if the overwrite header is present and is not {@value WebDAV#OVERWRITE_TRUE} or {@value WebDAV#OVERWRITE_FALSE}.
 	@see WebDAV#OVERWRITE_HEADER
 	@see WebDAV#OVERWRITE_FALSE
 	@see WebDAV#OVERWRITE_TRUE

@@ -42,7 +42,7 @@ public class WeightedValue<V> implements Comparable<WeightedValue<V>>
 	/**Value and weight constructor.
 	@param value The weighted value.
 	@param qvalue The weight of the value.
-	@exception IllegalArgumentException if the qvalue is not within the range (0.0, 1.0), inclusive.
+	@throws IllegalArgumentException if the qvalue is not within the range (0.0, 1.0), inclusive.
 	*/
 	public WeightedValue(final V value, final double qvalue)
 	{

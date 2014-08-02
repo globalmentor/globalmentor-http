@@ -33,7 +33,7 @@ public class HTTPUnauthorizedException extends HTTPClientErrorException
 
 	/**Constructs a new unauthorized exception with a challenge.
 	@param challenge The authenticate challenge to issue to the client.
-	@exception NullPointerException if the authenticate challenge <code>null</code>.
+	@throws NullPointerException if the authenticate challenge <code>null</code>.
 	*/
 	public HTTPUnauthorizedException(final AuthenticateChallenge challenge)
 	{

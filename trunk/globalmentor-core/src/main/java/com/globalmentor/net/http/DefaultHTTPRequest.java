@@ -52,7 +52,7 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 
 		/**Sets the actual string used to make the request.
 		@param requestURI Either an absolute URI or an absolute path, depending on the circumstances.
-		@exception IllegalArgumentException if the given URI does not represent
+		@throws IllegalArgumentException if the given URI does not represent
 			an absolute URI or an absolute path.
 		*/
 		public void setRequestURI(final String requestURI)
@@ -68,7 +68,7 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 	/**Constructs a request with a method, address, and the default HTTP version, 1.1.
 	@param method The HTTP method.
 	@param uri The absolute URI of the request.
-	@exception IllegalArgumentException if the given URI does not represent
+	@throws IllegalArgumentException if the given URI does not represent
 		an absolute URI with an absolute path.
 	@see #DEFAULT_VERSION
 	*/
@@ -81,7 +81,7 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 	@param method The HTTP method.
 	@param uri The absolute URI of the request.
 	@param version The HTTP version being used.
-	@exception IllegalArgumentException if the given URI does not represent
+	@throws IllegalArgumentException if the given URI does not represent
 		an absolute URI with an absolute path.
 	*/
 	public DefaultHTTPRequest(final String method, final URI uri, final HTTPVersion version)
@@ -98,7 +98,7 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 
 	/**Gets the host information from the header.
 	@return The host name and optional port of the requested resource, or <code>null</code> if there is no host header.
-	@exception SyntaxException if the host header does not contain valid host information. 
+	@throws SyntaxException if the host header does not contain valid host information. 
 	@see HTTP#HOST_HEADER
 	*/
 	public Host getHost() throws SyntaxException
@@ -134,8 +134,8 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 	This method does not allow the wildcard '*' request-URI for the digest URI parameter.
 	@return The credentials from the authorization header,
 		or <code>null</code> if there is no such header.
-	@exception SyntaxException if the given header was not syntactically correct.
-	@exception IllegalArgumentException if the authorization information is not supported. 
+	@throws SyntaxException if the given header was not syntactically correct.
+	@throws IllegalArgumentException if the authorization information is not supported. 
 	@see HTTP#AUTHORIZATION_HEADER
 	*/
 	public AuthenticateCredentials getAuthorization() throws SyntaxException, IllegalArgumentException

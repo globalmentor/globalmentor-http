@@ -25,7 +25,7 @@ public abstract class HTTPRedirectException extends HTTPException
 
 	/**Constructs a new exception with the specified status code and location.
 	@param statusCode The HTTP status code to return in the request.
-	@exception IllegalArgumentException if the status code is not a 3xx status code.
+	@throws IllegalArgumentException if the status code is not a 3xx status code.
 	*/
 	public HTTPRedirectException(final int statusCode)
 	{

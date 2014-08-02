@@ -42,7 +42,7 @@ public interface WebDAVRequest extends HTTPRequest
 
 	/**Retrieves the destination URI.
 	@return The URI indicating the destination of a COPY or MOVE,	or <code>null</code> if the {@value WebDAV#DESTINATION_HEADER} header is not present.
-	@exception IllegalArgumentException if the destination header value does not represent a valid URI or the represented URI is not absolute.
+	@throws IllegalArgumentException if the destination header value does not represent a valid URI or the represented URI is not absolute.
 	@see WebDAV#DESTINATION_HEADER
 	*/
 	public URI getDestination();
@@ -50,14 +50,14 @@ public interface WebDAVRequest extends HTTPRequest
 	/**Sets the destination URI.
 	The destination header value is ignored if it does not represennt a valid URI or the represented URI is not absolute.
 	@param destinationURI The absolute URI indicating the destination of a COPY or MOVE.
-	@exception IllegalArgumentException if the given destination URI is not absolute.
+	@throws IllegalArgumentException if the given destination URI is not absolute.
 	@see WebDAV#DESTINATION_HEADER
 	*/
 	public void setDestination(final URI destinationURI);
 
 	/**Returns the overwrite status.
 	@return <code>true</code> if the WebDAV {@value WebDAV#OVERWRITE_HEADER} header is missing or {@value WebDAV#OVERWRITE_TRUE}, or <code>false</code> if the value is {@value WebDAV#OVERWRITE_FALSE}.
-	@exception IllegalArgumentException if the overwrite header is present and is not {@value WebDAV#OVERWRITE_TRUE} or {@value WebDAV#OVERWRITE_FALSE}.
+	@throws IllegalArgumentException if the overwrite header is present and is not {@value WebDAV#OVERWRITE_TRUE} or {@value WebDAV#OVERWRITE_FALSE}.
 	@see WebDAV#OVERWRITE_HEADER
 	@see WebDAV#OVERWRITE_FALSE
 	@see WebDAV#OVERWRITE_TRUE

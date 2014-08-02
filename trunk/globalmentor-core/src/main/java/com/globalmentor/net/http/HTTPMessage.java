@@ -101,13 +101,13 @@ public interface HTTPMessage
 	//Content-Length header
 	
 	/**@return The content length, or <code>-1</code> if no content length is given.
-	@exception SyntaxException if the content length is given but in an invalid format.
+	@throws SyntaxException if the content length is given but in an invalid format.
 	*/
 	public long getContentLength() throws SyntaxException;
 
 	/**Sets the content length header.
 	@param contentLength The length of the body content.
-	@exception IllegalArgumentException if the given content length is less than zero.
+	@throws IllegalArgumentException if the given content length is less than zero.
 	*/
 	public void setContentLength(final long contentLength);
 
@@ -121,7 +121,7 @@ public interface HTTPMessage
 	//Date header
 
 	/**@return The date of message, or <code>null</code> if there is no date header.
-	@exception SyntaxException if the date header does not contain a valid RFC 1123 date. 
+	@throws SyntaxException if the date header does not contain a valid RFC 1123 date. 
 	@see HTTP#DATE_HEADER
 	*/
 	public Date getDate() throws SyntaxException;
@@ -142,8 +142,8 @@ public interface HTTPMessage
 
 	/**Sets the transfer encoding header.
 	@param transferEncodings The transfer encodings to use.
-	@exception NullPointerException if the given transfer encodings is <code>null</code>.
-	@exception IllegalArgumentException if no transfer encodings are given.
+	@throws NullPointerException if the given transfer encodings is <code>null</code>.
+	@throws IllegalArgumentException if no transfer encodings are given.
 	@see HTTP#TRANSFER_ENCODING_HEADER
 	*/
 	public void setTransferEncoding(final String... transferEncodings);

@@ -130,10 +130,10 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 	@param nonceCount The count of the number of requests (including the current request)
 		that the client has sent with the nonce value in this request, or -1 if not provided.
 	@param algorithm The standard name of the digest algorithm. 
-	@exception NoSuchAlgorithmException if the given algorithm is not recognized.
-	@exception IllegalArgumentException if a quality of protection is provided and either cnonce or nonce-count
+	@throws NoSuchAlgorithmException if the given algorithm is not recognized.
+	@throws IllegalArgumentException if a quality of protection is provided and either cnonce or nonce-count
 		is not provided.
-	@exception NullPointerException if the realm, nonoce, username, digest URI, or response is <code>null</code>.
+	@throws NullPointerException if the realm, nonoce, username, digest URI, or response is <code>null</code>.
 	*/
 	public DigestAuthenticateCredentials(final String username, final String realm, final String nonce, final String digestURI, final String response,
 			final String cnonce, final String opaque, final QOP qop, final long nonceCount, final String algorithm) throws NoSuchAlgorithmException
@@ -156,10 +156,10 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 	@param nonceCount The count of the number of requests (including the current request)
 		that the client has sent with the nonce value in this request, or -1 if not provided.
 	@param algorithm The standard name of the digest algorithm. 
-	@exception NoSuchAlgorithmException if the given algorithm is not recognized.
-	@exception IllegalArgumentException if a quality of protection is provided and either cnonce or nonce-count
+	@throws NoSuchAlgorithmException if the given algorithm is not recognized.
+	@throws IllegalArgumentException if a quality of protection is provided and either cnonce or nonce-count
 		is not provided.
-	@exception NullPointerException if the method, realm, nonoce, username, or digest URI is <code>null</code>.
+	@throws NullPointerException if the method, realm, nonoce, username, or digest URI is <code>null</code>.
 	*/
 	public DigestAuthenticateCredentials(final String method, final String username, final String realm, final char[] password, final String nonce, final String digestURI,
 			final String cnonce, final String opaque, final QOP qop, final long nonceCount, final String algorithm) throws NoSuchAlgorithmException
@@ -182,10 +182,10 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 	@param nonceCount The count of the number of requests (including the current request)
 		that the client has sent with the nonce value in this request, or -1 if not provided.
 	@param algorithm The standard name of the digest algorithm. 
-	@exception NoSuchAlgorithmException if the given algorithm is not recognized.
-	@exception IllegalArgumentException if a quality of protection is provided and either cnonce or nonce-count
+	@throws NoSuchAlgorithmException if the given algorithm is not recognized.
+	@throws IllegalArgumentException if a quality of protection is provided and either cnonce or nonce-count
 		is not provided.
-	@exception NullPointerException if the realm, nonoce, username, digest URI, or response is <code>null</code>, and cannot be calculated by the given information.
+	@throws NullPointerException if the realm, nonoce, username, digest URI, or response is <code>null</code>, and cannot be calculated by the given information.
 	*/
 	protected DigestAuthenticateCredentials(final String method, final String username, final String realm, final char[] password, final String nonce, final String digestURI, final String response,
 			final String cnonce, final String opaque, final QOP qop, final long nonceCount, final String algorithm) throws NoSuchAlgorithmException

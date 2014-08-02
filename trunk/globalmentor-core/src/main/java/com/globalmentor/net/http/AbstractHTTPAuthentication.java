@@ -39,7 +39,7 @@ public abstract class AbstractHTTPAuthentication implements HTTPAuthentication
 	/**Constructs authentication.
 	@param scheme The authentication scheme with which to challenge the client.
 	@param realm The authentication realm, or <code>null</code> if not known.
-	@exception NullPointerException if the authentication scheme is <code>null</code>.
+	@throws NullPointerException if the authentication scheme is <code>null</code>.
 	*/
 	public AbstractHTTPAuthentication(final AuthenticationScheme scheme, final String realm)
 	{

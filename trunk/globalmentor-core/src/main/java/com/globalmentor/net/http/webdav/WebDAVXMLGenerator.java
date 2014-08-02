@@ -60,7 +60,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	
 	/**Creates an XML document representing propfind.
 	@return A new XML document representing propfind.
-	@exception DOMException if there is an error creating the document.
+	@throws DOMException if there is an error creating the document.
 	*/
 	public Document createPropfindDocument() throws DOMException
 	{
@@ -69,7 +69,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 
 	/**Creates an XML document representing propertyupdate.
 	@return A new XML document representing propertyupdate.
-	@exception DOMException if there is an error creating the document.
+	@throws DOMException if there is an error creating the document.
 	*/
 	public Document createPropertyupdateDocument() throws DOMException
 	{
@@ -78,7 +78,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 
 	/**Creates an XML document representing multistatus.
 	@return A new XML document representing multistatus.
-	@exception DOMException if there is an error creating the document.
+	@throws DOMException if there is an error creating the document.
 	*/
 	public Document createMultistatusDocument() throws DOMException
 	{
@@ -88,7 +88,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	/**Creates a response and appends it to the given element.
 	@param element An XML element representing a multistatus.
 	@return A WebDAV response XML element.
-	@exception DOMException if there is an error creating the element.
+	@throws DOMException if there is an error creating the element.
 	*/
 	public Element addResponse(final Element element) throws DOMException
 	{
@@ -99,7 +99,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	@param element An XML element representing, for example, a response.
 	@param uri The URI to use as the href.
 	@return A WebDAV href XML element with the URI as its content.
-	@exception DOMException if there is an error creating the element.
+	@throws DOMException if there is an error creating the element.
 	*/
 	public Element addHref(final Element element, final URI uri) throws DOMException
 	{
@@ -110,7 +110,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	/**Creates a property container element.
 	@param element An XML element representing, for example, a response.
 	@return A WebDAV propstat XML element.
-	@exception DOMException if there is an error creating the element.
+	@throws DOMException if there is an error creating the element.
 	*/
 	public Element addPropstat(final Element element) throws DOMException
 	{
@@ -121,7 +121,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	/**Creates a property element.
 	@param element An XML element representing, for example, a property container.
 	@return A WebDAV prop XML element.
-	@exception DOMException if there is an error creating the element.
+	@throws DOMException if there is an error creating the element.
 	*/
 	public Element addProp(final Element element) throws DOMException
 	{			
@@ -131,7 +131,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	/**Adds property requests to a property element.
 	@param propElement An XML element representing a property element.
 	@param propertyList A list of all requested properties, or {@link WebDAV#ALL_PROPERTIES} or {@link WebDAV#PROPERTY_NAMES} indicating all properties or all property names, respectively.
-	@exception DOMException if there is an error creating the child elements.
+	@throws DOMException if there is an error creating the child elements.
 	@see WebDAV#ALL_PROPERTIES
 	@see WebDAV#PROPERTY_NAMES
 	*/
@@ -157,7 +157,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	/**Adds a property and a value to a property element.
 	@param propElement An XML element representing a property element.
 	@param property A property URI and its value, may be <code>null</code> to indicate that no content should be added.
-	@exception DOMException if there is an error creating the child elements.
+	@throws DOMException if there is an error creating the child elements.
 	@return A WebDAV property XML element with its serialized value.
 	*/
 	public Element addProperty(final Element propElement, final WebDAVProperty property) throws DOMException
@@ -188,7 +188,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	/**Adds a property request to a property element.
 	@param propElement An XML element representing a property element.
 	@param propertyNames The WebDAV property name of the property to add.
-	@exception DOMException if there is an error creating the child elements.
+	@throws DOMException if there is an error creating the child elements.
 	@return A WebDAV property XML element.
 	*/
 	public Element addPropertyName(final Element propElement, final WebDAVPropertyName propertyName) throws DOMException
@@ -201,7 +201,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	/**Creates a remove element.
 	@param element An XML element representing, for example, a property removal as a child of a propertyupdate document element.
 	@return A WebDAV remove XML element.
-	@exception DOMException if there is an error creating the element.
+	@throws DOMException if there is an error creating the element.
 	*/
 	public Element addRemove(final Element element) throws DOMException
 	{			
@@ -211,7 +211,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	/**Creates a set element.
 	@param element An XML element representing, for example, a property setting as a child of a propertyupdate document element.
 	@return A WebDAV set XML element.
-	@exception DOMException if there is an error creating the element.
+	@throws DOMException if there is an error creating the element.
 	*/
 	public Element addSet(final Element element) throws DOMException
 	{			
@@ -222,7 +222,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	@param element An XML element representing, for example, a propstat.
 	@param status The text of the status report.
 	@return A WebDAV status XML element with the status text as its content.
-	@exception DOMException if there is an error creating the element.
+	@throws DOMException if there is an error creating the element.
 	*/
 	public Element addStatus(final Element element, final String status) throws DOMException
 	{
@@ -236,7 +236,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager
 	@param typeNamespace The namespace of the property, or <code>null</code> to indicate no type. 
 	@param typeLocalName The local name of the property, or <code>null</code> to indicate no type. 
 	@return A WebDAV resource type XML element with the optional type indicated by a child element.
-	@exception DOMException if there is an error creating the elements.
+	@throws DOMException if there is an error creating the elements.
 	*/
 	public Element addResourceType(final Element element, final String typeNamespace, final String typeLocalName) throws DOMException
 	{

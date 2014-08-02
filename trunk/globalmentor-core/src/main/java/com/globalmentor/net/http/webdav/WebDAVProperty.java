@@ -29,7 +29,7 @@ public class WebDAVProperty extends NameValuePair<WebDAVPropertyName, WebDAVProp
 	/**Constructor specifying the name and value.
 	@param name The WebDAV property's name.
 	@param value The WebDAV property's value, which may be <code>null</code>.
-	@exception NullPointerException if the given name is <code>null</code>.
+	@throws NullPointerException if the given name is <code>null</code>.
 	*/
 	public WebDAVProperty(final WebDAVPropertyName name, final WebDAVPropertyValue value)
 	{

@@ -262,7 +262,7 @@ public class HTTPClientTCPConnection
 	}
 
 	/**Disconnects from the host.
-	@exception IOException if there is an error disconnecting from the host.
+	@throws IOException if there is an error disconnecting from the host.
 	*/
 	public void disconnect() throws IOException
 	{
@@ -282,7 +282,7 @@ public class HTTPClientTCPConnection
 	private InputStream inputStream;
 
 		/**@return The input stream from the channel, connecting if needed.
-		@exception IOException if there is an error getting an input stream.
+		@throws IOException if there is an error getting an input stream.
 		*/
 		protected InputStream getInputStream() throws IOException
 		{
@@ -297,7 +297,7 @@ public class HTTPClientTCPConnection
 	private OutputStream outputStream;
 
 		/**@return The output stream to the channel, connecting if needed.
-		@exception IOException if there is an error getting an output stream.
+		@throws IOException if there is an error getting an output stream.
 		*/
 		protected OutputStream getOutputStream() throws IOException
 		{
@@ -311,8 +311,8 @@ public class HTTPClientTCPConnection
 	/**URI constructor.
 	@param client The client with which this connection is associated.
 	@param uri The URI indicating the host to which to connect.
-	@exception NullPointerException if the given client is <code>null</code>.
-	@exception IllegalArgumentException if the given URI does not contain a valid host.
+	@throws NullPointerException if the given client is <code>null</code>.
+	@throws IllegalArgumentException if the given URI does not contain a valid host.
 	*/
 /*TODO del if not needed
 	HTTPClientTCPConnection(final HTTPClient client, final URI uri)
@@ -332,7 +332,7 @@ public class HTTPClientTCPConnection
 	@param host The host to which to connect.
 	@param passwordAuthentication The connection-specific password authentication, or <code>null</code> if there should be no connection-specific password authentication.
 	@param secure Whether the connection should be secure.
-	@exception NullPointerException if the given client or host is <code>null</code>.
+	@throws NullPointerException if the given client or host is <code>null</code>.
 	*/
 	HTTPClientTCPConnection(final HTTPClient client, final Host host, final PasswordAuthentication passwordAuthentication, final boolean secure)
 	{
@@ -456,7 +456,7 @@ public class HTTPClientTCPConnection
 	The response body is not read.
 	@param request The request to which the response is a response.
 	@return A response parsed from the input stream data.
-	@exception IOException if there is an error reading the data.
+	@throws IOException if there is an error reading the data.
 	*/
 	public HTTPResponse readResponse(final HTTPRequest request) throws IOException
 	{
@@ -486,7 +486,7 @@ public class HTTPClientTCPConnection
 
 	/**Reads headers from the current position in the input stream and places them in the given response.
 	@param response The response to contain the read headers.
-	@exception IOException if there is an error reading the data.
+	@throws IOException if there is an error reading the data.
 	*/
 	protected void readHeaders(final HTTPResponse response) throws IOException
 	{
@@ -567,8 +567,8 @@ public class HTTPClientTCPConnection
 	@param request The request to which the response is a response.
 	@param response The response for which a body should be read.
 	@return The contents of the response body.
-	@exception EOFException if the end of the stream was unexpectedly reached.
-	@exception IOException if there is an error reading the data.
+	@throws EOFException if the end of the stream was unexpectedly reached.
+	@throws IOException if there is an error reading the data.
 	*/
 	public byte[] readResponseBody(final HTTPRequest request, final HTTPResponse response) throws EOFException, IOException
 	{
@@ -664,7 +664,7 @@ public class HTTPClientTCPConnection
 	@param body The body of the request.
 	@return The response to get from the server
 	@throws NullPointerException if the given request and/or body is <code>null</code>.
-	@exception IOException if there is an error writing the request or reading the response.
+	@throws IOException if there is an error writing the request or reading the response.
 	*/
 	public HTTPResponse sendRequest(final HTTPRequest request, final byte[] body) throws IOException
 	{
@@ -776,7 +776,7 @@ public class HTTPClientTCPConnection
 	@param document The XML document to place in the body of the request.
 	@return The response to get from the server
 	@throws NullPointerException if the given request and/or document is <code>null</code>.
-	@exception IOException if there is an error writing the request or reading the response.
+	@throws IOException if there is an error writing the request or reading the response.
 	*/
 	public HTTPResponse sendRequest(final HTTPRequest request, final Document document) throws IOException
 	{
@@ -794,7 +794,7 @@ public class HTTPClientTCPConnection
 	}
 	
 	/**Closes the connection.
-	@exception IOException if there is a problem closing the connection.
+	@throws IOException if there is a problem closing the connection.
 	*/
 /*TODO del
 	public void close() throws IOException

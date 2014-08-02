@@ -82,8 +82,8 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 	Defaults to authentication quality of protection.
 	@param realm The realm for which authentication is requested.
 	@param nonce The un-hashed server-specific data unique for each challenge.
-	@exception NoSuchAlgorithmException if the given algorithm is not recognized.
-	@exception NullPointerException if the realm or the nonce is <code>null</code>.
+	@throws NoSuchAlgorithmException if the given algorithm is not recognized.
+	@throws NullPointerException if the realm or the nonce is <code>null</code>.
 	*/
 	public DigestAuthenticateChallenge(final String realm, final String nonce) throws NoSuchAlgorithmException
 	{
@@ -95,8 +95,8 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 	@param realm The realm for which authentication is requested.
 	@param nonce The un-hashed server-specific data unique for each challenge.
 	@param stale Whether the previous request from the client was rejected because the nonce value was stale.
-	@exception NoSuchAlgorithmException if the given algorithm is not recognized.
-	@exception NullPointerException if the realm or the nonce is <code>null</code>.
+	@throws NoSuchAlgorithmException if the given algorithm is not recognized.
+	@throws NullPointerException if the realm or the nonce is <code>null</code>.
 	*/
 	public DigestAuthenticateChallenge(final String realm, final String nonce, final boolean stale) throws NoSuchAlgorithmException
 	{
@@ -108,8 +108,8 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 	@param realm The realm for which authentication is requested.
 	@param nonce The un-hashed server-specific data unique for each challenge.
 	@param opaque The opaque challenge data, or <code>null</code> for no opaque data.
-	@exception NoSuchAlgorithmException if the given algorithm is not recognized.
-	@exception NullPointerException if the realm or the nonce is <code>null</code>.
+	@throws NoSuchAlgorithmException if the given algorithm is not recognized.
+	@throws NullPointerException if the realm or the nonce is <code>null</code>.
 	*/
 	public DigestAuthenticateChallenge(final String realm, final String nonce, final String opaque) throws NoSuchAlgorithmException
 	{
@@ -122,8 +122,8 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 	@param nonce The un-hashed server-specific data unique for each challenge.
 	@param opaque The opaque challenge data, or <code>null</code> for no opaque data.
 	@param stale Whether the previous request from the client was rejected because the nonce value was stale.
-	@exception NoSuchAlgorithmException if the given algorithm is not recognized.
-	@exception NullPointerException if the realm or the nonce is <code>null</code>.
+	@throws NoSuchAlgorithmException if the given algorithm is not recognized.
+	@throws NullPointerException if the realm or the nonce is <code>null</code>.
 	*/
 	public DigestAuthenticateChallenge(final String realm, final String nonce, final String opaque, final boolean stale) throws NoSuchAlgorithmException
 	{
@@ -136,8 +136,8 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 	@param nonce The un-hashed server-specific data unique for each challenge.
 	@param opaque The opaque challenge data, or <code>null</code> for no opaque data.
 	@param algorithm The standard name of the digest algorithm. 
-	@exception NoSuchAlgorithmException if the given algorithm is not recognized.
-	@exception NullPointerException if the realm or the nonce is <code>null</code>.
+	@throws NoSuchAlgorithmException if the given algorithm is not recognized.
+	@throws NullPointerException if the realm or the nonce is <code>null</code>.
 	*/
 	public DigestAuthenticateChallenge(final String realm, final String nonce, final String opaque, final String algorithm) throws NoSuchAlgorithmException
 	{
@@ -151,8 +151,8 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge
 	@param opaque The opaque challenge data, or <code>null</code> for no opaque data.
 	@param stale Whether the previous request from the client was rejected because the nonce value was stale.
 	@param algorithm The standard name of the digest algorithm.
-	@exception NoSuchAlgorithmException if the given algorithm is not recognized.
-	@exception NullPointerException if the realm or the nonce is <code>null</code>.
+	@throws NoSuchAlgorithmException if the given algorithm is not recognized.
+	@throws NullPointerException if the realm or the nonce is <code>null</code>.
 	*/
 	public DigestAuthenticateChallenge(final String realm, final String nonce, final String opaque, final boolean stale, final String algorithm) throws NoSuchAlgorithmException
 	{

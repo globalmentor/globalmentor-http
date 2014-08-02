@@ -37,7 +37,7 @@ public interface HTTPResponse extends HTTPMessage
 	public HTTPResponseClass getResponseClass();
 
 	/**Checks the response code and throws an exception on an error condition.
-	@exception HTTPException if the response code represents an error condition.
+	@throws HTTPException if the response code represents an error condition.
 	@see #getStatusCode()
 	@see #getReasonPhrase()
 	*/
@@ -47,8 +47,8 @@ public interface HTTPResponse extends HTTPMessage
 	This method does not allow the wildcard '*' request-URI for the digest URI parameter.
 	@return The credentials from the authorization header,
 		or <code>null</code> if there is no such header.
-	@exception SyntaxException if the given header was not syntactically correct.
-	@exception IllegalArgumentException if the authorization information is not supported. 
+	@throws SyntaxException if the given header was not syntactically correct.
+	@throws IllegalArgumentException if the authorization information is not supported. 
 	@see HTTP#WWW_AUTHENTICATE_HEADER
 	*/
 	public AuthenticateChallenge getWWWAuthenticate() throws SyntaxException, IllegalArgumentException;

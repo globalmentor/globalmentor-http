@@ -50,7 +50,7 @@ public class WebDAVPropertyName extends DefaultResource implements IDed<URI>
 	Both components are expected to be already encoded for inclusion in a URI.
 	@param namespace The property namespace.
 	@param localName The property local name.
-	@exception NullPointerException if the given namespace and/or local name is <code>null</code>.
+	@throws NullPointerException if the given namespace and/or local name is <code>null</code>.
 	*/
 	public WebDAVPropertyName(final String namespace, final String localName)
 	{
@@ -63,7 +63,7 @@ public class WebDAVPropertyName extends DefaultResource implements IDed<URI>
 	The local name is expected to be already encoded for inclusion in a URI.
 	@param namespaceURI The property namespace URI.
 	@param localName The property local name.
-	@exception NullPointerException if the given namespace URI and/or local name is <code>null</code>.
+	@throws NullPointerException if the given namespace URI and/or local name is <code>null</code>.
 	*/
 	public WebDAVPropertyName(final URI namespaceURI, final String localName)
 	{
@@ -98,7 +98,7 @@ public class WebDAVPropertyName extends DefaultResource implements IDed<URI>
 	@param propertyNamespace The WebDAV property namespace.
 	@param propertyLocalName The WebDAV property namespace.
 	@return A reference URI constructed from the given namespace and local name.
-	@exception NullPointerException if the given property namespace and/or property local name is <code>null</code>.
+	@throws NullPointerException if the given property namespace and/or property local name is <code>null</code>.
 	*/
 	public static URI createPropertyURI(final String propertyNamespace, final String propertyLocalName)
 	{

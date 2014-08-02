@@ -28,7 +28,7 @@ public class BasicAuthenticateChallenge extends AbstractAuthenticateChallenge
 
 	/**Constructs a basic authentication challenge.
 	@param realm The realm for which authentication is requested.
-	@exception NullPointerException if the authentication realm is <code>null</code>.
+	@throws NullPointerException if the authentication realm is <code>null</code>.
 	*/
 	public BasicAuthenticateChallenge(final String realm)
 	{
