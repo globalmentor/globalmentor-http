@@ -45,8 +45,7 @@ import static com.globalmentor.net.http.HTTPParser.*;
  * </p>
  * @author Garret Wilson
  */
-public class HTTPChunkedInputStream extends InputStream
-{
+public class HTTPChunkedInputStream extends InputStream {
 
 	/** The input stream being decorated. */
 	private InputStream inputStream;
@@ -63,8 +62,7 @@ public class HTTPChunkedInputStream extends InputStream
 	private long chunkCount = 0;
 
 	/** @return The number of chunks read so far. */
-	public long getChunkCount()
-	{
+	public long getChunkCount() {
 		return chunkCount;
 	}
 
@@ -80,19 +78,15 @@ public class HTTPChunkedInputStream extends InputStream
 	 * @throws IOException If there is an error reading the chunk.
 	 * @throws IllegalStateException if the stream has already been closed.
 	 */
-	protected byte[] loadChunk() throws IOException
-	{
+	protected byte[] loadChunk() throws IOException {
 		checkState(inputStream != null, "Input stream already closed.");
 		byte[] chunk;
-		do
-		{
+		do {
 			chunk = parseChunk(inputStream); //parse another chunk from the input stream
-			if(chunk != null)
-			{
+			if(chunk != null) {
 				++chunkCount;
 			}
-		}
-		while(chunk != null && chunk.length == 0); //technically HTTP chunks can't be zero length, but this makes the algorithm more rigorous
+		} while(chunk != null && chunk.length == 0); //technically HTTP chunks can't be zero length, but this makes the algorithm more rigorous
 		index = 0; //reset our position to the start of the chunk
 		return chunk;
 	}
@@ -105,8 +99,7 @@ public class HTTPChunkedInputStream extends InputStream
 	 * @param inputStream The input stream to decorate.
 	 * @throws NullPointerException if the given stream is <code>null</code>.
 	 */
-	public HTTPChunkedInputStream(final InputStream inputStream)
-	{
+	public HTTPChunkedInputStream(final InputStream inputStream) {
 		this(inputStream, true);
 	}
 
@@ -116,27 +109,22 @@ public class HTTPChunkedInputStream extends InputStream
 	 * @param closeDecoratedStream Whether the decorated stream should be closed when this stream is closed.
 	 * @throws NullPointerException if the given stream is <code>null</code>.
 	 */
-	public HTTPChunkedInputStream(final InputStream inputStream, final boolean closeDecoratedStream)
-	{
+	public HTTPChunkedInputStream(final InputStream inputStream, final boolean closeDecoratedStream) {
 		this.inputStream = checkInstance(inputStream, "Input stream cannot be null."); //save the decorated input stream
 		this.closeDecoratedStream = closeDecoratedStream;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public int read() throws IOException
-	{
-		if(inputStream == null || chunk == null) //if this stream is closed or we're out of chunks
-		{
+	public int read() throws IOException {
+		if(inputStream == null || chunk == null) { //if this stream is closed or we're out of chunks
 			return -1;
 		}
 		//technically the HTTP protocol says the chunk shouldn't be empty,
 		//but having a loop makes this logically rigorous for empty chunks
-		while(index == chunk.length) //if we have drained this chunk
-		{
+		while(index == chunk.length) { //if we have drained this chunk
 			chunk = loadChunk(); //parse another chunk from the input stream
-			if(chunk == null) //if we were unable to get another chunk
-			{
+			if(chunk == null) { //if we were unable to get another chunk
 				return -1;
 			}
 		}
@@ -145,67 +133,55 @@ public class HTTPChunkedInputStream extends InputStream
 
 	/** {@inheritDoc} This version delegates to {@link #read(byte[], int, int)}. */
 	@Override
-	public final int read(byte b[]) throws IOException
-	{
+	public final int read(byte b[]) throws IOException {
 		return read(b, 0, b.length); //let the other method take care of the fixed length
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public int read(byte b[], int off, int len) throws IOException
-	{
-		if(inputStream == null) //if this stream is closed
-		{
+	public int read(byte b[], int off, int len) throws IOException {
+		if(inputStream == null) { //if this stream is closed
 			return -1;
 
 		}
 		//make sure we have a chunk with data or no chunk at all---otherwise we would wind up sending back zero bytes
 		//the API contract prohibits sending back zero bytes, and can confuse the Sun XML parser, making it think there is content after the body
-		if(chunk != null && index == chunk.length)
-		{
+		if(chunk != null && index == chunk.length) {
 			chunk = loadChunk(); //parse another chunk from the input stream
 		}
-		if(chunk == null) //if there is no data to begin with
-		{
+		if(chunk == null) { //if there is no data to begin with
 			return -1; //EOT
 		}
 		int total = 0;
 		//they shouldn't ask for zero bytes, and we shouldn't return zero bytes, but if they ask for zero
 		//we'll needlessly go through the loop and then give it to them like they asked
-		do
-		{
+		do {
 			final int count = Math.min(len, chunk.length - index); //don't read more from this chunk that there is left in the chunk
 			arraycopy(chunk, index, b, off, count); //copy from the chunk
 			total += count; //increase the total number of bytes read
 			index += count; //advance our position in the chunk
 			off += count; //advance the destination position in the buffer
 			len -= count; //decrease the number of bytes we need to copy
-			if(len > 0 && index == chunk.length) //if they want more data but we've reached the end of a chunk
-			{
+			if(len > 0 && index == chunk.length) { //if they want more data but we've reached the end of a chunk
 				chunk = loadChunk(); //load another chunk from the input stream
 			}
-		}
-		while(chunk != null && len > 0); //keep reading until we run out of chunks or we don't need to read any more
+		} while(chunk != null && len > 0); //keep reading until we run out of chunks or we don't need to read any more
 		return total; //return the total bytes read
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public long skip(long n) throws IOException
-	{
-		if(inputStream == null) //if this stream is closed
-		{
+	public long skip(long n) throws IOException {
+		if(inputStream == null) { //if this stream is closed
 			return 0;
 		}
 		int total = 0;
-		while(chunk != null && n > 0) //keep reading until we run out of chunks or we don't need to read any more
-		{
+		while(chunk != null && n > 0) { //keep reading until we run out of chunks or we don't need to read any more
 			final long count = Math.min(n, chunk.length - index); //don't skip more from this chunk that there is left in the chunk
 			total += count; //increase the total number of bytes read
 			index += count; //advance our position in the chunk
 			n -= count; //decrease the number of bytes we need to skip
-			if(n > 0 && index == chunk.length) //if we need to read more bytes but we've drained the chunk
-			{
+			if(n > 0 && index == chunk.length) { //if we need to read more bytes but we've drained the chunk
 				chunk = loadChunk(); //parse another chunk from the input stream
 			}
 		}
@@ -214,10 +190,8 @@ public class HTTPChunkedInputStream extends InputStream
 
 	/** {@inheritDoc} */
 	@Override
-	public int available() throws IOException
-	{
-		if(inputStream == null || chunk == null) //if this stream is closed or we're out of chunks
-		{
+	public int available() throws IOException {
+		if(inputStream == null || chunk == null) { //if this stream is closed or we're out of chunks
 			return 0;
 		}
 		return chunk.length - index; //show how many bytes are left in this chunk
@@ -225,21 +199,18 @@ public class HTTPChunkedInputStream extends InputStream
 
 	/** {@inheritDoc} This implementation does nothing. */
 	@Override
-	public synchronized void mark(int readlimit)
-	{
+	public synchronized void mark(int readlimit) {
 	}
 
 	/** {@inheritDoc} This method throws an {@link IOException}, as mark/reset is not supported. */
 	@Override
-	public synchronized void reset() throws IOException
-	{
+	public synchronized void reset() throws IOException {
 		throw new IOException("Mark/reset not supported.");
 	}
 
 	/** {@inheritDoc} This method returns <code>false</code>. */
 	@Override
-	public boolean markSupported()
-	{
+	public boolean markSupported() {
 		return false;
 	}
 
@@ -247,32 +218,26 @@ public class HTTPChunkedInputStream extends InputStream
 	 * Called before the stream is closed.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	protected void beforeClose() throws IOException
-	{
+	protected void beforeClose() throws IOException {
 	}
 
 	/**
 	 * Called after the stream is successfully closed.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	protected void afterClose() throws IOException
-	{
+	protected void afterClose() throws IOException {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void close() throws IOException
-	{
-		if(inputStream != null) //if we still have an input stream to decorate
-		{
-			while(chunk != null) //while there are more chunks, drain the input stream
-			{
+	public void close() throws IOException {
+		if(inputStream != null) { //if we still have an input stream to decorate
+			while(chunk != null) { //while there are more chunks, drain the input stream
 				chunk = loadChunk(); //parse another chunk from the input stream
 			}
 			parseHeaders(inputStream); //parse any trailers
 			beforeClose(); //perform actions before closing
-			if(closeDecoratedStream) //if we should close the underlying stream
-			{
+			if(closeDecoratedStream) { //if we should close the underlying stream
 				inputStream.close();
 			}
 			inputStream = null; //release the underlying input stream, but don't close it

@@ -16,16 +16,16 @@
 
 package com.globalmentor.net.http;
 
-/**An authentication challenge or response.
-@author Garret Wilson
-*/
-public interface HTTPAuthentication
-{
+/**
+ * An authentication challenge or response.
+ * @author Garret Wilson
+ */
+public interface HTTPAuthentication {
 
-	/**@return The authentication scheme.*/ 
+	/** @return The authentication scheme. */
 	public AuthenticationScheme getScheme();
 
-	/**@return The authentication realm, or <code>null</code> if not known.*/
+	/** @return The authentication realm, or <code>null</code> if not known. */
 	public String getRealm();
 
 }

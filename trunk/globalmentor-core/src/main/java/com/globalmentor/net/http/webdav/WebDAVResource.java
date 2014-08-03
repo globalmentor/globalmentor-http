@@ -40,8 +40,7 @@ import org.w3c.dom.*;
  * @author Garret Wilson
  * @see HTTPException
  */
-public class WebDAVResource extends HTTPResource
-{
+public class WebDAVResource extends HTTPResource {
 
 	/** The soft value map containing cached properties. This map is made thread-safe through the use of {@link #cacheLock}. */
 	protected final static Map<CacheKey, CachedProperties> cachedPropertiesMap = new DecoratorReadWriteLockMap<CacheKey, CachedProperties>(
@@ -49,17 +48,13 @@ public class WebDAVResource extends HTTPResource
 
 	/** {@inheritDoc} This version also clears all cached properties. */
 	@Override
-	protected void clearCache()
-	{
+	protected void clearCache() {
 		cacheLock.writeLock().lock(); //lock the cache for writing
-		try
-		{
+		try {
 
 			super.clearCache(); //clear the cache normally
 			cachedPropertiesMap.clear(); //clear our properties cache
-		}
-		finally
-		{
+		} finally {
 			cacheLock.writeLock().unlock(); //always release the write lock
 		}
 	}
@@ -68,19 +63,14 @@ public class WebDAVResource extends HTTPResource
 	 * Caches the given exists status for this resource. This version removes cached properties if the new exists status is <code>false</code>.
 	 * @param exists The existence status.
 	 */
-	protected void cacheExists(final boolean exists)
-	{
+	protected void cacheExists(final boolean exists) {
 		cacheLock.writeLock().lock(); //lock the cache for writing
-		try
-		{
+		try {
 			super.cacheExists(exists); //do the default caching
-			if(!exists) //if the resource no longer exists
-			{
+			if(!exists) { //if the resource no longer exists
 				cachedPropertiesMap.remove(new CacheKey(getClient(), getURI())); //uncache the properties, as the resource no longer exists
 			}
-		}
-		finally
-		{
+		} finally {
 			cacheLock.writeLock().unlock(); //always release the write lock
 		}
 	}
@@ -89,16 +79,12 @@ public class WebDAVResource extends HTTPResource
 	 * Removes all cached information for a given resource. This version, in addition to the default functionality, uncaches properties.
 	 * @param resourceURI The URI of the resource for which cached information should be removed.
 	 */
-	protected void uncacheInfo(final URI resourceURI)
-	{
+	protected void uncacheInfo(final URI resourceURI) {
 		cacheLock.writeLock().lock(); //lock the cache for writing
-		try
-		{
+		try {
 			super.uncacheInfo(resourceURI); //remove the default cached info
 			cachedPropertiesMap.remove(new CacheKey(getClient(), resourceURI)); //uncache the properties for the given resource
-		}
-		finally
-		{
+		} finally {
 			cacheLock.writeLock().unlock(); //always release the write lock
 		}
 	}
@@ -109,8 +95,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
 	 * @throws NullPointerException if the given reference URI is <code>null</code>.
 	 */
-	public WebDAVResource(final URI referenceURI) throws IllegalArgumentException, NullPointerException
-	{
+	public WebDAVResource(final URI referenceURI) throws IllegalArgumentException, NullPointerException {
 		this(referenceURI, (PasswordAuthentication)null); //construct the resource with no preset password authentication
 	}
 
@@ -122,8 +107,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
 	 * @throws NullPointerException if the given reference URI is <code>null</code>.
 	 */
-	public WebDAVResource(final URI referenceURI, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException, NullPointerException
-	{
+	public WebDAVResource(final URI referenceURI, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException, NullPointerException {
 		this(referenceURI, HTTPClient.getInstance(), passwordAuthentication); //construct the resource with the default client		
 	}
 
@@ -134,8 +118,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
 	 * @throws NullPointerException if the given reference URI and/or client is <code>null</code>.
 	 */
-	public WebDAVResource(final URI referenceURI, final HTTPClient client) throws IllegalArgumentException, NullPointerException
-	{
+	public WebDAVResource(final URI referenceURI, final HTTPClient client) throws IllegalArgumentException, NullPointerException {
 		this(referenceURI, client, null); //construct the class with no preset password authentication
 	}
 
@@ -149,8 +132,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws NullPointerException if the given reference URI and/or client is <code>null</code>.
 	 */
 	public WebDAVResource(final URI referenceURI, final HTTPClient client, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException,
-			NullPointerException
-	{
+			NullPointerException {
 		super(referenceURI, client, passwordAuthentication); //construct the parent class
 	}
 
@@ -160,43 +142,28 @@ public class WebDAVResource extends HTTPResource
 	 * @return The latest determined existence status.
 	 * @throws IOException if there was an error invoking a method.
 	 */
-	protected boolean getExists() throws IOException
-	{
-		if(isCached()) //if we are caching values, let's cache all we can
-		{
+	protected boolean getExists() throws IOException {
+		if(isCached()) { //if we are caching values, let's cache all we can
 			final URI resourceURI = getURI(); //get our resource URI
-			try
-			{
+			try {
 				final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> resourcePropertyMaps = propFind(Depth.ONE); //do a PROPFIND with a depth of one to get all children resource properties, proactively caching their values as well
-				for(final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> resourcePropertyMap : resourcePropertyMaps) //look at each property map to see if properties were really returned for this resource, as the server might have tried to follow redirects and return properties for other resources
-				{
-					if(resourceURI.equals(resourcePropertyMap.getName())) //if this is information about our resource
-					{
+				for(final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> resourcePropertyMap : resourcePropertyMaps) { //look at each property map to see if properties were really returned for this resource, as the server might have tried to follow redirects and return properties for other resources
+					if(resourceURI.equals(resourcePropertyMap.getName())) { //if this is information about our resource
 						return true; //we found properties for the resource, so it exists
 					}
 				}
 				return false; //even though we succeeded in retrieving information for *some* resource, it apparently wasn't exactly the one we requested---perhaps it was http://www.example.com/collection/ instead of http://www.example.com/collection, the latter of which (the one we requested) doesn't exist 
-			}
-			catch(final HTTPBadRequestException httpBadRequestException) //if the WebDAV server thinks this was a bad request
-			{
-				if(isCollectionURI(resourceURI)) //Apache sends back a 400 Bad Request for a non-existent collection shadowed by a resource with the same name (but no trailing slash)
-				{
+			} catch(final HTTPBadRequestException httpBadRequestException) { //if the WebDAV server thinks this was a bad request
+				if(isCollectionURI(resourceURI)) { //Apache sends back a 400 Bad Request for a non-existent collection shadowed by a resource with the same name (but no trailing slash)
 					return false;
 				}
 				throw httpBadRequestException; //if this wasn't a request for a collection, maybe the request really was bad
-			}
-			catch(final HTTPNotFoundException notFoundException) //404 Not Found
-			{
+			} catch(final HTTPNotFoundException notFoundException) { //404 Not Found
 				return false; //show that the resource is not there
-			}
-			catch(final HTTPGoneException goneException) //410 Gone
-			{
+			} catch(final HTTPGoneException goneException) { //410 Gone
 				return false; //show that the resource is permanently not there
 			}
-		}
-		else
-		//if we're not caching values
-		{
+		} else { //if we're not caching values
 			return super.getExists(); //do the default functionality, which is more efficient if we're not caching values
 		}
 	}
@@ -208,28 +175,20 @@ public class WebDAVResource extends HTTPResource
 	 * @see #cachedCollection
 	 * @see #propFind()
 	 */
-	public boolean isCollection() throws IOException
-	{
-		if(isCached()) //if we are using cached info
-		{
+	public boolean isCollection() throws IOException {
+		if(isCached()) { //if we are using cached info
 			final CacheKey cacheKey = new CacheKey(getClient(), getURI()); //create a new cache key
 			final CachedProperties cachedProperties = cachedPropertiesMap.get(cacheKey); //get cached properties from the map
-			if(cachedProperties != null && !cachedProperties.isStale()) //if information is cached that isn't stale
-			{
+			if(cachedProperties != null && !cachedProperties.isStale()) { //if information is cached that isn't stale
 				return cachedProperties.isCollection(); //return whether the resource is a collection
 			}
 		}
-		try
-		{
+		try {
 			final Map<WebDAVPropertyName, WebDAVProperty> properties = propFind(); //get properties for this resource, which will cache the properties along with the existence and collection states
 			return WebDAV.isCollection(properties); //send back whether the resource is a collection
-		}
-		catch(final HTTPNotFoundException notFoundException) //404 Not Found
-		{
+		} catch(final HTTPNotFoundException notFoundException) { //404 Not Found
 			return false; //a resource that doesn't exist isn't a collection
-		}
-		catch(final HTTPGoneException goneException) //ignore 410 Gone
-		{
+		} catch(final HTTPGoneException goneException) { //ignore 410 Gone
 			return false; //a resource that doesn't exist isn't a collection
 		}
 	}
@@ -244,8 +203,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IOException if there was an error invoking the method.
 	 * @see Depth#INFINITY
 	 */
-	public void copy(final URI destinationURI) throws IOException
-	{
+	public void copy(final URI destinationURI) throws IOException {
 		copy(destinationURI, true); //copy the resource with overwrite
 	}
 
@@ -260,8 +218,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws HTTPPreconditionFailedException if the operation failed because of the overwrite setting.
 	 * @throws IOException if there was an error invoking the method.
 	 */
-	public void copy(final URI destinationURI, final Depth depth) throws IOException
-	{
+	public void copy(final URI destinationURI, final Depth depth) throws IOException {
 		copy(destinationURI, depth, true); //copy the resource with overwrite
 	}
 
@@ -276,8 +233,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IOException if there was an error invoking the method.
 	 * @see Depth#INFINITY
 	 */
-	public void copy(final URI destinationURI, final boolean overwrite) throws IOException
-	{
+	public void copy(final URI destinationURI, final boolean overwrite) throws IOException {
 		copy(destinationURI, Depth.INFINITY, overwrite); //copy the resource with infinite depth
 	}
 
@@ -292,13 +248,11 @@ public class WebDAVResource extends HTTPResource
 	 * @throws HTTPPreconditionFailedException if the operation failed because of the overwrite setting.
 	 * @throws IOException if there was an error invoking the method.
 	 */
-	public void copy(final URI destinationURI, final Depth depth, final boolean overwrite) throws IOException
-	{
+	public void copy(final URI destinationURI, final Depth depth, final boolean overwrite) throws IOException {
 		final WebDAVRequest request = new DefaultWebDAVRequest(COPY_METHOD, getURI()); //create a COPY request
 		request.setDestination(destinationURI); //set the destination URI
 		checkInstance(depth, "Depth cannot be null.");
-		if(depth != Depth.ZERO && depth != Depth.INFINITY) //if the depth is not ZERO or INFINITY
-		{
+		if(depth != Depth.ZERO && depth != Depth.INFINITY) { //if the depth is not ZERO or INFINITY
 			throw new IllegalArgumentException("Depth of " + depth + " is not allowed for the " + COPY_METHOD + " method.");
 		}
 		request.setDepth(depth); //set the depth
@@ -306,8 +260,7 @@ public class WebDAVResource extends HTTPResource
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //send the request and get the response
 		connection.readResponseBody(request, response); //ignore the response body
-		if(isCached()) //if we're caching this resource
-		{
+		if(isCached()) { //if we're caching this resource
 			uncacheInfo(destinationURI); //remove the cache information of the destination, because a copy of this resource replaced it
 		}
 		response.checkStatus(); //check the status of the response, throwing an exception if this is an error
@@ -318,22 +271,17 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IOException if there was an error invoking the method.
 	 * @see #mkCols()
 	 */
-	public void mkCol() throws IOException
-	{
+	public void mkCol() throws IOException {
 		final WebDAVRequest request = new DefaultWebDAVRequest(MKCOL_METHOD, getURI()); //create a MKCOL request
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //send the request and get the response
 		connection.readResponseBody(request, response); //ignore the response body
-		if(isCached()) //if we're caching this resource
-		{
+		if(isCached()) { //if we're caching this resource
 			cacheLock.writeLock().lock(); //lock the cache for writing
-			try
-			{
+			try {
 				uncacheInfo(); //uncache our info for this resource; the new content could change properties
 				cacheExists(true); //we just created the collection with no errors, so it should now exist
-			}
-			finally
-			{
+			} finally {
 				cacheLock.writeLock().unlock(); //always release the write lock
 			}
 		}
@@ -346,8 +294,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IOException if there is an error creating one of the path segments.
 	 * @see #mkCols(URI)
 	 */
-	public void mkCols() throws IOException
-	{
+	public void mkCols() throws IOException {
 		mkCols(changeRawPath(getURI(), ROOT_PATH)); //make the collections starting from the root
 	}
 
@@ -358,41 +305,32 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IOException if there is an error creating one of the path segments.
 	 * @throws IllegalArgumentException if the base path does not end in '/', or the path path is not a base path of this resource's URI.
 	 */
-	public void mkCols(final URI baseURI) throws IOException
-	{
+	public void mkCols(final URI baseURI) throws IOException {
 		final String baseURIString = baseURI.toString(); //get the base URI as a string
-		if(!endsWith(baseURIString, PATH_SEPARATOR)) //if the base URI doesn't end with the path separator
-		{
+		if(!endsWith(baseURIString, PATH_SEPARATOR)) { //if the base URI doesn't end with the path separator
 			throw new IllegalArgumentException("Base URI " + baseURI + " does not end with '" + PATH_SEPARATOR + "'.");
 		}
 		final String referenceURIString = getURI().toString(); //get the string version of the resource's reference URI
-		if(!referenceURIString.startsWith(baseURIString)) //if the reference URI doesn't start with the given base URI
-		{
+		if(!referenceURIString.startsWith(baseURIString)) { //if the reference URI doesn't start with the given base URI
 			throw new IllegalArgumentException("Resource URI " + referenceURIString + " does not begin with base URI " + baseURIString);
 		}
 		final String remainingPath = referenceURIString.substring(baseURIString.length()); //get the remaining path to examine
 		final StringBuilder uriBuilder = new StringBuilder(baseURIString); //we'll check each component of the reconstructed path as we add it to the URI builder
 		final String delimiter = String.valueOf(PATH_SEPARATOR); //determine the path delimiter
 		final StringTokenizer tokenizer = new StringTokenizer(remainingPath, delimiter, true); //get the path tokens, returning the delimiters as well
-		while(tokenizer.hasMoreTokens()) //while there are more tokens
-		{
+		while(tokenizer.hasMoreTokens()) { //while there are more tokens
 			final String token = tokenizer.nextToken(); //get the next token
 			uriBuilder.append(token); //add the token to our path
-			if(delimiter.equals(token)) //if we just finished a collection segment
-			{
-				try
-				{
+			if(delimiter.equals(token)) { //if we just finished a collection segment
+				try {
 					final URI segmentURI = new URI(uriBuilder.toString()); //create a URI for this segment of the path
 					//				TODO del Log.trace("looking at segment URI", segmentURI);
 					final WebDAVResource segmentWebDAVResource = new WebDAVResource(segmentURI, getClient()); //create a WebDAV resource for this segment of the path, using the same client
-					if(!segmentWebDAVResource.exists()) //if this segment collection doesn't exist //TODO later use and isCollection() or something
-					{
+					if(!segmentWebDAVResource.exists()) { //if this segment collection doesn't exist //TODO later use and isCollection() or something
 						//					TODO del Log.trace("making collection for segment URI", segmentURI);
 						segmentWebDAVResource.mkCol(); //make this collection
 					}
-				}
-				catch(final URISyntaxException uriSyntaxException) //as we are creating this URI from an existing URI, segment by segment, we should never run into a URI syntax problem
-				{
+				} catch(final URISyntaxException uriSyntaxException) { //as we are creating this URI from an existing URI, segment by segment, we should never run into a URI syntax problem
 					throw new AssertionError(uriSyntaxException);
 				}
 			}
@@ -409,8 +347,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IOException if there was an error invoking the method.
 	 * @see Depth#INFINITY
 	 */
-	public void move(final URI destinationURI) throws IOException
-	{
+	public void move(final URI destinationURI) throws IOException {
 		move(destinationURI, true); //move the resource with overwrite
 	}
 
@@ -424,8 +361,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IOException if there was an error invoking the method.
 	 * @see Depth#INFINITY
 	 */
-	public void move(final URI destinationURI, final boolean overwrite) throws IOException
-	{
+	public void move(final URI destinationURI, final boolean overwrite) throws IOException {
 		final WebDAVRequest request = new DefaultWebDAVRequest(MOVE_METHOD, getURI()); //create a MOVE request
 		request.setDestination(destinationURI); //set the destination URI
 		request.setDepth(Depth.INFINITY); //set the depth to infinity
@@ -433,23 +369,15 @@ public class WebDAVResource extends HTTPResource
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //send the request and get the response
 		connection.readResponseBody(request, response); //ignore the response body
-		if(isCached()) //if we're caching this resource
-		{
-			if(isCollectionURI(getURI())) //if this is a collection, we may have information cached for child resources
-			{
+		if(isCached()) { //if we're caching this resource
+			if(isCollectionURI(getURI())) { //if this is a collection, we may have information cached for child resources
 				clearCache(); //dump all our cache; this is a drastic measure, but we can't have cached information for children that no longer exist TODO improve to be more selective
-			}
-			else
-			//for non-collection resources
-			{
+			} else { //for non-collection resources
 				cacheLock.writeLock().lock(); //lock the cache for writing
-				try
-				{
+				try {
 					uncacheInfo(); //remove the cache information, because this resource is moving
 					uncacheInfo(destinationURI); //remove the cache information of the destination, because this resource replaced it
-				}
-				finally
-				{
+				} finally {
 					cacheLock.writeLock().unlock(); //always release the write lock
 				}
 			}
@@ -465,14 +393,11 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IOException if there was an error invoking the method.
 	 * @see #propFind(Depth)
 	 */
-	public Map<WebDAVPropertyName, WebDAVProperty> propFind() throws IOException
-	{
+	public Map<WebDAVPropertyName, WebDAVProperty> propFind() throws IOException {
 		final URI referenceURI = getURI(); //get the reference URI of this resource
 		final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> propertyMaps = propFind(Depth.ZERO); //do a propfind with no depth
-		for(final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> propertyMap : propertyMaps) //look at each property map
-		{
-			if(propertyMap.getName().equals(referenceURI)) //if this property list is for this resource
-			{
+		for(final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> propertyMap : propertyMaps) { //look at each property map
+			if(propertyMap.getName().equals(referenceURI)) { //if this property list is for this resource
 				return propertyMap.getValue(); //return the list of properties for this resource
 			}
 		}
@@ -489,24 +414,20 @@ public class WebDAVResource extends HTTPResource
 	 * @return A list of all properties of all requested resources, each representing the URI of the resource paired by a map of its properties.
 	 * @throws IOException if there was an error invoking the method.
 	 */
-	public List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> propFind(final Depth depth) throws IOException
-	{
+	public List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> propFind(final Depth depth) throws IOException {
 		final HTTPClient httpClient = getClient(); //get the client we are using
 		final URI referenceURI = getURI(); //get the reference URI of this resource
 		//return cached values if we can
-		if(depth == Depth.ZERO && isCached()) //if we're caching values and a depth of zero is requested
-		{
+		if(depth == Depth.ZERO && isCached()) { //if we're caching values and a depth of zero is requested
 			final CacheKey cacheKey = new CacheKey(httpClient, referenceURI); //create a new cache key
 			final CachedProperties cachedProperties = cachedPropertiesMap.get(cacheKey); //get cached properties from the map
-			if(cachedProperties != null && !cachedProperties.isStale()) //if we have cached properties that is not stale
-			{
+			if(cachedProperties != null && !cachedProperties.isStale()) { //if we have cached properties that is not stale
 				final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> cachedPropFindList = new ArrayList<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>>();
 				cachedPropFindList.add(new NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>(referenceURI, cachedProperties.getProperties())); //add the property list for this resource to the list, paired with its URI TODO make sure it doesn't hurt to use our own URI---will forwarding affect this?
 				return cachedPropFindList; //return the manufactured property list from our cached properyy list
 			}
 		}
-		try
-		{
+		try {
 			final WebDAVRequest request = new DefaultWebDAVRequest(PROPFIND_METHOD, referenceURI); //create a PROPFIND request
 			request.setDepth(depth); //set the requested depth
 			final WebDAVXMLGenerator webdavXMLGenerator = new WebDAVXMLGenerator(); //create a WebDAV XML generator
@@ -515,54 +436,41 @@ public class WebDAVResource extends HTTPResource
 
 			final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 			final HTTPResponse response = connection.sendRequest(request, propfindDocument); //send the request and get the response
-			if(response.getStatusCode() != SC_MULTI_STATUS) //if the operation was not successful
-			{
+			if(response.getStatusCode() != SC_MULTI_STATUS) { //if the operation was not successful
 				connection.readResponseBody(request, response); //ignore the response body TODO add special handling for specific WebDAV errors
 				response.checkStatus(); //check the status of the response, throwing an exception if this is an error
 				throw new HTTPException(response.getStatusCode(), response.getReasonPhrase()); //create a generic exception HTTP exception if one of the standard errors wasn't recognized
 			}
 			final Document document = connection.readResponseBodyXML(request, response, true, false); //get the XML from the response body, aware of namespaces but not validating
-			if(document != null) //if there was an XML document in the request TODO probably delete; no XML response is probably an error condition
-			{
+			if(document != null) { //if there was an XML document in the request TODO probably delete; no XML response is probably an error condition
 				final Element documentElement = document.getDocumentElement(); //get the document element
 				//TODO check to make sure the document element is correct
 				final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> resourcePropertyMaps = WebDAVXMLProcessor.getMultistatusProperties(
 						documentElement, referenceURI); //get the properties from the multistatus document, relative to this resource URI			
-				if(isCached()) //if we're caching information, cache the properties for this resource
-				{
+				if(isCached()) { //if we're caching information, cache the properties for this resource
 					cacheLock.writeLock().lock(); //lock the cache for writing
-					try
-					{
-						for(final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> resourcePropertyList : resourcePropertyMaps) //look at each property map
-						{
+					try {
+						for(final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> resourcePropertyList : resourcePropertyMaps) { //look at each property map
 							final Map<WebDAVPropertyName, WebDAVProperty> properties = resourcePropertyList.getValue(); //cache the map of properties for this resource
 							final boolean isCollection = WebDAV.isCollection(properties); //see if this resource is a collection
 							final CacheKey cacheKey = new CacheKey(httpClient, resourcePropertyList.getName()); //create a key for the caches
 							cachedExistsMap.put(cacheKey, new CachedExists(true)); //show that this resource exists
 							cachedPropertiesMap.put(cacheKey, new CachedProperties(properties, isCollection)); //cache the properties for this resource
 						}
-					}
-					finally
-					{
+					} finally {
 						cacheLock.writeLock().unlock(); //always release the write lock
 					}
 				}
 				return resourcePropertyMaps; //return all the properties requested
 			}
 			return emptyList(); //return an empty list, because there was no XML returned
-		}
-		catch(final HTTPNotFoundException notFoundException) //404 Not Found
-		{
-			if(isCached()) //if we are caching information
-			{
+		} catch(final HTTPNotFoundException notFoundException) { //404 Not Found
+			if(isCached()) { //if we are caching information
 				cacheExists(false); //indicate that the resource is missing
 			}
 			throw notFoundException; //rethrow the exception
-		}
-		catch(final HTTPGoneException goneException) //410 Gone
-		{
-			if(isCached()) //if we are caching information
-			{
+		} catch(final HTTPGoneException goneException) { //410 Gone
+			if(isCached()) { //if we are caching information
 				cacheExists(false); //indicate that the resource is permanently missing
 			}
 			throw goneException; //rethrow the exception
@@ -576,8 +484,7 @@ public class WebDAVResource extends HTTPResource
 	 * @param removeProperties The list of properties to remove.
 	 * @throws IOException if there was an error invoking the method.
 	 */
-	public void removeProperties(final WebDAVPropertyName... removePropertyNames) throws IOException
-	{
+	public void removeProperties(final WebDAVPropertyName... removePropertyNames) throws IOException {
 		removeProperties(asList(removePropertyNames)); //remove the given names, wrapped in a list
 	}
 
@@ -589,8 +496,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IOException if there was an error invoking the method.
 	 */
 	@SuppressWarnings("unchecked")
-	public void removeProperties(final Collection<WebDAVPropertyName> removePropertyNames) throws IOException
-	{
+	public void removeProperties(final Collection<WebDAVPropertyName> removePropertyNames) throws IOException {
 		propPatch(removePropertyNames, (Set<WebDAVProperty>)EMPTY_SET); //perform a PROPPATCH with no properties to set		
 	}
 
@@ -602,8 +508,7 @@ public class WebDAVResource extends HTTPResource
 	 * @throws IOException if there was an error invoking the method.
 	 */
 	@SuppressWarnings("unchecked")
-	public void setProperties(final Collection<WebDAVProperty> setProperties) throws IOException
-	{
+	public void setProperties(final Collection<WebDAVProperty> setProperties) throws IOException {
 		propPatch((Set<WebDAVPropertyName>)EMPTY_SET, setProperties); //perform a PROPPATCH with no properties to remove
 	}
 
@@ -614,22 +519,19 @@ public class WebDAVResource extends HTTPResource
 	 * @param setProperties The list of properties and values to set.
 	 * @throws IOException if there was an error invoking the method.
 	 */
-	public void propPatch(final Collection<WebDAVPropertyName> removePropertyNames, final Collection<WebDAVProperty> setProperties) throws IOException
-	{
+	public void propPatch(final Collection<WebDAVPropertyName> removePropertyNames, final Collection<WebDAVProperty> setProperties) throws IOException {
 		final URI referenceURI = getURI(); //get the reference URI of this resource
 		uncacheInfo(); //empty the cache
 		final WebDAVRequest request = new DefaultWebDAVRequest(PROPPATCH_METHOD, referenceURI); //create a PROPPATCH request
 		final WebDAVXMLGenerator webdavXMLGenerator = new WebDAVXMLGenerator(); //create a WebDAV XML generator
 		final Document propertyupdateDocument = webdavXMLGenerator.createPropertyupdateDocument(); //create a propertyupdate document	//TODO check DOM exceptions here
 		final Element propertyupdateElement = propertyupdateDocument.getDocumentElement(); //get the document element
-		for(final WebDAVPropertyName removePropertyName : removePropertyNames) //for each property to remove
-		{
+		for(final WebDAVPropertyName removePropertyName : removePropertyNames) { //for each property to remove
 			final Element removeElement = webdavXMLGenerator.addRemove(propertyupdateElement); //add a remove element
 			final Element propElement = webdavXMLGenerator.addProp(removeElement); //add a property element
 			webdavXMLGenerator.addPropertyName(propElement, removePropertyName); //add the property name for removal
 		}
-		for(final WebDAVProperty setProperty : setProperties) //for each property to set
-		{
+		for(final WebDAVProperty setProperty : setProperties) { //for each property to set
 			final Element setElement = webdavXMLGenerator.addSet(propertyupdateElement); //add a set element
 			final Element propElement = webdavXMLGenerator.addProp(setElement); //add a property element
 			webdavXMLGenerator.addProperty(propElement, setProperty); //add the property
@@ -637,8 +539,7 @@ public class WebDAVResource extends HTTPResource
 		final Document document;
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final HTTPResponse response = connection.sendRequest(request, propertyupdateDocument); //send the request and get the response
-		if(response.getStatusCode() != SC_MULTI_STATUS) //if the operation was not successful
-		{
+		if(response.getStatusCode() != SC_MULTI_STATUS) { //if the operation was not successful
 			connection.readResponseBody(request, response); //ignore the response body TODO add special handling for specific WebDAV errors
 			response.checkStatus(); //check the status of the response, throwing an exception if this is an error
 			throw new HTTPException(response.getStatusCode(), response.getReasonPhrase()); //create a generic exception HTTP exception if one of the standard errors wasn't recognized
@@ -651,14 +552,13 @@ public class WebDAVResource extends HTTPResource
 	 * Property information stored in a WebDAV resource cache.
 	 * @author Garret Wilson
 	 */
-	protected static class CachedProperties extends AbstractCachedInfo
-	{
+	protected static class CachedProperties extends AbstractCachedInfo {
+
 		/** The cached map of properties. */
 		private final Map<WebDAVPropertyName, WebDAVProperty> properties;
 
 		/** @return The cached list of properties. */
-		public final Map<WebDAVPropertyName, WebDAVProperty> getProperties()
-		{
+		public final Map<WebDAVPropertyName, WebDAVProperty> getProperties() {
 			return properties;
 		}
 
@@ -666,8 +566,7 @@ public class WebDAVResource extends HTTPResource
 		private final boolean isCollection;
 
 		/** @return The cached record of whether the resource is a collection. */
-		public boolean isCollection()
-		{
+		public boolean isCollection() {
 			return isCollection;
 		}
 
@@ -677,8 +576,7 @@ public class WebDAVResource extends HTTPResource
 		 * @param isCollection Whether the resource is a collection.
 		 * @throws NullPointerException if the given map of properties is <code>null</code>.
 		 */
-		public CachedProperties(final Map<WebDAVPropertyName, WebDAVProperty> properties, final boolean isCollection)
-		{
+		public CachedProperties(final Map<WebDAVPropertyName, WebDAVProperty> properties, final boolean isCollection) {
 			this.isCollection = isCollection; //save the cached collection state
 			this.properties = unmodifiableMap(checkInstance(properties, "Properties cannot be null."));
 		}

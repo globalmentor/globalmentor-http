@@ -44,8 +44,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	private final HTTPClient client;
 
 	/** @return The client used to create a connection to this resource. */
-	protected HTTPClient getClient()
-	{
+	protected HTTPClient getClient() {
 		return client;
 	}
 
@@ -53,8 +52,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	private final PasswordAuthentication passwordAuthentication;
 
 	/** @return The preset password authentication, or <code>null</code> if this connection specifies no preset password authentication. */
-	protected PasswordAuthentication getPasswordAuthentication()
-	{
+	protected PasswordAuthentication getPasswordAuthentication() {
 		return passwordAuthentication;
 	}
 
@@ -62,8 +60,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	private boolean cached = true;
 
 	/** @return Whether cached properties are to be returned; the default is <code>true</code>. */
-	public boolean isCached()
-	{
+	public boolean isCached() {
 		return cached;
 	}
 
@@ -72,10 +69,8 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * cached values.
 	 * @param cached Whether cached properties are to be returned.
 	 */
-	public void setCached(final boolean cached)
-	{
-		if(this.cached != cached) //if the caching state is changing
-		{
+	public void setCached(final boolean cached) {
+		if(this.cached != cached) { //if the caching state is changing
 			this.cached = cached; //update the cache state
 		}
 	}
@@ -88,8 +83,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 			new PurgeOnWriteSoftValueHashMap<CacheKey, CachedExists>(), cacheLock);
 
 	/** Clears all information from the caches. This version clears all cached exists information. */
-	protected void clearCache()
-	{
+	protected void clearCache() {
 		cachedExistsMap.clear();
 	}
 
@@ -97,8 +91,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * Caches the given exists status for this resource.
 	 * @param exists The existence status.
 	 */
-	protected void cacheExists(final boolean exists)
-	{
+	protected void cacheExists(final boolean exists) {
 		cachedExistsMap.put(new CacheKey(getClient(), getURI()), new CachedExists(exists)); //cache the information
 	}
 
@@ -106,16 +99,14 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * Removes all cached information for a given resource. This version calls uncaches exists information.
 	 * @param resourceURI The URI of the resource for which cached information should be removed.
 	 */
-	protected void uncacheInfo(final URI resourceURI)
-	{
+	protected void uncacheInfo(final URI resourceURI) {
 		cachedExistsMap.remove(new CacheKey(getClient(), resourceURI)); //uncache the exists status for the given resource
 	}
 
 	/**
 	 * Removes all cached information for this resource. This is a convenience method that delegates to {@link #uncacheInfo(URI)}.
 	 */
-	protected void uncacheInfo()
-	{
+	protected void uncacheInfo() {
 		uncacheInfo(getURI()); //uncache the information for this resource
 	}
 
@@ -125,8 +116,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @throws IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
 	 * @throws NullPointerException if the given reference URI is <code>null</code>.
 	 */
-	public HTTPResource(final URI referenceURI) throws IllegalArgumentException, NullPointerException
-	{
+	public HTTPResource(final URI referenceURI) throws IllegalArgumentException, NullPointerException {
 		this(referenceURI, (PasswordAuthentication)null); //construct the resource with no preset password authentication
 	}
 
@@ -138,8 +128,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @throws IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
 	 * @throws NullPointerException if the given reference URI is <code>null</code>.
 	 */
-	public HTTPResource(final URI referenceURI, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException, NullPointerException
-	{
+	public HTTPResource(final URI referenceURI, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException, NullPointerException {
 		this(referenceURI, HTTPClient.getInstance(), passwordAuthentication); //construct the resource with the default client		
 	}
 
@@ -150,8 +139,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @throws IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
 	 * @throws NullPointerException if the given reference URI and/or client is <code>null</code>.
 	 */
-	public HTTPResource(final URI referenceURI, final HTTPClient client) throws IllegalArgumentException, NullPointerException
-	{
+	public HTTPResource(final URI referenceURI, final HTTPClient client) throws IllegalArgumentException, NullPointerException {
 		this(referenceURI, client, null); //construct the class with no preset password authentication
 	}
 
@@ -165,19 +153,15 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @throws NullPointerException if the given reference URI and/or client is <code>null</code>.
 	 */
 	public HTTPResource(final URI referenceURI, final HTTPClient client, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException,
-			NullPointerException
-	{
+			NullPointerException {
 		super(referenceURI); //construct the parent class
-		if(!referenceURI.isAbsolute()) //if the URI is not absolute
-		{
+		if(!referenceURI.isAbsolute()) { //if the URI is not absolute
 			throw new IllegalArgumentException("URI " + referenceURI + " is not absolute.");
 		}
-		if(referenceURI.getHost() == null) //if the URI has no host
-		{
+		if(referenceURI.getHost() == null) { //if the URI has no host
 			throw new IllegalArgumentException("URI " + referenceURI + " has no host specified.");
 		}
-		if(!isHTTPURI(referenceURI)) //if this isn't a HTTP or HTTPS resource
-		{
+		if(!isHTTPURI(referenceURI)) { //if this isn't a HTTP or HTTPS resource
 			throw new IllegalArgumentException("Invalid HTTP scheme " + referenceURI.getScheme());
 		}
 		this.client = checkInstance(client, "Client cannot be null."); //save the client
@@ -188,30 +172,21 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * Deletes the resource using the {@value HTTP#DELETE_METHOD} method.
 	 * @throws IOException if there was an error invoking the method.
 	 */
-	public void delete() throws IOException
-	{
+	public void delete() throws IOException {
 		final HTTPRequest request = new DefaultHTTPRequest(DELETE_METHOD, getURI()); //create a DELETE request
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //send the request and get the response
 		connection.readResponseBody(request, response); //ignore the response body
 		response.checkStatus(); //check the status of the response, throwing an exception if this is an error
-		if(isCached()) //if we're caching this resource
-		{
-			if(isCollectionURI(getURI())) //if this is a collection, we may have information cached for child resources
-			{
+		if(isCached()) { //if we're caching this resource
+			if(isCollectionURI(getURI())) { //if this is a collection, we may have information cached for child resources
 				clearCache(); //dump all our cache; this is a drastic measure, but we can't have cached information for children that no longer exist TODO improve to be more selective
-			}
-			else
-			//for non-collection resources
-			{
+			} else { //for non-collection resources
 				cacheLock.writeLock().lock(); //lock the cache for writing
-				try
-				{
+				try {
 					uncacheInfo(); //uncache our info for this resource
 					cacheExists(false); //indicate that the resource no longer exists
-				}
-				finally
-				{
+				} finally {
 					cacheLock.writeLock().unlock(); //always release the write lock
 				}
 			}
@@ -223,20 +198,16 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @return <code>true</code> if the resource is present on the server.
 	 * @throws IOException if there was an error invoking a method.
 	 */
-	public boolean exists() throws IOException
-	{
-		if(isCached()) //if we're caching values
-		{
+	public boolean exists() throws IOException {
+		if(isCached()) { //if we're caching values
 			final CacheKey cacheKey = new CacheKey(getClient(), getURI()); //create a new cache key
 			CachedExists cachedExists = cachedExistsMap.get(cacheKey); //get cached exists state from the map
-			if(cachedExists != null && !cachedExists.isStale()) //there is cached exists information that isn't stale
-			{
+			if(cachedExists != null && !cachedExists.isStale()) { //there is cached exists information that isn't stale
 				return cachedExists.exists(); //return the new exists information
 			}
 		}
 		final boolean exists = getExists(); //determine if the resource exists
-		if(isCached()) //if we are caching information
-		{
+		if(isCached()) { //if we are caching information
 			cachedExistsMap.put(new CacheKey(getClient(), getURI()), new CachedExists(exists)); //cache the exists status
 		}
 		return exists; //return the exists status
@@ -248,15 +219,13 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @return The latest determined existence status.
 	 * @throws IOException if there was an error invoking a method.
 	 */
-	protected boolean getExists() throws IOException
-	{
+	protected boolean getExists() throws IOException {
 		final HTTPRequest request = new DefaultHTTPRequest(HEAD_METHOD, getURI()); //create a HEAD request
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //get the response
 		connection.readResponseBody(request, response); //ignore the response body
 		if(response.getStatusCode() == SC_NOT_FOUND //404 Not Found
-				|| response.getStatusCode() == SC_GONE) //410 Gone
-		{
+				|| response.getStatusCode() == SC_GONE) { //410 Gone
 			return false; //show that the resource is not there
 		}
 		response.checkStatus(); //check the status of the response, throwing an exception if this is an error
@@ -268,37 +237,27 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @return An input stream to the server.
 	 * @throws IOException if there was an error invoking the method.
 	 */
-	public InputStream getInputStream() throws IOException
-	{
+	public InputStream getInputStream() throws IOException {
 		Boolean exists = null; //we'll see if we can determine existence
 		final HTTPRequest request = new DefaultHTTPRequest(GET_METHOD, getURI()); //create a GET request
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
-		try
-		{
+		try {
 			final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //get the response
-			try
-			{
+			try {
 				response.checkStatus(); //check the status of the response, throwing an exception if this is an error
 				exists = Boolean.TRUE; //if GET succeeds, the resource exists
-			}
-			catch(final HTTPNotFoundException notFoundException) //404 Not Found
-			{
+			} catch(final HTTPNotFoundException notFoundException) { //404 Not Found
 				exists = Boolean.FALSE; //show that the resource is not there
 				connection.readResponseBody(request, response); //skip the response body
 				throw notFoundException; //rethrow the exception
-			}
-			catch(final HTTPGoneException goneException) //410 Gone
-			{
+			} catch(final HTTPGoneException goneException) { //410 Gone
 				exists = Boolean.FALSE; //show that the resource is permanently not there
 				connection.readResponseBody(request, response); //skip the response body
 				throw goneException; //rethrow the exception
 			}
 			return connection.getResponseBodyInputStream(request, response); //get an input stream to the response body
-		}
-		finally
-		{
-			if(isCached() && exists != null) //if information is being cached and we know the latest existence state
-			{
+		} finally {
+			if(isCached() && exists != null) { //if information is being cached and we know the latest existence state
 				cacheExists(exists.booleanValue()); //update the exists status
 			}
 		}
@@ -310,27 +269,21 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @throws IOException if there was an error invoking the method.
 	 * @see #cachedExists
 	 */
-	public byte[] get() throws IOException
-	{
+	public byte[] get() throws IOException {
 		Boolean exists = null; //we'll see if we can determine existence
 		final HTTPRequest request = new DefaultHTTPRequest(GET_METHOD, getURI()); //create a GET request
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
-		try
-		{
+		try {
 			final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //get the response
 			if(response.getStatusCode() == SC_NOT_FOUND //404 Not Found
-					|| response.getStatusCode() == SC_GONE) //410 Gone
-			{
+					|| response.getStatusCode() == SC_GONE) { //410 Gone
 				exists = Boolean.FALSE; //show that the resource is not there
 			}
 			response.checkStatus(); //check the status of the response, throwing an exception if this is an error
 			exists = Boolean.TRUE; //if GET succeeds, the resource exists
 			return connection.readResponseBody(request, response); //read and return the response body
-		}
-		finally
-		{
-			if(isCached() && exists != null) //if information is being cached and we know the latest existence state
-			{
+		} finally {
+			if(isCached() && exists != null) { //if information is being cached and we know the latest existence state
 				cacheExists(exists.booleanValue()); //update the exists status
 			}
 		}
@@ -341,27 +294,21 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @throws IOException if there was an error invoking the method.
 	 * @see #cachedExists
 	 */
-	public void head() throws IOException
-	{
+	public void head() throws IOException {
 		Boolean exists = null; //we'll see if we can determine existence
 		final HTTPRequest request = new DefaultHTTPRequest(HEAD_METHOD, getURI()); //create a HEAD request
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
-		try
-		{
+		try {
 			final HTTPResponse response = connection.sendRequest(request, Bytes.NO_BYTES); //get the response
 			connection.readResponseBody(request, response); //ignore the response body
 			if(response.getStatusCode() == SC_NOT_FOUND //404 Not Found
-					|| response.getStatusCode() == SC_GONE) //410 Gone
-			{
+					|| response.getStatusCode() == SC_GONE) { //410 Gone
 				exists = Boolean.FALSE; //show that the resource is not there
 			}
 			response.checkStatus(); //check the status of the response, throwing an exception if this is an error
 			exists = Boolean.TRUE; //if no exceptions were thrown, assume the resource exists
-		}
-		finally
-		{
-			if(isCached() && exists != null) //if information is being cached and we know the latest existence state
-			{
+		} finally {
+			if(isCached() && exists != null) { //if information is being cached and we know the latest existence state
 				cacheExists(exists.booleanValue()); //update the exists status
 			}
 		}
@@ -372,23 +319,18 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @param content The bytes to store at the resource location.
 	 * @throws IOException if there was an error invoking the method.
 	 */
-	public void put(final byte[] content) throws IOException
-	{
+	public void put(final byte[] content) throws IOException {
 		final HTTPRequest request = new DefaultHTTPRequest(PUT_METHOD, getURI()); //create a PUT request
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final HTTPResponse response = connection.sendRequest(request, content); //get the response
 		connection.readResponseBody(request, response); //ignore the response body
 		response.checkStatus(); //check the status of the response, throwing an exception if this is an error
-		if(isCached()) //if we're caching this resource
-		{
+		if(isCached()) { //if we're caching this resource
 			cacheLock.writeLock().lock(); //lock the cache for writing
-			try
-			{
+			try {
 				uncacheInfo(); //uncache our info for this resource; the new content could change properties such as content-length
 				cacheExists(true); //we just put content with no errors, so it should now exist
-			}
-			finally
-			{
+			} finally {
 				cacheLock.writeLock().unlock(); //always release the write lock
 			}
 		}
@@ -399,21 +341,16 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @return An output stream to the resource.
 	 * @throws IOException if there was an error invoking the method.
 	 */
-	public OutputStream getOutputStream() throws IOException
-	{
+	public OutputStream getOutputStream() throws IOException {
 		final HTTPRequest request = new DefaultHTTPRequest(PUT_METHOD, getURI()); //create a PUT request
 		final HTTPClientTCPConnection connection = getConnection(); //get a connection to the server
 		final OutputStream outputStream = connection.writeRequest(request); //write the request to the server
-		if(isCached()) //if we're caching this resource
-		{
+		if(isCached()) { //if we're caching this resource
 			cacheLock.writeLock().lock(); //lock the cache for writing
-			try
-			{
+			try {
 				uncacheInfo(); //uncache our info for this resource; the new content could change properties such as content-length
 				cacheExists(true); //just writing the PUT request will probably create something, so we assume the resource exists, even if we later don't succeed in writing all the bytes
-			}
-			finally
-			{
+			} finally {
 				cacheLock.writeLock().unlock(); //always release the write lock
 			}
 		}
@@ -426,15 +363,11 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @return The object read from the resource.
 	 * @throws IOException if there is an error reading the data.
 	 */
-	public <T> T get(final IO<T> io) throws IOException
-	{
+	public <T> T get(final IO<T> io) throws IOException {
 		final InputStream inputStream = getInputStream(); //get an input stream to the resource
-		try
-		{
+		try {
 			return io.read(inputStream, getURI()); //read the object, using the resource reference URI as the base URI
-		}
-		finally
-		{
+		} finally {
 			inputStream.close(); //always close the input stream
 		}
 	}
@@ -445,15 +378,11 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @param io The I/O support for writing the object.
 	 * @throws IOException if there is an error writing the data.
 	 */
-	public <T> void put(final T object, final IO<T> io) throws IOException
-	{
+	public <T> void put(final T object, final IO<T> io) throws IOException {
 		final OutputStream outputStream = getOutputStream();//get an output stream to the resource
-		try
-		{
+		try {
 			io.write(outputStream, getURI(), object); //write the object, using the resource reference URI as the base URI
-		}
-		finally
-		{
+		} finally {
 			outputStream.close(); //always close the output stream
 		}
 	}
@@ -465,10 +394,8 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * Gets a connection to the server.
 	 * @return A connection to the server.
 	 */
-	protected HTTPClientTCPConnection getConnection()
-	{
-		if(connection == null) //if no connection has been created
-		{
+	protected HTTPClientTCPConnection getConnection() {
+		if(connection == null) { //if no connection has been created
 			final URI referenceURI = getURI(); //get the reference URI
 			final boolean secure = HTTP.HTTPS_URI_SCHEME.equals(referenceURI.getScheme()); //see if this connection should be secure
 			connection = getClient().createConnection(getHost(getURI()), getPasswordAuthentication(), secure); //get a connection to the URI
@@ -483,8 +410,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @throws IOException if there was an error sending the request or receiving the response.
 	 */
 	/*TODO del if not needed
-		protected HTTPResponse sendRequest(final HTTPRequest request) throws IOException	//TODO add connection persistence
-		{
+		protected HTTPResponse sendRequest(final HTTPRequest request) throws IOException {	//TODO add connection persistence
 			final URI referenceURI=getURI();	//get the reference URI
 			final boolean secure=HTTP.HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
 			final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
@@ -506,8 +432,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @throws IOException if there was an error sending the request or receiving the response.
 	 */
 	/*TODO bring back if needed
-		protected HTTPResponse sendRequest(final HTTPRequest request, final Authenticable authenticator) throws IOException	//TODO add connection peristence
-		{
+		protected HTTPResponse sendRequest(final HTTPRequest request, final Authenticable authenticator) throws IOException {	//TODO add connection peristence
 			final URI referenceURI=getURI();	//get the reference URI
 			final boolean secure=HTTP.HTTPS_SCHEME.equals(referenceURI.getScheme());	//see if this connection should be secure
 			final HTTPClientTCPConnection connection=getClient().createConnection(getHost(getURI()), getPasswordAuthentication(), secure);	//get a connection to the URI
@@ -526,8 +451,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * Creates an output stream that, after being closed, reads the HTTP response and throws an error if appropriate.
 	 * @author Garret Wilson
 	 */
-	protected class ReadResponseOutputStreamDecorator extends OutputStreamDecorator<OutputStream>
-	{
+	protected class ReadResponseOutputStreamDecorator extends OutputStreamDecorator<OutputStream> {
 
 		private final HTTPClientTCPConnection connection;
 		private final HTTPRequest request;
@@ -539,8 +463,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		 * @param outputStream The output stream to decorate.
 		 * @throws NullPointerException if the given connection, request, and/or stream is <code>null</code>.
 		 */
-		public ReadResponseOutputStreamDecorator(final HTTPClientTCPConnection connection, final HTTPRequest request, final OutputStream outputStream)
-		{
+		public ReadResponseOutputStreamDecorator(final HTTPClientTCPConnection connection, final HTTPRequest request, final OutputStream outputStream) {
 			super(outputStream); //construct the parent class
 			this.connection = checkInstance(connection, "Connection cannot be null.");
 			this.request = checkInstance(request, "Request cannot be null.");
@@ -550,8 +473,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		 * Called after the stream is successfully closed. This version reads the HTTP response and throws an error if the response is an error condition.
 		 * @throws IOException if an I/O error occurs.
 		 */
-		protected void afterClose() throws IOException
-		{
+		protected void afterClose() throws IOException {
 			super.afterClose();
 			final HTTPResponse response = connection.readResponse(request); //read the response
 			connection.readResponseBody(request, response); //ignore the response body
@@ -564,8 +486,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * A key for cached resource information.
 	 * @author Garret Wilson
 	 */
-	protected static class CacheKey extends AbstractHashObject
-	{
+	protected static class CacheKey extends AbstractHashObject {
 
 		/**
 		 * HTTP client and resource URI constructor.
@@ -573,8 +494,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		 * @param resourceURI The resource URI.
 		 * @throws NullPointerException if the given HTTP client and/or resource URI is <code>null</code>.
 		 */
-		public CacheKey(final HTTPClient httpClient, final URI resourceURI)
-		{
+		public CacheKey(final HTTPClient httpClient, final URI resourceURI) {
 			super(checkInstance(httpClient, "HTTP client cannot be null."), checkInstance(resourceURI, "Resource URI cannot be null."));
 		}
 	}
@@ -583,8 +503,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * Abstract class for information stored in an HTTP resource cache.
 	 * @author Garret Wilson
 	 */
-	protected static class AbstractCachedInfo
-	{
+	protected static class AbstractCachedInfo {
 
 		/** The length of time, in milliseconds, to keep cached information. */
 		private final static long CACHE_EXPIRATION_MILLISECONDS = 10000;
@@ -593,20 +512,17 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		private final long createdTime;
 
 		/** @return The time the cached information was created. */
-		public long getCreatedTime()
-		{
+		public long getCreatedTime() {
 			return createdTime;
 		}
 
 		/** @return <code>true</code> if the cached information has expired. */
-		public boolean isStale()
-		{
+		public boolean isStale() {
 			return System.currentTimeMillis() - getCreatedTime() > CACHE_EXPIRATION_MILLISECONDS;
 		}
 
 		/** Default constructor. */
-		public AbstractCachedInfo()
-		{
+		public AbstractCachedInfo() {
 			createdTime = System.currentTimeMillis(); //record the time this information was created
 		}
 	}
@@ -615,15 +531,13 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * Existence information stored in an HTTP resource cache.
 	 * @author Garret Wilson
 	 */
-	protected static class CachedExists extends AbstractCachedInfo
-	{
+	protected static class CachedExists extends AbstractCachedInfo {
 
 		/** The cached record of whether the resource exists. */
 		private final boolean exists;
 
 		/** @return The cached record of whether the resource exists. */
-		public boolean exists()
-		{
+		public boolean exists() {
 			return exists;
 		}
 
@@ -631,8 +545,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		 * Constructor.
 		 * @param exists Whether the resource is currently known to exist.
 		 */
-		public CachedExists(final boolean exists)
-		{
+		public CachedExists(final boolean exists) {
 			this.exists = exists; //save the cached existence state
 		}
 	}

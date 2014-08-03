@@ -18,25 +18,23 @@ package com.globalmentor.net.http.webdav;
 
 import com.globalmentor.model.ObjectDecorator;
 
-/**A literal WebDAV value of a resource property.
-The literal value of the resource can be returned using {@link #toString()} or {@link #getText()}.
-@author Garret Wilson
-*/
-public class WebDAVLiteralPropertyValue extends ObjectDecorator<String> implements WebDAVPropertyValue
-{
+/**
+ * A literal WebDAV value of a resource property. The literal value of the resource can be returned using {@link #toString()} or {@link #getText()}.
+ * @author Garret Wilson
+ */
+public class WebDAVLiteralPropertyValue extends ObjectDecorator<String> implements WebDAVPropertyValue {
 
-	/**String literal constructor.
-	@param literal The literal string this value represents.
-	@throws NullPointerException if the given literal is <code>null</code>.
-	*/
-	public WebDAVLiteralPropertyValue(final String literal)
-	{
-		super(literal);	//construct the parent class
+	/**
+	 * String literal constructor.
+	 * @param literal The literal string this value represents.
+	 * @throws NullPointerException if the given literal is <code>null</code>.
+	 */
+	public WebDAVLiteralPropertyValue(final String literal) {
+		super(literal); //construct the parent class
 	}
 
-	/**@return A non-<code>null</code> literal representing plain text contained in this WebDAV value, which may be the empty string.*/
-	public String getText()
-	{
-		return getObject();	//return the string literal itself
+	/** @return A non-<code>null</code> literal representing plain text contained in this WebDAV value, which may be the empty string. */
+	public String getText() {
+		return getObject(); //return the string literal itself
 	}
 }

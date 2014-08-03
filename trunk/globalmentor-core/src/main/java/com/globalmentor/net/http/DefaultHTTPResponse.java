@@ -30,15 +30,13 @@ import com.globalmentor.text.SyntaxException;
  * "Hypertext Transfer Protocol -- HTTP/1.1".
  * @author Garret Wilson
  */
-public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResponse
-{
+public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResponse {
 
 	/** The status code. */
 	private final int statusCode;
 
 	/** @return The status code. */
-	public int getStatusCode()
-	{
+	public int getStatusCode() {
 		return statusCode;
 	}
 
@@ -46,8 +44,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	private final String reasonPhrase;
 
 	/** @return The provided textual representation of the status code. */
-	public String getReasonPhrase()
-	{
+	public String getReasonPhrase() {
 		return reasonPhrase;
 	}
 
@@ -57,8 +54,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	 * @param reasonPhrase The provided textual representation of the status code.
 	 * @see #DEFAULT_VERSION
 	 */
-	public DefaultHTTPResponse(final int statusCode, final String reasonPhrase)
-	{
+	public DefaultHTTPResponse(final int statusCode, final String reasonPhrase) {
 		this(DEFAULT_VERSION, statusCode, reasonPhrase); //construct the class with the default version
 	}
 
@@ -68,8 +64,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	 * @param statusCode The status code.
 	 * @param reasonPhrase The provided textual representation of the status code.
 	 */
-	public DefaultHTTPResponse(final HTTPVersion version, final int statusCode, final String reasonPhrase)
-	{
+	public DefaultHTTPResponse(final HTTPVersion version, final int statusCode, final String reasonPhrase) {
 		super(version); //construct the parent class
 		this.statusCode = statusCode;
 		this.reasonPhrase = reasonPhrase;
@@ -79,8 +74,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	 * @return The class of the response.
 	 * @see #getResponseCode()
 	 */
-	public HTTPResponseClass getResponseClass()
-	{
+	public HTTPResponseClass getResponseClass() {
 		return HTTPResponseClass.fromStatusCode(getStatusCode()); //get the response class from the status code
 	}
 
@@ -121,27 +115,19 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	 * @see #getStatusCode()
 	 * @see #getReasonPhrase()
 	 */
-	public void checkStatus() throws HTTPException
-	{
+	public void checkStatus() throws HTTPException {
 		//TODO del if not needed		checkStatus(getStatusCode(), getReasonPhrase());	//check the status code and reason phrase
-		try
-		{
+		try {
 			final int statusCode = getStatusCode(); //get the status code
-			switch(statusCode)
-			//see which response code this is
-			{
+			switch(statusCode) { //see which response code this is
 				case SC_MOVED_PERMANENTLY: //301 Moved Permanently
 				{
 					final String location = getHeader(LOCATION_HEADER); //get the location header, if any
 					URI locationURI = null; //we'll determine the location URI
-					if(location != null) //if a location was given
-					{
-						try
-						{
+					if(location != null) { //if a location was given
+						try {
 							locationURI = new URI(location); //parse the location
-						}
-						catch(final URISyntaxException uriSyntaxException) //if the location wasn't in the correct format
-						{
+						} catch(final URISyntaxException uriSyntaxException) { //if the location wasn't in the correct format
 							Log.warn(uriSyntaxException);
 						}
 					}
@@ -151,14 +137,10 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 				{
 					final String location = getHeader(LOCATION_HEADER); //get the location header, if any
 					URI locationURI = null; //we'll determine the location URI
-					if(location != null) //if a location was given
-					{
-						try
-						{
+					if(location != null) { //if a location was given
+						try {
 							locationURI = new URI(location); //parse the location
-						}
-						catch(final URISyntaxException uriSyntaxException) //if the location wasn't in the correct format
-						{
+						} catch(final URISyntaxException uriSyntaxException) { //if the location wasn't in the correct format
 							Log.warn(uriSyntaxException);
 						}
 					}
@@ -187,15 +169,12 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 								   method.
 					*/
 				default: //if we don't recognize the status
-					if(getResponseClass().isError()) //if the status is an error
-					{
+					if(getResponseClass().isError()) { //if the status is an error
 						throw new HTTPException(statusCode, getReasonPhrase()); //create a generic exception class TODO create a specific client or server error exception
 					}
 
 			}
-		}
-		catch(final SyntaxException syntaxException)
-		{
+		} catch(final SyntaxException syntaxException) {
 			//TODO decide what to do here
 		}
 	}
@@ -209,8 +188,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	/*TODO del if not needed
 		public static void checkStatus(final int statusCode, final String reasonPhrase) throws HTTPException
 		{
-			switch(statusCode)	//see which response code this is
-			{
+			switch(statusCode) {	//see which response code this is
 				case SC_UNAUTHORIZED:	//401 Forbidden
 					throw new HTTPUnauthorizedException(get);
 				case SC_FORBIDDEN:	//403 Forbidden
@@ -242,8 +220,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	 * @throws IllegalArgumentException if the authorization information is not supported.
 	 * @see HTTP#WWW_AUTHENTICATE_HEADER
 	 */
-	public AuthenticateChallenge getWWWAuthenticate() throws SyntaxException, IllegalArgumentException
-	{
+	public AuthenticateChallenge getWWWAuthenticate() throws SyntaxException, IllegalArgumentException {
 		final String authenticateHeader = getHeader(WWW_AUTHENTICATE_HEADER); //get the authenticate information
 		return authenticateHeader != null ? parseWWWAuthenticateHeader(authenticateHeader) : null; //parse the authenticate header, if present
 	}
@@ -253,8 +230,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	 * @param challenge The authenticate challenge to issue to the client.
 	 * @see HTTP#WWW_AUTHENTICATE_HEADER
 	 */
-	public void setWWWAuthenticate(final AuthenticateChallenge challenge)
-	{
+	public void setWWWAuthenticate(final AuthenticateChallenge challenge) {
 		setHeader(WWW_AUTHENTICATE_HEADER, formatWWWAuthenticateHeader(new StringBuilder(), challenge).toString()); //set the WWW-Authenticate header
 	}
 

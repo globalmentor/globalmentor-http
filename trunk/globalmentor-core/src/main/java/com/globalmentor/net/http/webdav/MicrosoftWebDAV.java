@@ -23,8 +23,7 @@ import java.net.URI;
  * @author Garret Wilson
  * @see <a href="http://msdn.microsoft.com/en-us/library/cc250176.aspx">WebDAV Microsoft Extensions Server Details: Server Properties</a>
  */
-public class MicrosoftWebDAV
-{
+public class MicrosoftWebDAV {
 
 	/** The URI to the Microsoft property namespace. */
 	public final static URI MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI = URI.create("urn:schemas-microsoft-com:");

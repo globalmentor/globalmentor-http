@@ -30,13 +30,11 @@ import com.globalmentor.test.AbstractTest;
  * Tests of a WebDAV resource.
  * @author Garret Wilson
  */
-public class WebDAVResourceTest extends AbstractTest
-{
+public class WebDAVResourceTest extends AbstractTest {
 
 	@Test
 	@Ignore
-	public final void testPROPFIND() throws IOException
-	{
+	public final void testPROPFIND() throws IOException {
 		final URI resourceURI = URI.create("https://dav.globalmentor.com/public/");
 		final WebDAVResource webDAVResource = new WebDAVResource(resourceURI);
 		final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> propertiesList = webDAVResource.propFind(Depth.ONE);

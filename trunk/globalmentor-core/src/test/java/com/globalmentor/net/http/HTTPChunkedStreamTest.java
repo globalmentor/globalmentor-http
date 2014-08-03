@@ -26,23 +26,22 @@ import static junit.framework.Assert.*;
 
 import org.junit.Test;
 
-/**Tests for streams processing HTTP chunked encoding.
-@author Garret Wilson
-*/
-public class HTTPChunkedStreamTest
-{
+/**
+ * Tests for streams processing HTTP chunked encoding.
+ * @author Garret Wilson
+ */
+public class HTTPChunkedStreamTest {
 
-	/**Tests that two HTTP chunked streams can transfer data between each other.*/
+	/** Tests that two HTTP chunked streams can transfer data between each other. */
 	@Test
-	public void testHTTPChunkedRoundTrip() throws IOException
-	{
-		final byte[] testData=StreamsTest.generateSequentialTestData(HTTPChunkedOutputStream.DEFAULT_CHUNK_SIZE*5/2);	//use a buffer size that tests around two and a half chunks
-		final ByteArrayOutputStream temp=new ByteArrayOutputStream();
-		final OutputStream outputStream=new HTTPChunkedOutputStream(temp);	//write the test data to a temporary buffer chunk-encoded
+	public void testHTTPChunkedRoundTrip() throws IOException {
+		final byte[] testData = StreamsTest.generateSequentialTestData(HTTPChunkedOutputStream.DEFAULT_CHUNK_SIZE * 5 / 2); //use a buffer size that tests around two and a half chunks
+		final ByteArrayOutputStream temp = new ByteArrayOutputStream();
+		final OutputStream outputStream = new HTTPChunkedOutputStream(temp); //write the test data to a temporary buffer chunk-encoded
 		outputStream.write(testData);
 		outputStream.close();
-		final InputStream inputStream=new HTTPChunkedInputStream(new ByteArrayInputStream(temp.toByteArray()));	//read the chunked data back back out
-		final ByteArrayOutputStream copy=new ByteArrayOutputStream();
+		final InputStream inputStream = new HTTPChunkedInputStream(new ByteArrayInputStream(temp.toByteArray())); //read the chunked data back back out
+		final ByteArrayOutputStream copy = new ByteArrayOutputStream();
 		Streams.copy(inputStream, copy);
 		inputStream.close();
 		assertTrue("HTTP chunked output stream did not correctly write data.", Arrays.equals(testData, copy.toByteArray()));
