@@ -25,37 +25,37 @@ package com.globalmentor.net.http;
 public class DigestAuthentication {
 
 	/** The parameter for digest URI. */
-	public final static String DIGEST_URI_PARAMETER = "uri";
+	public static final String DIGEST_URI_PARAMETER = "uri";
 	/** The parameter for the cnonce. */
-	public final static String CNONCE_PARAMETER = "cnonce";
+	public static final String CNONCE_PARAMETER = "cnonce";
 	/** The parameter for domain. */
-	public final static String DOMAIN_PARAMETER = "domain";
+	public static final String DOMAIN_PARAMETER = "domain";
 	/** The parameter for the nonce. */
-	public final static String NONCE_PARAMETER = "nonce";
+	public static final String NONCE_PARAMETER = "nonce";
 	/** The parameter for the nonce count. */
-	public final static String NONCE_COUNT_PARAMETER = "nc";
+	public static final String NONCE_COUNT_PARAMETER = "nc";
 	/** The length of the nonce count hex string. */
-	public final static int NONCE_COUNT_LENGTH = 8;
+	public static final int NONCE_COUNT_LENGTH = 8;
 	/** The parameter for opaque. */
-	public final static String OPAQUE_PARAMETER = "opaque";
+	public static final String OPAQUE_PARAMETER = "opaque";
 	/** The parameter for stale. */
-	public final static String STALE_PARAMETER = "stale";
+	public static final String STALE_PARAMETER = "stale";
 	/** The parameter for algorithm. */
-	public final static String ALGORITHM_PARAMETER = "algorithm";
+	public static final String ALGORITHM_PARAMETER = "algorithm";
 	/** The parameter for quality of protection. */
-	public final static String QOP_PARAMETER = "qop";
+	public static final String QOP_PARAMETER = "qop";
 	/** Authentication quality of protection. */
-	public final static String AUTH_QOP = "auth";
+	public static final String AUTH_QOP = "auth";
 	/** Authentication with integerity protection quality of protection. */
-	public final static String AUTH_INT_QOP = "auth-int";
+	public static final String AUTH_INT_QOP = "auth-int";
 	/** The parameter for response. */
-	public final static String RESPONSE_PARAMETER = "response";
+	public static final String RESPONSE_PARAMETER = "response";
 	/** The parameter for username. */
-	public final static String USERNAME_PARAMETER = "username";
+	public static final String USERNAME_PARAMETER = "username";
 
 	/** The delimiter used when concatenating multiple strings before hashing. */
-	public final static char DIGEST_DELIMITER = ':';
+	public static final char DIGEST_DELIMITER = ':';
 	/** The characters of the delimiter used when concatenating multiple strings before hashing. */
-	public final static char[] DIGEST_DELIMITER_CHARS = new char[] { DIGEST_DELIMITER };
+	public static final char[] DIGEST_DELIMITER_CHARS = new char[] { DIGEST_DELIMITER };
 
 }

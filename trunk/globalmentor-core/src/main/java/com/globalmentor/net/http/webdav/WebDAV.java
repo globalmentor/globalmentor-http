@@ -38,98 +38,98 @@ import org.w3c.dom.NodeList;
 public class WebDAV {
 
 	/** The WebDAV COPY method. */
-	public final static String COPY_METHOD = "COPY";
+	public static final String COPY_METHOD = "COPY";
 	/** The WebDAV LOCk method. */
-	public final static String LOCK_METHOD = "LOCK";
+	public static final String LOCK_METHOD = "LOCK";
 	/** The WebDAV MKCOL method. */
-	public final static String MKCOL_METHOD = "MKCOL";
+	public static final String MKCOL_METHOD = "MKCOL";
 	/** The WebDAV MOVE method. */
-	public final static String MOVE_METHOD = "MOVE";
+	public static final String MOVE_METHOD = "MOVE";
 	/** The WebDAV PROPFIND method. */
-	public final static String PROPFIND_METHOD = "PROPFIND";
+	public static final String PROPFIND_METHOD = "PROPFIND";
 	/** The WebDAV PROPPATCH method. */
-	public final static String PROPPATCH_METHOD = "PROPPATCH";
+	public static final String PROPPATCH_METHOD = "PROPPATCH";
 	/** The WebDAV UNLOCK method. */
-	public final static String UNLOCK_METHOD = "UNLOCK";
+	public static final String UNLOCK_METHOD = "UNLOCK";
 
 	/** The recommended prefix to the WebDAV namespace. */
-	public final static String WEBDAV_NAMESPACE_PREFIX = "D";
+	public static final String WEBDAV_NAMESPACE_PREFIX = "D";
 	/** The WebDAV namespace identifier, which is not a true URI. */
-	public final static String WEBDAV_NAMESPACE = "DAV:";
+	public static final String WEBDAV_NAMESPACE = "DAV:";
 
 	/** The header indicating the WevDAV versions supported. */
-	public final static String DAV_HEADER = "DAV";
+	public static final String DAV_HEADER = "DAV";
 	/** The header indicating the depth of property discovery. */
-	public final static String DEPTH_HEADER = "Depth";
+	public static final String DEPTH_HEADER = "Depth";
 	/** The depth header value indicating zero depth. */
-	public final static String DEPTH_0 = "0";
+	public static final String DEPTH_0 = "0";
 	/** The depth header value indicating single depth. */
-	public final static String DEPTH_1 = "1";
+	public static final String DEPTH_1 = "1";
 	/** The depth header value indicating an infinite depth. */
-	public final static String DEPTH_INFINITY = "infinity";
+	public static final String DEPTH_INFINITY = "infinity";
 	/** The header indicating the destination of COPY or MOVE. */
-	public final static String DESTINATION_HEADER = "Destination";
+	public static final String DESTINATION_HEADER = "Destination";
 	/** The header indicating preferred Microsoft authoring. */
-	public final static String MS_AUTHOR_VIA_HEADER = "MS-Author-Via";
+	public static final String MS_AUTHOR_VIA_HEADER = "MS-Author-Via";
 	/** The header indicating Microsoft authoring via DAV. */
-	public final static String MS_AUTHOR_VIA_DAV = "DAV";
+	public static final String MS_AUTHOR_VIA_DAV = "DAV";
 	/** The header indicating whether an existing resource should be overwritten. */
-	public final static String OVERWRITE_HEADER = "Overwrite";
+	public static final String OVERWRITE_HEADER = "Overwrite";
 	/** The overwrite header value indicating false. */
-	public final static String OVERWRITE_FALSE = "F";
+	public static final String OVERWRITE_FALSE = "F";
 	/** The overwrite header value indicating true. */
-	public final static String OVERWRITE_TRUE = "T";
+	public static final String OVERWRITE_TRUE = "T";
 
 	//property names
-	public final static WebDAVPropertyName CREATION_DATE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "creationdate");
-	public final static WebDAVPropertyName DISPLAY_NAME_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "displayname");
-	public final static WebDAVPropertyName GET_CONTENT_LANGUAGE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontentlanguage");
-	public final static WebDAVPropertyName GET_CONTENT_LENGTH_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontentlength");
-	public final static WebDAVPropertyName GET_CONTENT_TYPE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontenttype");
-	public final static WebDAVPropertyName GET_ETAG_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getetag");
-	public final static WebDAVPropertyName GET_LAST_MODIFIED_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getlastmodified");
-	public final static WebDAVPropertyName LOCK_DISCOVERY_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "lockdiscovery");
-	public final static WebDAVPropertyName RESOURCE_TYPE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "resourcetype");
+	public static final WebDAVPropertyName CREATION_DATE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "creationdate");
+	public static final WebDAVPropertyName DISPLAY_NAME_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "displayname");
+	public static final WebDAVPropertyName GET_CONTENT_LANGUAGE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontentlanguage");
+	public static final WebDAVPropertyName GET_CONTENT_LENGTH_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontentlength");
+	public static final WebDAVPropertyName GET_CONTENT_TYPE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontenttype");
+	public static final WebDAVPropertyName GET_ETAG_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getetag");
+	public static final WebDAVPropertyName GET_LAST_MODIFIED_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getlastmodified");
+	public static final WebDAVPropertyName LOCK_DISCOVERY_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "lockdiscovery");
+	public static final WebDAVPropertyName RESOURCE_TYPE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "resourcetype");
 
 	/** The constant property list indicating all properties. */
-	public final static DecoratorIDedMappedList<URI, WebDAVPropertyName> ALL_PROPERTIES = new DecoratorIDedMappedList<URI, WebDAVPropertyName>(
+	public static final DecoratorIDedMappedList<URI, WebDAVPropertyName> ALL_PROPERTIES = new DecoratorIDedMappedList<URI, WebDAVPropertyName>(
 			new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
 
 	/** The constant property list indicating all property names. */
-	public final static DecoratorIDedMappedList<URI, WebDAVPropertyName> PROPERTY_NAMES = new DecoratorIDedMappedList<URI, WebDAVPropertyName>(
+	public static final DecoratorIDedMappedList<URI, WebDAVPropertyName> PROPERTY_NAMES = new DecoratorIDedMappedList<URI, WebDAVPropertyName>(
 			new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
 
 	//resource type names
-	public final static String COLLECTION_TYPE_NAME = "collection";
+	public static final String COLLECTION_TYPE_NAME = "collection";
 
 	//resource types
-	public final static URI COLLECTION_TYPE = createPropertyURI(WEBDAV_NAMESPACE, COLLECTION_TYPE_NAME);
+	public static final URI COLLECTION_TYPE = createPropertyURI(WEBDAV_NAMESPACE, COLLECTION_TYPE_NAME);
 
 	//XML names
 	/** The all properties element name. */
-	public final static String ELEMENT_ALLPROP = "allprop";
+	public static final String ELEMENT_ALLPROP = "allprop";
 	/** The href element name. */
-	public final static String ELEMENT_HREF = "href";
+	public static final String ELEMENT_HREF = "href";
 	/** The multiple status container element name. */
-	public final static String ELEMENT_MULTISTATUS = "multistatus";
+	public static final String ELEMENT_MULTISTATUS = "multistatus";
 	/** The property element name. */
-	public final static String ELEMENT_PROP = "prop";
+	public static final String ELEMENT_PROP = "prop";
 	/** The property name element name. */
-	public final static String ELEMENT_PROPNAME = "propname";
+	public static final String ELEMENT_PROPNAME = "propname";
 	/** The property find element name. */
-	public final static String ELEMENT_PROPFIND = "propfind";
+	public static final String ELEMENT_PROPFIND = "propfind";
 	/** The property status stat element name. */
-	public final static String ELEMENT_PROPSTAT = "propstat";
+	public static final String ELEMENT_PROPSTAT = "propstat";
 	/** The property update element name. */
-	public final static String ELEMENT_PROPERTYUPDATE = "propertyupdate";
+	public static final String ELEMENT_PROPERTYUPDATE = "propertyupdate";
 	/** The property remove element name. */
-	public final static String ELEMENT_REMOVE = "remove";
+	public static final String ELEMENT_REMOVE = "remove";
 	/** The response element name. */
-	public final static String ELEMENT_RESPONSE = "response";
+	public static final String ELEMENT_RESPONSE = "response";
 	/** The property set element name. */
-	public final static String ELEMENT_SET = "set";
+	public static final String ELEMENT_SET = "set";
 	/** The status element name. */
-	public final static String ELEMENT_STATUS = "status";
+	public static final String ELEMENT_STATUS = "status";
 
 	/**
 	 * Status code (207) indicating that the response requires providing status for multiple independent operations.

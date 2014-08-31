@@ -43,7 +43,7 @@ import static com.globalmentor.net.http.HTTP.*;
 public class HTTPChunkedOutputStream extends OutputStream {
 
 	/** The default size of chunks if none is specified. */
-	public final static int DEFAULT_CHUNK_SIZE = 64 * 1024;
+	public static final int DEFAULT_CHUNK_SIZE = 64 * 1024;
 
 	/** The output stream being decorated. */
 	private OutputStream outputStream;

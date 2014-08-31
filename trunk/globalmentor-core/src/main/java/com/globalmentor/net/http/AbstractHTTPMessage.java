@@ -39,7 +39,7 @@ import com.globalmentor.util.*;
 public class AbstractHTTPMessage implements HTTPMessage {
 
 	/** The default HTTP version supported, 1.1. */
-	protected final static HTTPVersion DEFAULT_VERSION = new HTTPVersion(1, 1);
+	protected static final HTTPVersion DEFAULT_VERSION = new HTTPVersion(1, 1);
 
 	/** A convenience constant signifying no header values. */
 	protected final String[] NO_HEADERS = new String[0];

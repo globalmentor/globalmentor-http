@@ -76,10 +76,10 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	}
 
 	/** The lock controlling access to the caches. */
-	protected final static ReadWriteLock cacheLock = new ReentrantReadWriteLock();
+	protected static final ReadWriteLock cacheLock = new ReentrantReadWriteLock();
 
 	/** The soft value map containing cached exists information. This map is made thread-safe through the use of {@link #cacheLock}. */
-	protected final static Map<CacheKey, CachedExists> cachedExistsMap = new DecoratorReadWriteLockMap<CacheKey, CachedExists>(
+	protected static final Map<CacheKey, CachedExists> cachedExistsMap = new DecoratorReadWriteLockMap<CacheKey, CachedExists>(
 			new PurgeOnWriteSoftValueHashMap<CacheKey, CachedExists>(), cacheLock);
 
 	/** Clears all information from the caches. This version clears all cached exists information. */
@@ -506,7 +506,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	protected static class AbstractCachedInfo {
 
 		/** The length of time, in milliseconds, to keep cached information. */
-		private final static long CACHE_EXPIRATION_MILLISECONDS = 10000;
+		private static final long CACHE_EXPIRATION_MILLISECONDS = 10000;
 
 		/** The time the cached information was created. */
 		private final long createdTime;

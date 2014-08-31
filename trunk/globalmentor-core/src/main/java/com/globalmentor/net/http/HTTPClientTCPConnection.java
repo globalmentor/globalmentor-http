@@ -76,10 +76,10 @@ import org.xml.sax.SAXException;
 public class HTTPClientTCPConnection {
 
 	/** The number of times to try a request if there is an error connecting. */
-	private final static int MAX_REQUEST_TRIES = 5;
+	private static final int MAX_REQUEST_TRIES = 5;
 
 	/** The number of extra milliseconds to back each time off when retrying connections. */
-	private final static int REQUEST_RETRY_BACKOFF_DELAY = 500;
+	private static final int REQUEST_RETRY_BACKOFF_DELAY = 500;
 
 	/** The atomic value indicating whether this connections is in the middle of a request/response exchange. */
 	private final AtomicBoolean exchanging;

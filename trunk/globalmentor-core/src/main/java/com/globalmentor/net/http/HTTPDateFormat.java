@@ -40,11 +40,11 @@ public class HTTPDateFormat extends SimpleDateFormat {
 	};
 
 	/** Pattern for RFC 822, updated by RFC 1123. */
-	private final static String RFC1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss 'GMT'";
+	private static final String RFC1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss 'GMT'";
 	/** Pattern for year and month: YYYY-MM (eg 1997-07) */
-	private final static String RFC850_PATTERN = "EEEE, dd-MMM-yy HH:mm:ss 'GMT'";
+	private static final String RFC850_PATTERN = "EEEE, dd-MMM-yy HH:mm:ss 'GMT'";
 	/** Pattern for ANSI C's asctime() format. */
-	private final static String ASCTIME_PATTERN = "EEE MMM d HH:mm:ss yyyy";
+	private static final String ASCTIME_PATTERN = "EEE MMM d HH:mm:ss yyyy";
 
 	/** The style to use for formatting. */
 	private final Style style;
@@ -72,7 +72,7 @@ public class HTTPDateFormat extends SimpleDateFormat {
 	}
 
 	/** The formatting patterns used, in order. */
-	private final static String[] patterns = { RFC1123_PATTERN, RFC850_PATTERN, ASCTIME_PATTERN };
+	private static final String[] patterns = { RFC1123_PATTERN, RFC850_PATTERN, ASCTIME_PATTERN };
 
 	/**
 	 * Determines a pattern to use for the given style. This pattern may be incomplete and the output may require more processing.

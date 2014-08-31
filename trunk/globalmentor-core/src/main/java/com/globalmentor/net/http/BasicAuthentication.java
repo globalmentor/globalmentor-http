@@ -25,5 +25,5 @@ package com.globalmentor.net.http;
 public class BasicAuthentication {
 
 	/** The delimiter used when concatenating multiple strings before Base64-encoding. */
-	public final static char BASIC_DELIMITER = ':';
+	public static final char BASIC_DELIMITER = ':';
 }

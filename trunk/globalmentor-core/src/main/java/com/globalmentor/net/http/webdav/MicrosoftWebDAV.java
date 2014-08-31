@@ -26,14 +26,14 @@ import java.net.URI;
 public class MicrosoftWebDAV {
 
 	/** The URI to the Microsoft property namespace. */
-	public final static URI MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI = URI.create("urn:schemas-microsoft-com:");
+	public static final URI MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI = URI.create("urn:schemas-microsoft-com:");
 
 	/** The creation timestamp in the format specified by RFC 1123. */
-	public final static WebDAVPropertyName WIN32_CREATION_TIME = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32CreationTime");
+	public static final WebDAVPropertyName WIN32_CREATION_TIME = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32CreationTime");
 	/** The last accessed timestamp in the format specified by RFC 1123. */
-	public final static WebDAVPropertyName WIN32_LAST_ACCESS_TIME = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32LastAccessTime");
+	public static final WebDAVPropertyName WIN32_LAST_ACCESS_TIME = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32LastAccessTime");
 	/** The last modified timestamp in the format specified by RFC 1123. */
-	public final static WebDAVPropertyName WIN32_LAST_MODIFIED_TIME = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32LastModifiedTime");
-	public final static WebDAVPropertyName WIN32_FILE_ATTRIBUTES = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32FileAttributes");
+	public static final WebDAVPropertyName WIN32_LAST_MODIFIED_TIME = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32LastModifiedTime");
+	public static final WebDAVPropertyName WIN32_FILE_ATTRIBUTES = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32FileAttributes");
 
 }

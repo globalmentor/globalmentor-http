@@ -43,7 +43,7 @@ import org.w3c.dom.*;
 public class WebDAVResource extends HTTPResource {
 
 	/** The soft value map containing cached properties. This map is made thread-safe through the use of {@link #cacheLock}. */
-	protected final static Map<CacheKey, CachedProperties> cachedPropertiesMap = new DecoratorReadWriteLockMap<CacheKey, CachedProperties>(
+	protected static final Map<CacheKey, CachedProperties> cachedPropertiesMap = new DecoratorReadWriteLockMap<CacheKey, CachedProperties>(
 			new PurgeOnWriteSoftValueHashMap<CacheKey, CachedProperties>(), cacheLock);
 
 	/** {@inheritDoc} This version also clears all cached properties. */

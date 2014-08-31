@@ -26,10 +26,10 @@ import java.net.URI;
 public class ApacheWebDAV {
 
 	/** The recommended prefix to the Apache WebDAV property namespace. */
-	public final static String APACHE_WEBDAV_PROPERTY_NAMESPACE_PREFIX = "apache";
+	public static final String APACHE_WEBDAV_PROPERTY_NAMESPACE_PREFIX = "apache";
 
 	/** The URI to the Apache WebDAV property namespace. */
-	public final static URI APACHE_WEBDAV_PROPERTY_NAMESPACE_URI = URI.create("http://apache.org/dav/props/");
+	public static final URI APACHE_WEBDAV_PROPERTY_NAMESPACE_URI = URI.create("http://apache.org/dav/props/");
 
 	//mod_dav property names
 	/**
@@ -37,6 +37,6 @@ public class ApacheWebDAV {
 	 * repository, the "filesystem" repository. It corresponds to the "executable" permission flag in most filesystems. This property is not defined on
 	 * collections. Value values are "T" and "F".
 	 */
-	public final static WebDAVPropertyName EXECUTABLE_PROPERTY_NAME = new WebDAVPropertyName(APACHE_WEBDAV_PROPERTY_NAMESPACE_URI, "executable");
+	public static final WebDAVPropertyName EXECUTABLE_PROPERTY_NAME = new WebDAVPropertyName(APACHE_WEBDAV_PROPERTY_NAMESPACE_URI, "executable");
 
 }
