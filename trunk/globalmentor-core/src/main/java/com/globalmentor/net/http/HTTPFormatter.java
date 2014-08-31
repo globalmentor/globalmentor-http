@@ -17,17 +17,15 @@
 package com.globalmentor.net.http;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static java.util.Collections.*;
-
+import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.unexpected;
 import static com.globalmentor.net.http.BasicAuthentication.*;
 import static com.globalmentor.net.http.DigestAuthentication.*;
 import static com.globalmentor.net.http.HTTP.*;
-import static com.globalmentor.text.CharacterEncoding.*;
 import static com.globalmentor.text.TextFormatter.*;
 
 import com.globalmentor.model.NameValuePair;
@@ -115,12 +113,8 @@ public class HTTPFormatter {
 			credentialsBuilder.append(basicCredentials.getUsername()); //username
 			credentialsBuilder.append(BASIC_DELIMITER); //:
 			credentialsBuilder.append(basicCredentials.getPassword()); //password
-			try {
-				final String base64Credentials = Base64.encodeBytes(credentialsBuilder.toString().getBytes(UTF_8)); //base64-encode the credential string
-				stringBuilder.append(base64Credentials); //append the base64-encoded basic credentials
-			} catch(final UnsupportedEncodingException unsupportedEncodingException) { //UTF-8 should always be accepted
-				throw new AssertionError(unsupportedEncodingException);
-			}
+			final String base64Credentials = Base64.encodeBytes(credentialsBuilder.toString().getBytes(UTF_8_CHARSET)); //base64-encode the credential string
+			stringBuilder.append(base64Credentials); //append the base64-encoded basic credentials
 		} else if(credentials instanceof DigestAuthenticateCredentials) { //if this is digest credentials
 			final DigestAuthenticateCredentials digestCredentials = (DigestAuthenticateCredentials)credentials; //get the credentials as digest credentials
 			final List<NameValuePair<String, String>> parameterList = new ArrayList<NameValuePair<String, String>>(); //create the list of parameters

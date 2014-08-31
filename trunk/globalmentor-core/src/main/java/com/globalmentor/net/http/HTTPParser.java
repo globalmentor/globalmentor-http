@@ -28,9 +28,7 @@ import com.globalmentor.io.ParseReader;
 import com.globalmentor.model.NameValuePair;
 
 import static com.globalmentor.security.MessageDigests.*;
-import static com.globalmentor.text.CharacterEncoding.*;
 
-import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.*;
 
