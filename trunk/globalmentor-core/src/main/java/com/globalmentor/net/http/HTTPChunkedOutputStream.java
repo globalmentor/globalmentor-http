@@ -188,7 +188,7 @@ public class HTTPChunkedOutputStream extends OutputStream {
 			throw new IOException("Stream already closed.");
 		}
 		if(length > 0) { //if there is chunk data to write
-			outputStream.write((Integer.toHexString(length) + CRLF).getBytes(HTTP_CHARSET)); //write the size of the chunk, followed by CRLF
+			outputStream.write((Integer.toHexString(length) + CRLF).getBytes(CHARSET)); //write the size of the chunk, followed by CRLF
 			outputStream.write(chunk, 0, length); //write whatever we have in the chunk
 			outputStream.write(CR); //CRLF
 			outputStream.write(LF);
@@ -222,7 +222,7 @@ public class HTTPChunkedOutputStream extends OutputStream {
 	public void close() throws IOException {
 		if(outputStream != null) { //if the stream is still open
 			flush(); //flush the current chunk, if any
-			outputStream.write(("0" + CRLF + CRLF).getBytes(HTTP_CHARSET)); //write an empty chunk, followed by CRLF, followed by a blank line
+			outputStream.write(("0" + CRLF + CRLF).getBytes(CHARSET)); //write an empty chunk, followed by CRLF, followed by a blank line
 			beforeClose(); //perform actions before closing
 			if(closeDecoratedStream) { //if we should close the underlying stream
 				outputStream.close();

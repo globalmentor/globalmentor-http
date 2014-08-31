@@ -19,8 +19,8 @@ package com.globalmentor.net.http;
 import java.io.IOException;
 import java.util.*;
 
+import static java.nio.charset.StandardCharsets.*;
 import static java.util.Collections.*;
-import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.unexpected;
 import static com.globalmentor.net.http.BasicAuthentication.*;
@@ -113,7 +113,7 @@ public class HTTPFormatter {
 			credentialsBuilder.append(basicCredentials.getUsername()); //username
 			credentialsBuilder.append(BASIC_DELIMITER); //:
 			credentialsBuilder.append(basicCredentials.getPassword()); //password
-			final String base64Credentials = Base64.encodeBytes(credentialsBuilder.toString().getBytes(UTF_8_CHARSET)); //base64-encode the credential string
+			final String base64Credentials = Base64.encodeBytes(credentialsBuilder.toString().getBytes(UTF_8)); //base64-encode the credential string
 			stringBuilder.append(base64Credentials); //append the base64-encoded basic credentials
 		} else if(credentials instanceof DigestAuthenticateCredentials) { //if this is digest credentials
 			final DigestAuthenticateCredentials digestCredentials = (DigestAuthenticateCredentials)credentials; //get the credentials as digest credentials

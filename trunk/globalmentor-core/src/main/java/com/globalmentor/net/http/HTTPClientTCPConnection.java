@@ -17,9 +17,7 @@
 package com.globalmentor.net.http;
 
 import java.io.*;
-
 import java.net.*;
-
 import java.security.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,7 +40,6 @@ import com.globalmentor.text.SyntaxException;
 import com.globalmentor.text.xml.XMLSerializer;
 import com.globalmentor.util.*;
 
-import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Characters.END_OF_TRANSMISSION_SYMBOL;
@@ -52,6 +49,7 @@ import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
 import static com.globalmentor.text.xml.XML.*;
+import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.fill;
 
 import org.w3c.dom.Document;
@@ -378,14 +376,14 @@ public class HTTPClientTCPConnection {
 
 		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); //create a byte array output stream to hold our outgoing data
 		try {
-			new XMLSerializer(true).serialize(document, byteArrayOutputStream, UTF_8_CHARSET); //serialize the document to the byte array with no byte order mark
+			new XMLSerializer(true).serialize(document, byteArrayOutputStream, UTF_8); //serialize the document to the byte array with no byte order mark
 			final byte[] bytes = byteArrayOutputStream.toByteArray(); //get the bytes we serialized
 			writeRequest(request, bytes); //write the request; don't stream the body, because it should be so short that we can deliver it all in one go
 		} finally {
 			byteArrayOutputStream.close(); //always close the stream as good practice			
 		}
 		/*alternate method using chunks:
-				new XMLSerializer(true).serialize(document, writeRequest(request), UTF_8_CHARSET);	//serialize the document to the byte array with no byte order mark
+				new XMLSerializer(true).serialize(document, writeRequest(request), UTF_8);	//serialize the document to the byte array with no byte order mark
 		*/
 	}
 
@@ -423,7 +421,7 @@ public class HTTPClientTCPConnection {
 		headerBuilder.append(CRLF); //append a blank line, signifying the end of the headers
 		connect(host); //make sure we're connected to the same host as the request TODO why do we even keep the host around in the class? verify and document
 		final OutputStream outputStream = getOutputStream(); //get the output stream
-		outputStream.write(headerBuilder.toString().getBytes(UTF_8_CHARSET)); //write the header
+		outputStream.write(headerBuilder.toString().getBytes(UTF_8)); //write the header
 		outputStream.flush(); //flush the data to the server
 	}
 
@@ -460,7 +458,7 @@ public class HTTPClientTCPConnection {
 	 */
 	protected void readHeaders(final HTTPResponse response) throws IOException {
 		for(final NameValuePair<String, String> header : parseHeaders(getInputStream())) { //parse the headers
-		//TODO del Log.trace("header", header.getName(), header.getValue());
+			//TODO del Log.trace("header", header.getName(), header.getValue());
 			response.addHeader(header.getName(), header.getValue()); //add this header to the response
 		}
 	}
@@ -688,7 +686,7 @@ public class HTTPClientTCPConnection {
 	public HTTPResponse sendRequest(final HTTPRequest request, final Document document) throws IOException {
 		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); //create a byte array output stream to hold our outgoing data
 		try {
-			new XMLSerializer(true).serialize(document, byteArrayOutputStream, UTF_8_CHARSET); //serialize the document to the byte array with no byte order mark
+			new XMLSerializer(true).serialize(document, byteArrayOutputStream, UTF_8); //serialize the document to the byte array with no byte order mark
 			final byte[] bytes = byteArrayOutputStream.toByteArray(); //get the bytes we serialized
 			return sendRequest(request, bytes); //set the bytes of the XML document into the body of the message
 		} finally {

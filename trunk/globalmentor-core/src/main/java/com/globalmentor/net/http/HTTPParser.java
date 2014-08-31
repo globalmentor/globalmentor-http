@@ -87,7 +87,7 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 			} else { //if we're building the reason phrase
 				if(value == CR) { //if we've reached the end of the reason phrase
 					parseLF(inputStream); //make sure there is a following LF, but ignore it
-					final String reasonPhrase = new String(reasonByteArrayOutputStream.toByteArray(), HTTP_CHARSET); //convert the reason phrase to a string
+					final String reasonPhrase = new String(reasonByteArrayOutputStream.toByteArray(), CHARSET); //convert the reason phrase to a string
 					return new HTTPStatus(version, statusCode, reasonPhrase); //return the status we parsed
 				} else { //if we're still collecting reason phrase characters
 					reasonByteArrayOutputStream.write((byte)value); //save the reason phrase byte
@@ -245,7 +245,7 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 			if(b == CR) { //if this is the first half of a CRLF sequence
 				parseLF(inputStream); //make sure there is a following LF, but ignore it
 				final byte[] bytes = byteArrayOutputStream.toByteArray(); //get the bytes we collected
-				return new String(bytes, HTTP_CHARSET); //return a string from the UTF-8-encoded bytes
+				return new String(bytes, CHARSET); //return a string from the UTF-8-encoded bytes
 			} else if(b == LF) { //if we get a bare LF
 				throw new ParseIOException("Unexpected LF.");
 			}
