@@ -36,8 +36,8 @@ import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.*;
 import com.globalmentor.security.*;
 import com.globalmentor.text.SyntaxException;
-import com.globalmentor.text.xml.XMLSerializer;
 import com.globalmentor.util.*;
+import com.globalmentor.xml.XMLSerializer;
 
 import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Arrays.*;
@@ -47,7 +47,7 @@ import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
-import static com.globalmentor.text.xml.XML.*;
+import static com.globalmentor.xml.XML.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.fill;
 

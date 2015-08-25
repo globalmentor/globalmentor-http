@@ -21,7 +21,8 @@ import java.util.*;
 
 import com.globalmentor.log.Log;
 import static com.globalmentor.net.http.webdav.WebDAV.*;
-import static com.globalmentor.text.xml.XML.*;
+import static com.globalmentor.xml.XML.*;
+
 import com.globalmentor.collections.DecoratorIDedMappedList;
 import com.globalmentor.model.NameValuePair;
 import static com.globalmentor.net.URIs.*;
