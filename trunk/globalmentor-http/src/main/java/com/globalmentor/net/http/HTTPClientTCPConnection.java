@@ -27,11 +27,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.net.ssl.*;
 import javax.xml.parsers.DocumentBuilder;
 
-import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Bytes;
 import com.globalmentor.java.Characters;
 import com.globalmentor.log.Log;
+import com.globalmentor.model.ConfigurationException;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.*;
 import com.globalmentor.security.*;

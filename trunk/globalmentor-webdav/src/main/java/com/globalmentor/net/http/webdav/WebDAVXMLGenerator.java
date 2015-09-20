@@ -25,7 +25,7 @@ import static com.globalmentor.net.http.webdav.WebDAV.*;
 import static com.globalmentor.w3c.spec.XML.*;
 import static com.globalmentor.xml.XML.*;
 
-import com.globalmentor.config.ConfigurationException;
+import com.globalmentor.model.ConfigurationException;
 import com.globalmentor.xml.XMLNamespacePrefixManager;
 
 import org.w3c.dom.*;
