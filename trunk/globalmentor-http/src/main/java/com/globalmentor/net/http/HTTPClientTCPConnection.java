@@ -31,6 +31,8 @@ import com.globalmentor.io.*;
 import com.globalmentor.java.Bytes;
 import com.globalmentor.java.Characters;
 import com.globalmentor.log.Log;
+import com.globalmentor.log.LogInputStream;
+import com.globalmentor.log.LogOutputStream;
 import com.globalmentor.model.ConfigurationException;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.*;
