@@ -4,41 +4,29 @@
 
 	<parent>
 		<groupId>com.globalmentor</groupId>
-		<artifactId>globalmentor-parent</artifactId>
-		<version>8.2.0</version>
+		<artifactId>globalmentor-http-parent</artifactId>
+		<version>0.6.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>globalmentor-http</artifactId>
-	<version>0.5.1-SNAPSHOT</version>
 
 	<name>GlobalMentor HTTP</name>
 	<description>GlobalMentor Java HTTP library.</description>
-	<url>http://www.globalmentor.com/software/</url>
-	<inceptionYear>1996</inceptionYear>
-
-	<scm>
-		<connection>scm:git:https://bitbucket.org/globalmentor/globalmentor-http.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/globalmentor/globalmentor-http.git</developerConnection>
-		<url>https://bitbucket.org/globalmentor/globalmentor-http</url>
-	</scm>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-core</artifactId>
-			<version>0.5.3</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-log</artifactId>
-			<version>0.5.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-xml</artifactId>
-			<version>0.5.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

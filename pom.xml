@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.globalmentor</groupId>
+		<artifactId>globalmentor-parent</artifactId>
+		<version>8.4.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>globalmentor-http-parent</artifactId>
+	<version>0.6.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>GlobalMentor HTTP Parent</name>
+	<description>GlobalMentor HTTP aggregate parent POM.</description>
+	<url>http://www.globalmentor.com/software/</url>
+	<inceptionYear>1996</inceptionYear>
+
+	<scm>
+		<connection>scm:git:https://bitbucket.org/globalmentor/globalmentor-http.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/globalmentor/globalmentor-http.git</developerConnection>
+		<url>https://bitbucket.org/globalmentor/globalmentor-http</url>
+	</scm>
+
+	<modules>
+		<module>http</module>
+		<module>webdav</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-core</artifactId>
+				<version>0.5.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-http</artifactId>
+				<version>0.6.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-log</artifactId>
+				<version>0.5.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-xml</artifactId>
+				<version>0.5.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-w3c-spec</artifactId>
+				<version>0.5.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
