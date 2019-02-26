@@ -16,7 +16,7 @@
 
 package com.globalmentor.net.http.webdav;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.model.NameValuePair;
 
@@ -33,7 +33,7 @@ public class WebDAVProperty extends NameValuePair<WebDAVPropertyName, WebDAVProp
 	 * @throws NullPointerException if the given name is <code>null</code>.
 	 */
 	public WebDAVProperty(final WebDAVPropertyName name, final WebDAVPropertyValue value) {
-		super(checkInstance(name, "WebDAV property name cannot be null."), value); //construct the parent class with the name and value
+		super(requireNonNull(name, "WebDAV property name cannot be null."), value); //construct the parent class with the name and value
 	}
 
 }

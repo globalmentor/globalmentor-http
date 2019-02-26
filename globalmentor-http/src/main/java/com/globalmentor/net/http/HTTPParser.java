@@ -26,6 +26,7 @@ import com.globalmentor.io.InputStreams;
 import com.globalmentor.io.ParseIOException;
 import com.globalmentor.io.ParseReader;
 import com.globalmentor.model.NameValuePair;
+import com.globalmentor.net.HTTP;
 
 import static com.globalmentor.security.MessageDigests.*;
 
@@ -51,6 +52,9 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 	/**
 	 * Parses the HTTP status line.
 	 * @param inputStream The source of the HTTP message.
+	 * @throws ParseIOException if the next character read is not an LF.
+	 * @throws EOFException If there is no more data in the input stream.
+	 * @throws IOException if there is an error reading the content.
 	 * @return An array of parsed headers.
 	 */
 	public static HTTPStatus parseStatusLine(final InputStream inputStream) throws ParseIOException, EOFException, IOException {
@@ -197,6 +201,9 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 	/**
 	 * Parses HTTP message headers, correctly folding LWS into a single space.
 	 * @param inputStream The source of the HTTP message.
+	 * @throws ParseIOException if the line is not properly formatted.
+	 * @throws EOFException If the end of the data string was unexpected reached while searching for the end of the line.
+	 * @throws IOException if there is an error reading the content.
 	 * @return The parsed headers.
 	 */
 	protected static Iterable<NameValuePair<String, String>> parseHeaders(final InputStream inputStream) throws ParseIOException, EOFException, IOException {
@@ -310,6 +317,7 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 	 * lowest to highest.
 	 * @param reader The source of the data.
 	 * @throws IOException if there is an error reading the data.
+	 * @return An array of list element string values.
 	 */
 	@SuppressWarnings("unchecked")
 	//we cast to an array of generic objects we have created, which Java cannot check at runtime
@@ -349,6 +357,7 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 	 * @param reader The source of the data.
 	 * @throws IOException if there is an error reading the data.
 	 * @throws IllegalArgumentException if more than one parameter with the same name was exists.
+	 * @return A name/value map representing the parameters.
 	 */
 	public static Map<String, String> parseParameterMap(final ParseReader reader) throws IOException, IllegalArgumentException {
 		final List<NameValuePair<String, String>> parameterList = parseParameters(reader); //parse the parameters
@@ -364,6 +373,7 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 	 * Parses a list of attribute name/value pair from the given reader, reading until the end of the reader is reached. Quotes are removed from quoted values.
 	 * @param reader The source of the data.
 	 * @throws IOException if there is an error reading the data.
+	 * @return A list containing name/value pairs representing the parameters.
 	 */
 	public static List<NameValuePair<String, String>> parseParameters(final ParseReader reader) throws IOException {
 		final List<NameValuePair<String, String>> parameterList = new ArrayList<NameValuePair<String, String>>(); //create a new list to hold our parameters
@@ -404,6 +414,7 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 	 * Parses a quoted string from the reader and returns the value within the quotes. Escaped quotes are correctly parsed.
 	 * @param reader The source of the data.
 	 * @throws IOException if there is an error reading the data.
+	 * @return The parsed string within the quotes.
 	 */
 	public static String parseQuotedString(final ParseReader reader) throws IOException {
 		final StringBuilder stringBuilder = new StringBuilder();

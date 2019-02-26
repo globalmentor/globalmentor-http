@@ -73,7 +73,7 @@ public class HTTPFormatter {
 	}
 
 	/**
-	 * Formats an HTTP list using the format: <var>name</var>="<var>value</value>", <var>name</var>="<var>value</value>"
+	 * Formats an HTTP list using the format: <var>name</var>="<var>value</var>", <var>name</var>="<var>value</var>"
 	 * @param stringBuilder The formatting destination.
 	 * @param attributes The attributes to format.
 	 * @return The string builder used for formatting.
@@ -83,7 +83,7 @@ public class HTTPFormatter {
 	}
 
 	/**
-	 * Formats an HTTP list using the format: <var>name</var>="<var>value</value>", <var>name</var>="<var>value</value>"
+	 * Formats an HTTP list using the format: <var>name</var>="<var>value</var>", <var>name</var>="<var>value</var>"
 	 * @param stringBuilder The formatting destination.
 	 * @param unquotedNames The set of names that should not be quoted.
 	 * @param attributes The attributes to format.
@@ -195,7 +195,7 @@ public class HTTPFormatter {
 	 * @param stringBuilder The string builder into which the result should be placed.
 	 * @param items The objects to be formatted.
 	 * @return The string buffer containing the new information.
-	 * @see TextFormatter#formatList(StringBuilder, char, Object[])
+	 * @see TextFormatter#formatList(Appendable, char, Object...)
 	 * @see Object#toString
 	 */
 	public static StringBuilder formatList(final StringBuilder stringBuilder, final Object... items) {
@@ -209,7 +209,6 @@ public class HTTPFormatter {
 	/**
 	 * Appends the string representations of the given objects separated by the HTTP list delimiter character.
 	 * @param stringBuilder The string builder into which the result should be placed.
-	 * @param delimiter The separator character to be inserted between the object strings.
 	 * @param iterable The objects to be formatted.
 	 * @return The string buffer containing the new information.
 	 * @see Object#toString

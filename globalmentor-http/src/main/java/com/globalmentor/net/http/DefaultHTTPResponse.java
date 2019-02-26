@@ -20,6 +20,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import com.globalmentor.log.Log;
+import com.globalmentor.net.HTTP;
+
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
@@ -72,7 +74,6 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 
 	/**
 	 * @return The class of the response.
-	 * @see #getResponseCode()
 	 */
 	public HTTPResponseClass getResponseClass() {
 		return HTTPResponseClass.fromStatusCode(getStatusCode()); //get the response class from the status code
@@ -107,7 +108,7 @@ public class DefaultHTTPResponse extends AbstractHTTPMessage implements HTTPResp
 	 * <dt>410</dt>
 	 * <dd>{@link HTTPGoneException}</dd>
 	 * <dt>412</dt>
-	 * <dd>{@link HTTPPreconditionFailed}</dd>
+	 * <dd>{@link HTTPPreconditionFailedException}</dd>
 	 * </dl>
 	 * <p>
 	 * All other client or server error codes will be sent back as an {@link HTTPException}.

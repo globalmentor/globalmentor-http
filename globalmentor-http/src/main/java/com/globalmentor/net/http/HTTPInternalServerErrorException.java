@@ -26,7 +26,6 @@ public class HTTPInternalServerErrorException extends HTTPServerErrorException {
 
 	/**
 	 * Constructs a new exception with the specified status code.
-	 * @param statusCode The HTTP status code to return in the request.
 	 */
 	public HTTPInternalServerErrorException() {
 		this((String)null); //construct the exception with the status code and no message
@@ -34,7 +33,6 @@ public class HTTPInternalServerErrorException extends HTTPServerErrorException {
 
 	/**
 	 * Constructs a new exception with the specified status code and detail message.
-	 * @param statusCode The HTTP status code to return in the request.
 	 * @param message The detail message.
 	 */
 	public HTTPInternalServerErrorException(final String message) {
@@ -43,7 +41,6 @@ public class HTTPInternalServerErrorException extends HTTPServerErrorException {
 
 	/**
 	 * Constructs a new exception with the specified status code and cause, along with a detail message derived from the cause.
-	 * @param statusCode The HTTP status code to return in the request.
 	 * @param cause The cause, or <code>null</code> to indicate the cause is nonexistent or unknown.
 	 */
 	public HTTPInternalServerErrorException(final Throwable cause) {

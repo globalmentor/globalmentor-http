@@ -27,9 +27,10 @@ import com.globalmentor.java.Bytes;
 import com.globalmentor.model.AbstractHashObject;
 import com.globalmentor.net.*;
 
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.HTTP.*;
+
+import static java.util.Objects.*;
 
 /**
  * A client's view of an HTTP resource on the server. For many error conditions, a subclass of {@link HTTPException} will be thrown. This class is not thread
@@ -164,7 +165,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		if(!isHTTPURI(referenceURI)) { //if this isn't a HTTP or HTTPS resource
 			throw new IllegalArgumentException("Invalid HTTP scheme " + referenceURI.getScheme());
 		}
-		this.client = checkInstance(client, "Client cannot be null."); //save the client
+		this.client = requireNonNull(client, "Client cannot be null."); //save the client
 		this.passwordAuthentication = passwordAuthentication; //save the password authentication
 	}
 
@@ -267,7 +268,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * Retrieves the contents of a resource using the {@value HTTP#GET_METHOD} method. The cached existence property is updated if information is being cached.
 	 * @return The content received from the server.
 	 * @throws IOException if there was an error invoking the method.
-	 * @see #cachedExists
+	 * @see #cacheExists(boolean)
 	 */
 	public byte[] get() throws IOException {
 		Boolean exists = null; //we'll see if we can determine existence
@@ -292,7 +293,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	/**
 	 * Accesses a resource using the {@value HTTP#HEAD_METHOD} method. The cached existence property is updated.
 	 * @throws IOException if there was an error invoking the method.
-	 * @see #cachedExists
+	 * @see #cacheExists(boolean)
 	 */
 	public void head() throws IOException {
 		Boolean exists = null; //we'll see if we can determine existence
@@ -359,6 +360,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 
 	/**
 	 * Reads an object from the resource using HTTP GET with the given I/O support.
+	 * @param <T> The type of the I/O support.
 	 * @param io The I/O support for reading the object.
 	 * @return The object read from the resource.
 	 * @throws IOException if there is an error reading the data.
@@ -374,6 +376,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 
 	/**
 	 * Writes an object to the resource using HTTP PUT with the given I/O support.
+	 * @param <T> The type of the I/O support.
 	 * @param object The object to write to the resource.
 	 * @param io The I/O support for writing the object.
 	 * @throws IOException if there is an error writing the data.
@@ -465,8 +468,8 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		 */
 		public ReadResponseOutputStreamDecorator(final HTTPClientTCPConnection connection, final HTTPRequest request, final OutputStream outputStream) {
 			super(outputStream); //construct the parent class
-			this.connection = checkInstance(connection, "Connection cannot be null.");
-			this.request = checkInstance(request, "Request cannot be null.");
+			this.connection = requireNonNull(connection, "Connection cannot be null.");
+			this.request = requireNonNull(request, "Request cannot be null.");
 		}
 
 		/**
@@ -495,7 +498,7 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 		 * @throws NullPointerException if the given HTTP client and/or resource URI is <code>null</code>.
 		 */
 		public CacheKey(final HTTPClient httpClient, final URI resourceURI) {
-			super(checkInstance(httpClient, "HTTP client cannot be null."), checkInstance(resourceURI, "Resource URI cannot be null."));
+			super(requireNonNull(httpClient, "HTTP client cannot be null."), requireNonNull(resourceURI, "Resource URI cannot be null."));
 		}
 	}
 

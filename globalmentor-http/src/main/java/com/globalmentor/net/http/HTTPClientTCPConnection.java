@@ -21,15 +21,12 @@ import java.net.*;
 import java.security.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.*;
 import javax.xml.parsers.DocumentBuilder;
 
 import com.globalmentor.io.*;
 import com.globalmentor.java.Bytes;
-import com.globalmentor.java.Characters;
 import com.globalmentor.log.Log;
 import com.globalmentor.log.LogInputStream;
 import com.globalmentor.log.LogOutputStream;
@@ -38,13 +35,10 @@ import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.*;
 import com.globalmentor.security.*;
 import com.globalmentor.text.SyntaxException;
-import com.globalmentor.util.*;
 import com.globalmentor.xml.XMLSerializer;
 
 import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Arrays.*;
-import static com.globalmentor.java.Characters.END_OF_TRANSMISSION_SYMBOL;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
@@ -56,10 +50,12 @@ import static java.util.Arrays.fill;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import static java.util.Objects.*;
+
 /**
- * Represents a connection from a client to a server using HTTP over TCP as defined by <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,
- * "Hypertext Transfer Protocol -- HTTP/1.1". This client supports logging. If authentication is needed, authentication is attempted to be retrieved from the
- * following sources, in this order:
+ * Represents a connection from a client to a server using HTTP over TCP as defined by <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>, "Hypertext
+ * Transfer Protocol -- HTTP/1.1". This client supports logging. If authentication is needed, authentication is attempted to be retrieved from the following
+ * sources, in this order:
  * <ol>
  * <li>The {@link PasswordAuthentication}, if any, associated with this connection.</li>
  * <li>The {@link PasswordAuthentication}, if any, cached by the associated client.</li>
@@ -184,7 +180,7 @@ public class HTTPClientTCPConnection {
 				try {
 					if(isSecure()) { //if this is a secure connection
 						//TODO testing ignore all certificate problems
-						TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+						TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
 
 							public java.security.cert.X509Certificate[] getAcceptedIssuers() {
 								return null;
@@ -195,7 +191,7 @@ public class HTTPClientTCPConnection {
 
 							public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
 							}
-						} };
+						}};
 
 						// Install the all-trusting trust manager
 
@@ -324,8 +320,8 @@ public class HTTPClientTCPConnection {
 	 */
 	HTTPClientTCPConnection(final HTTPClient client, final Host host, final PasswordAuthentication passwordAuthentication, final boolean secure) {
 		this.exchanging = new AtomicBoolean(false); //by default the connection is not exchanging
-		this.client = checkInstance(client, "Client cannot be null"); //save the client
-		this.host = checkInstance(host, "Host cannot be null"); //save the host
+		this.client = requireNonNull(client, "Client cannot be null"); //save the client
+		this.host = requireNonNull(host, "Host cannot be null"); //save the host
 		this.passwordAuthentication = passwordAuthentication; //save the authentication, if any
 		this.secure = secure; //save whether the connection should be secure
 	}
@@ -357,6 +353,7 @@ public class HTTPClientTCPConnection {
 	 * @param request The request to write.
 	 * @throws NullPointerException if the given request is <code>null</code>.
 	 * @throws IOException if there is an error writing the data.
+	 * @return An output stream providing the requested access.
 	 */
 	public OutputStream writeRequest(final HTTPRequest request) throws IOException {
 		request.removeHeaders(CONTENT_LENGTH_HEADER);
@@ -369,7 +366,7 @@ public class HTTPClientTCPConnection {
 	 * Writes a request to the output stream along with the given XML as the request body. This is a convenience method that delegates to
 	 * {@link #writeRequest(HTTPRequest, byte[])}.
 	 * @param request The request to write.
-	 * @param body The body of the request.
+	 * @param document The body of the request.
 	 * @throws NullPointerException if the given request and/or body is <code>null</code>.
 	 * @throws IOException if there is an error writing the data.
 	 */
@@ -647,8 +644,7 @@ public class HTTPClientTCPConnection {
 				} else if(challenge instanceof DigestAuthenticateChallenge) { //if this is digest authentication
 					final DigestAuthenticateChallenge digestChallenge = (DigestAuthenticateChallenge)challenge; //get the challenge as a digest challenge
 					final Nonce cnonce = new DefaultNonce(getClass().getName()); //create our own nonce value to send back
-					credentials = new DigestAuthenticateCredentials(
-							request.getMethod(), //generate credentials for the client
+					credentials = new DigestAuthenticateCredentials(request.getMethod(), //generate credentials for the client
 							passwordAuthentication.getUserName(), realm, passwordAuthentication.getPassword(), digestChallenge.getNonce(), request.getRequestURI(), "cnonce",
 							digestChallenge.getOpaque(), QOP.AUTH, nonceCount, digestChallenge.getMessageDigest().getAlgorithm()); //TODO fix cnonce
 				} else { //if we don't recognize the challenge type
@@ -776,7 +772,7 @@ public class HTTPClientTCPConnection {
 		 */
 		public ResponseBodyInputStreamDecorator(final InputStream outputStream, final HTTPResponse response) {
 			super(outputStream); //construct the parent class
-			this.response = checkInstance(response, "Response cannot be null.");
+			this.response = requireNonNull(response, "Response cannot be null.");
 		}
 
 		/**

@@ -46,9 +46,9 @@ public class SRTWebDAV {
 
 	/**
 	 * The server's last modified time, using the RFC 3339 Internet timestamp ISO 8601 profile, last known to WebDrive as reported by the
-	 * {@value WebDAV#GET_LAST_MODIFIED_PROPERTY_NAME} property; deprecated by South River Technologies because it uses the standard WebDAV namespace. WebDrive
+	 * {@link WebDAV#GET_LAST_MODIFIED_PROPERTY_NAME} property; deprecated by South River Technologies because it uses the standard WebDAV namespace. WebDrive
 	 * stores this as a duplicate time value so that it will know if any other software modified the file without WebDrive's knowledge. If the value of this
-	 * property matches the {@value WebDAV#GET_LAST_MODIFIED_PROPERTY_NAME} property, WebDrive will assume that {@value #DEPRECATED_MODIFIED_TIME_PROPERTY_NAME}
+	 * property matches the {@link WebDAV#GET_LAST_MODIFIED_PROPERTY_NAME} property, WebDrive will assume that {@link #DEPRECATED_MODIFIED_TIME_PROPERTY_NAME}
 	 * stores the correct last modified time set by WebDrive.
 	 */
 	public static final WebDAVPropertyName DEPRECATED_TIMESTAMP_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "srt_proptimestamp");

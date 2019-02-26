@@ -23,8 +23,9 @@ import static java.lang.System.*;
 import com.globalmentor.java.Bytes;
 
 import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.http.HTTPParser.*;
+
+import static java.util.Objects.*;
 
 /**
  * An input stream that reads HTTP chunked content from an existing stream, signaling the end of the stream when the chunks are finished.
@@ -110,7 +111,7 @@ public class HTTPChunkedInputStream extends InputStream {
 	 * @throws NullPointerException if the given stream is <code>null</code>.
 	 */
 	public HTTPChunkedInputStream(final InputStream inputStream, final boolean closeDecoratedStream) {
-		this.inputStream = checkInstance(inputStream, "Input stream cannot be null."); //save the decorated input stream
+		this.inputStream = requireNonNull(inputStream, "Input stream cannot be null."); //save the decorated input stream
 		this.closeDecoratedStream = closeDecoratedStream;
 	}
 

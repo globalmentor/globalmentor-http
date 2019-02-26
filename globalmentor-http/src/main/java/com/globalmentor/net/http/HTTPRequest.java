@@ -19,6 +19,7 @@ package com.globalmentor.net.http;
 import java.net.URI;
 
 import com.globalmentor.net.Host;
+import com.globalmentor.net.HTTP;
 import com.globalmentor.text.SyntaxException;
 
 /**

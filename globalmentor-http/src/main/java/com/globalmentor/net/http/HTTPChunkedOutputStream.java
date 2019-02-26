@@ -20,9 +20,10 @@ import java.io.*;
 
 import static java.lang.System.*;
 
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.HTTP.*;
+
+import static java.util.Objects.*;
 
 /**
  * An output stream that writes HTTP chunked content to an existing stream, but doesn't close the underlying stream when closed.
@@ -96,7 +97,7 @@ public class HTTPChunkedOutputStream extends OutputStream {
 	 * @throws IllegalArgumentException if the given chunk size is less than or equal to zero.
 	 */
 	public HTTPChunkedOutputStream(final OutputStream outputStream, final int chunkSize, final boolean closeDecoratedStream) {
-		this.outputStream = checkInstance(outputStream, "Output stream cannot be null."); //save the decorated output stream
+		this.outputStream = requireNonNull(outputStream, "Output stream cannot be null."); //save the decorated output stream
 		this.closeDecoratedStream = closeDecoratedStream;
 		chunk = new byte[checkArgumentMinimum(chunkSize, 1)];
 		length = 0;
@@ -147,7 +148,7 @@ public class HTTPChunkedOutputStream extends OutputStream {
 	 * If <code>b</code> is <code>null</code>, a <code>NullPointerException</code> is thrown.
 	 * <p>
 	 * If <code>off</code> is negative, or <code>len</code> is negative, or <code>off+len</code> is greater than the length of the array <code>b</code>, then an
-	 * <tt>IndexOutOfBoundsException</tt> is thrown.
+	 * <code>IndexOutOfBoundsException</code> is thrown.
 	 *
 	 * @param b the data.
 	 * @param off the start offset in the data.
@@ -217,7 +218,6 @@ public class HTTPChunkedOutputStream extends OutputStream {
 	 * @throws IOException if an I/O error occurs.
 	 * @see #beforeClose()
 	 * @see #afterClose()
-	 * @see #close(boolean)
 	 */
 	public void close() throws IOException {
 		if(outputStream != null) { //if the stream is still open

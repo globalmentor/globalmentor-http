@@ -65,6 +65,7 @@ public class HTTPClient extends AbstractClient {
 	/**
 	 * Creates an unsecure connection to a host. Ultimately delegates to {@link #createConnection(Host, PasswordAuthentication, boolean)}.
 	 * @param host The host to which to connect.
+	 * @return The connection to the host.
 	 */
 	public final HTTPClientTCPConnection createConnection(final Host host) {
 		return createConnection(host, false); //create and return a connection that is not secure
@@ -76,6 +77,7 @@ public class HTTPClient extends AbstractClient {
 	 * @param host The host to which to connect.
 	 * @param passwordAuthentication The connection-specific password authentication, or <code>null</code> if there should be no connection-specific password
 	 *          authentication.
+	 * @return The connection to the host.
 	 */
 	public final HTTPClientTCPConnection createConnection(final Host host, final PasswordAuthentication passwordAuthentication) {
 		return createConnection(host, passwordAuthentication, false); //create and return a connection that is not secure
@@ -85,6 +87,7 @@ public class HTTPClient extends AbstractClient {
 	 * Creates a connection to a host that is optionally secure. Ultimately delegates to {@link #createConnection(Host, PasswordAuthentication, boolean)}.
 	 * @param host The host to which to connect.
 	 * @param secure Whether the connection should be secure.
+	 * @return The connection to the host.
 	 */
 	public final HTTPClientTCPConnection createConnection(final Host host, final boolean secure) {
 		return createConnection(host, null, secure); //create and return an optionally secure connection with no connection-specific authentication
@@ -96,6 +99,7 @@ public class HTTPClient extends AbstractClient {
 	 * @param passwordAuthentication The connection-specific password authentication, or <code>null</code> if there should be no connection-specific password
 	 *          authentication.
 	 * @param secure Whether the connection should be secure.
+	 * @return The connection to the host.
 	 */
 	public HTTPClientTCPConnection createConnection(final Host host, final PasswordAuthentication passwordAuthentication, final boolean secure) {
 		return new HTTPClientTCPConnection(this, host, passwordAuthentication, secure); //return a new connection to the given host

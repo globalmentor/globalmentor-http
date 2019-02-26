@@ -16,6 +16,7 @@
 
 package com.globalmentor.net.http;
 
+import com.globalmentor.net.HTTP;
 import com.globalmentor.text.SyntaxException;
 
 /**
@@ -32,7 +33,6 @@ public interface HTTPResponse extends HTTPMessage {
 
 	/**
 	 * @return The class of the response.
-	 * @see #getResponseCode()
 	 */
 	public HTTPResponseClass getResponseClass();
 
@@ -55,7 +55,6 @@ public interface HTTPResponse extends HTTPMessage {
 
 	/**
 	 * Sets the response header challenging the client to authenticate itself.
-	 * @param response The HTTP response.
 	 * @param challenge The authenticate challenge to issue to the client.
 	 * @see HTTP#WWW_AUTHENTICATE_HEADER
 	 */

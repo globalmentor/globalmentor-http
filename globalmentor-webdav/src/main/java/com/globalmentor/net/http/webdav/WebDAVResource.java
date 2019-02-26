@@ -19,13 +19,14 @@ package com.globalmentor.net.http.webdav;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.collections.*;
 import com.globalmentor.java.Bytes;
 import static com.globalmentor.java.CharSequences.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.model.NameValuePair;
@@ -131,8 +132,8 @@ public class WebDAVResource extends HTTPResource {
 	 * @throws IllegalArgumentException if the given reference URI is not absolute, the reference URI has no host, or the scheme is not an HTTP scheme.
 	 * @throws NullPointerException if the given reference URI and/or client is <code>null</code>.
 	 */
-	public WebDAVResource(final URI referenceURI, final HTTPClient client, final PasswordAuthentication passwordAuthentication) throws IllegalArgumentException,
-			NullPointerException {
+	public WebDAVResource(final URI referenceURI, final HTTPClient client, final PasswordAuthentication passwordAuthentication)
+			throws IllegalArgumentException, NullPointerException {
 		super(referenceURI, client, passwordAuthentication); //construct the parent class
 	}
 
@@ -172,7 +173,7 @@ public class WebDAVResource extends HTTPResource {
 	 * Determines if a resource is a collection. The cached collection property is updated.
 	 * @return <code>true</code> if the resource is present on the server and is a collection.
 	 * @throws IOException if there was an error invoking a method.
-	 * @see #cachedCollection
+	 * @see #cachedPropertiesMap
 	 * @see #propFind()
 	 */
 	public boolean isCollection() throws IOException {
@@ -251,7 +252,7 @@ public class WebDAVResource extends HTTPResource {
 	public void copy(final URI destinationURI, final Depth depth, final boolean overwrite) throws IOException {
 		final WebDAVRequest request = new DefaultWebDAVRequest(COPY_METHOD, getURI()); //create a COPY request
 		request.setDestination(destinationURI); //set the destination URI
-		checkInstance(depth, "Depth cannot be null.");
+		requireNonNull(depth, "Depth cannot be null.");
 		if(depth != Depth.ZERO && depth != Depth.INFINITY) { //if the depth is not ZERO or INFINITY
 			throw new IllegalArgumentException("Depth of " + depth + " is not allowed for the " + COPY_METHOD + " method.");
 		}
@@ -445,8 +446,8 @@ public class WebDAVResource extends HTTPResource {
 			if(document != null) { //if there was an XML document in the request TODO probably delete; no XML response is probably an error condition
 				final Element documentElement = document.getDocumentElement(); //get the document element
 				//TODO check to make sure the document element is correct
-				final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> resourcePropertyMaps = WebDAVXMLProcessor.getMultistatusProperties(
-						documentElement, referenceURI); //get the properties from the multistatus document, relative to this resource URI			
+				final List<NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>>> resourcePropertyMaps = WebDAVXMLProcessor
+						.getMultistatusProperties(documentElement, referenceURI); //get the properties from the multistatus document, relative to this resource URI			
 				if(isCached()) { //if we're caching information, cache the properties for this resource
 					cacheLock.writeLock().lock(); //lock the cache for writing
 					try {
@@ -481,7 +482,7 @@ public class WebDAVResource extends HTTPResource {
 	 * Removes properties using the PROPPATCH method. If properties are being removed and others are being set at the same time, the
 	 * {@link #propPatch(Collection, Collection)} method should be used. The cached information is cleared. The URI of each resource is canonicized to be an
 	 * absolute URI.
-	 * @param removeProperties The list of properties to remove.
+	 * @param removePropertyNames The list of properties to remove.
 	 * @throws IOException if there was an error invoking the method.
 	 */
 	public void removeProperties(final WebDAVPropertyName... removePropertyNames) throws IOException {
@@ -492,7 +493,7 @@ public class WebDAVResource extends HTTPResource {
 	 * Removes properties using the PROPPATCH method. If properties are being removed and others are being set at the same time, the
 	 * {@link #propPatch(Collection, Collection)} method should be used. The cached information is cleared. The URI of each resource is canonicized to be an
 	 * absolute URI.
-	 * @param removeProperties The list of properties to remove.
+	 * @param removePropertyNames The list of properties to remove.
 	 * @throws IOException if there was an error invoking the method.
 	 */
 	@SuppressWarnings("unchecked")
@@ -504,7 +505,7 @@ public class WebDAVResource extends HTTPResource {
 	 * Sets properties using the PROPPATCH method. If properties are being removed and others are being set at the same time, the
 	 * {@link #propPatch(Collection, Collection)} method should be used. The cached information is cleared. The URI of each resource is canonicized to be an
 	 * absolute URI.
-	 * @param setPropertyNames The list of properties and values to set.
+	 * @param setProperties The list of properties and values to set.
 	 * @throws IOException if there was an error invoking the method.
 	 */
 	@SuppressWarnings("unchecked")
@@ -578,7 +579,7 @@ public class WebDAVResource extends HTTPResource {
 		 */
 		public CachedProperties(final Map<WebDAVPropertyName, WebDAVProperty> properties, final boolean isCollection) {
 			this.isCollection = isCollection; //save the cached collection state
-			this.properties = unmodifiableMap(checkInstance(properties, "Properties cannot be null."));
+			this.properties = unmodifiableMap(requireNonNull(properties, "Properties cannot be null."));
 		}
 	}
 

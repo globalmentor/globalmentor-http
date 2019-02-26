@@ -19,6 +19,7 @@ package com.globalmentor.net.http;
 import java.net.URI;
 
 import com.globalmentor.net.Host;
+import com.globalmentor.net.HTTP;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;

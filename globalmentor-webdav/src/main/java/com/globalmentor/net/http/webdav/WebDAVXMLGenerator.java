@@ -182,7 +182,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	/**
 	 * Adds a property request to a property element.
 	 * @param propElement An XML element representing a property element.
-	 * @param propertyNames The WebDAV property name of the property to add.
+	 * @param propertyName The WebDAV property name of the property to add.
 	 * @throws DOMException if there is an error creating the child elements.
 	 * @return A WebDAV property XML element.
 	 */

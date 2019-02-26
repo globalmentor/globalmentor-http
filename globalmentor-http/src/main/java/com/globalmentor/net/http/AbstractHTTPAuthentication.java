@@ -16,7 +16,7 @@
 
 package com.globalmentor.net.http;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * An authentication challenge or response.
@@ -47,7 +47,7 @@ public abstract class AbstractHTTPAuthentication implements HTTPAuthentication {
 	 * @throws NullPointerException if the authentication scheme is <code>null</code>.
 	 */
 	public AbstractHTTPAuthentication(final AuthenticationScheme scheme, final String realm) {
-		this.scheme = checkInstance(scheme, "Authentication scheme must be provided.");
+		this.scheme = requireNonNull(scheme, "Authentication scheme must be provided.");
 		this.realm = realm;
 	}
 

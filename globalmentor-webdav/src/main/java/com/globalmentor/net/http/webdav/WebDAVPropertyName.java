@@ -18,7 +18,7 @@ package com.globalmentor.net.http.webdav;
 
 import java.net.URI;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.model.IDed;
 import com.globalmentor.net.DefaultResource;
@@ -104,7 +104,7 @@ public class WebDAVPropertyName extends DefaultResource implements IDed<URI> {
 	 * @throws NullPointerException if the given property namespace and/or property local name is <code>null</code>.
 	 */
 	public static URI createPropertyURI(final String propertyNamespace, final String propertyLocalName) {
-		return URI.create(checkInstance(propertyNamespace, "Property namespace cannot be null.")
-				+ checkInstance(propertyLocalName, "Property local name cannot be null.")); //concatenate the property namespace and local name after ensuring they are not null
+		return URI.create(requireNonNull(propertyNamespace, "Property namespace cannot be null.")
+				+ requireNonNull(propertyLocalName, "Property local name cannot be null.")); //concatenate the property namespace and local name after ensuring they are not null
 	}
 }

@@ -16,7 +16,7 @@
 
 package com.globalmentor.net.http;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * An encapsulation of basic authenticate credentials of HTTP Basic Access Authentication, <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,
@@ -55,9 +55,9 @@ public class BasicAuthenticateCredentials extends AbstractHTTPAuthentication imp
 	 * @throws NullPointerException if the username, realm, and/or password <code>null</code>.
 	 */
 	protected BasicAuthenticateCredentials(final String username, final String realm, final char[] password) {
-		super(AuthenticationScheme.BASIC, checkInstance(realm, "Realm must be provided.")); //construct the parent class
-		this.username = checkInstance(username, "Username must be provided.");
-		this.password = checkInstance(password, "Password must be provided.");
+		super(AuthenticationScheme.BASIC, requireNonNull(realm, "Realm must be provided.")); //construct the parent class
+		this.username = requireNonNull(username, "Username must be provided.");
+		this.password = requireNonNull(password, "Password must be provided.");
 	}
 
 }

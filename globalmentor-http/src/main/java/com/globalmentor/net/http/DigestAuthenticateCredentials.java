@@ -21,9 +21,10 @@ import java.security.NoSuchAlgorithmException;
 
 import static com.globalmentor.java.Bytes.*;
 import static com.globalmentor.java.Longs.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.http.DigestAuthentication.*;
 import static com.globalmentor.security.MessageDigests.*;
+
+import static java.util.Objects.*;
 
 /**
  * An encapsulation of digest authenticate credentials of HTTP Digest Access Authentication, <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,
@@ -203,7 +204,7 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 	protected DigestAuthenticateCredentials(final String method, final String username, final String realm, final char[] password, final String nonce,
 			final String digestURI, final String response, final String cnonce, final String opaque, final QOP qop, final long nonceCount, final String algorithm)
 			throws NoSuchAlgorithmException {
-		super(AuthenticationScheme.DIGEST, checkInstance(realm, "Realm must be provided.")); //construct the parent class
+		super(AuthenticationScheme.DIGEST, requireNonNull(realm, "Realm must be provided.")); //construct the parent class
 		if(nonce == null) { //if the nonce is null
 			throw new NullPointerException("Nonce must be provided.");
 		}

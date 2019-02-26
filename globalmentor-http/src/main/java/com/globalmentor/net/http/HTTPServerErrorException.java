@@ -53,6 +53,7 @@ public abstract class HTTPServerErrorException extends HTTPException {
 
 	/**
 	 * Constructs a new exception with the specified status code, detail message, and cause.
+	 * @param statusCode The HTTP status code to return in the request.
 	 * @param message The detail message.
 	 * @param cause The cause, or <code>null</code> to indicate the cause is nonexistent or unknown.
 	 * @throws IllegalArgumentException if the status code is not a 5xx status code.

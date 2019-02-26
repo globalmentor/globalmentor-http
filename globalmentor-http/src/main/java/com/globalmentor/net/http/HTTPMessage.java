@@ -19,6 +19,7 @@ package com.globalmentor.net.http;
 import java.util.Date;
 
 import com.globalmentor.model.NameValuePair;
+import com.globalmentor.net.HTTP;
 import com.globalmentor.text.SyntaxException;
 
 /**
