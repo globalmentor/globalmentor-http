@@ -30,7 +30,6 @@ import static com.globalmentor.text.TextFormatter.*;
 
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.text.TextFormatter;
-import com.globalmentor.util.Base64;
 
 /**
  * Class that knows how to format HTTP information.
@@ -46,7 +45,8 @@ public class HTTPFormatter {
 	 * @param httpVersion The HTTP version.
 	 * @return The string builder containing the formatted information.
 	 */
-	public static StringBuilder formatRequestLine(final StringBuilder stringBuilder, final String method, final String requestURI, final HTTPVersion httpVersion) {
+	public static StringBuilder formatRequestLine(final StringBuilder stringBuilder, final String method, final String requestURI,
+			final HTTPVersion httpVersion) {
 		stringBuilder.append(method).append(SP).append(requestURI.toString()).append(SP); //Method SP Request-URI SP
 		formatVersion(stringBuilder, httpVersion); //HTTP-Version
 		return stringBuilder.append(CRLF); //CRLF
@@ -113,7 +113,7 @@ public class HTTPFormatter {
 			credentialsBuilder.append(basicCredentials.getUsername()); //username
 			credentialsBuilder.append(BASIC_DELIMITER); //:
 			credentialsBuilder.append(basicCredentials.getPassword()); //password
-			final String base64Credentials = Base64.encodeBytes(credentialsBuilder.toString().getBytes(UTF_8)); //base64-encode the credential string
+			final String base64Credentials = Base64.getEncoder().encodeToString(credentialsBuilder.toString().getBytes(UTF_8)); //base64-encode the credential string
 			stringBuilder.append(base64Credentials); //append the base64-encoded basic credentials
 		} else if(credentials instanceof DigestAuthenticateCredentials) { //if this is digest credentials
 			final DigestAuthenticateCredentials digestCredentials = (DigestAuthenticateCredentials)credentials; //get the credentials as digest credentials

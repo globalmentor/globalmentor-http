@@ -22,17 +22,18 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 
 import static com.globalmentor.net.http.webdav.WebDAV.*;
-import static com.globalmentor.w3c.spec.XML.*;
 import static com.globalmentor.xml.XML.*;
+import static com.globalmentor.xml.spec.XML.*;
 
 import com.globalmentor.model.ConfigurationException;
 import com.globalmentor.xml.XMLNamespacePrefixManager;
+import com.globalmentor.xml.spec.XML;
 
 import org.w3c.dom.*;
 
 /**
- * Class to generate XML trees for WebDAV as defined by <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>,
- * "HTTP Extensions for Distributed Authoring -- WEBDAV". This class is not thread safe.
+ * Class to generate XML trees for WebDAV as defined by <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>, "HTTP Extensions for Distributed Authoring
+ * -- WEBDAV". This class is not thread safe.
  * @author Garret Wilson
  */
 public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {

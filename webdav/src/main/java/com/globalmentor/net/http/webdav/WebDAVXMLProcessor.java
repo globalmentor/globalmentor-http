@@ -19,19 +19,21 @@ package com.globalmentor.net.http.webdav;
 import java.net.*;
 import java.util.*;
 
-import com.globalmentor.log.Log;
 import static com.globalmentor.net.http.webdav.WebDAV.*;
 import static com.globalmentor.xml.XML.*;
 
 import com.globalmentor.collections.DecoratorIDedMappedList;
 import com.globalmentor.model.NameValuePair;
+
+import io.clogr.Clogr;
+
 import static com.globalmentor.net.URIs.*;
 
 import org.w3c.dom.*;
 
 /**
- * Class to process XML containing serialized information from WebDAV as defined by <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>,
- * "HTTP Extensions for Distributed Authoring -- WEBDAV". This class is not thread safe.
+ * Class to process XML containing serialized information from WebDAV as defined by <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>, "HTTP Extensions
+ * for Distributed Authoring -- WEBDAV". This class is not thread safe.
  * @author Garret Wilson
  */
 public class WebDAVXMLProcessor {
@@ -89,7 +91,7 @@ public class WebDAVXMLProcessor {
 			final Node childNode = childList.item(childIndex); //get this child node
 			if(childNode.getNodeType() == Node.ELEMENT_NODE && WEBDAV_NAMESPACE.equals(childNode.getNamespaceURI())
 					&& ELEMENT_RESPONSE.equals(childNode.getLocalName())) { //D:response
-			//			TODO del Log.trace("found response element");
+				//			TODO del Log.trace("found response element");
 				final NameValuePair<URI, Map<WebDAVPropertyName, WebDAVProperty>> resourceProperties = getResponseProperties((Element)childNode, baseURI); //get the resource URI and properties
 				if(resourceProperties != null) { //if we got a resource and properties
 					resourcesPropertyMaps.add(resourceProperties); //add this resource properties pair to the list
@@ -127,7 +129,7 @@ public class WebDAVXMLProcessor {
 								uri = resolve(baseURI, uri); //resolve the URI to the base URI to compensate for servers that return relative URIs
 							}
 						} catch(final URISyntaxException uriSyntaxException) { //if the URI is not in proper form
-							Log.warn(uriSyntaxException); //TODO return an appropriate error
+							Clogr.getLogger(WebDAVXMLProcessor.class).warn("Invalid format for href URI {}.", uriString, uriSyntaxException); //TODO return an appropriate error
 						}
 					} else if(ELEMENT_PROPSTAT.equals(childLocalName)) { //D:propstat
 						propertyMap.putAll(getPropstatProperties(childElement)); //get the properties and add them to our map (there can be multiple propstat properties) TODO later perhaps group the propstat properties, each of which can have a status
@@ -161,7 +163,7 @@ public class WebDAVXMLProcessor {
 				if(WEBDAV_NAMESPACE.equals(childNode.getNamespaceURI())) { //if this is a WebDAV element
 					final String childLocalName = childNode.getLocalName(); //get the child element's local name
 					if(ELEMENT_PROP.equals(childLocalName)) { //D:prop
-					//TODO del Log.trace("found D:prop");
+						//TODO del Log.trace("found D:prop");
 						final NodeList propertyChildList = childNode.getChildNodes(); //get a list of property element children
 						final int propertyChildCount = propertyChildList.getLength(); //find out how many property children there are
 						for(int propertyChildIndex = 0; propertyChildIndex < propertyChildCount; ++propertyChildIndex) { //look at each property child node

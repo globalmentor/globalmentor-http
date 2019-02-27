@@ -27,15 +27,14 @@ import javax.xml.parsers.DocumentBuilder;
 
 import com.globalmentor.io.*;
 import com.globalmentor.java.Bytes;
-import com.globalmentor.log.Log;
-import com.globalmentor.log.LogInputStream;
-import com.globalmentor.log.LogOutputStream;
 import com.globalmentor.model.ConfigurationException;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.*;
 import com.globalmentor.security.*;
 import com.globalmentor.text.SyntaxException;
 import com.globalmentor.xml.XMLSerializer;
+
+import io.clogr.Clogged;
 
 import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Arrays.*;
@@ -63,12 +62,12 @@ import static java.util.Objects.*;
  * <li>The {@link Authenticable}, if any, specified by the default client.</li>
  * </ol>
  * <p>
- * This connection also provides a lock that can be used by callallows callers to ensure that only one
+ * This connection also provides a lock that can be used by callers to ensure that only one
  * @author Garret Wilson
  * @see HTTPClient
  * @see Client#isLogged()
  */
-public class HTTPClientTCPConnection {
+public class HTTPClientTCPConnection implements Clogged {
 
 	/** The number of times to try a request if there is an error connecting. */
 	private static final int MAX_REQUEST_TRIES = 5;
@@ -230,7 +229,7 @@ public class HTTPClientTCPConnection {
 					}
 					++tryCount; //indicate we're trying again
 					retryDelay += REQUEST_RETRY_BACKOFF_DELAY; //increase the amount of time we wait between retrying
-					Log.debug("Retrying connection to " + host + " (try " + tryCount + ").");
+					getLogger().debug("Retrying connection to " + host + " (try " + tryCount + ").");
 				}
 			} while(!connected);
 			//TODO later turn on non-blocking access when we have a separate client which will on a separate thread feed requests and retrieve responses
@@ -238,10 +237,12 @@ public class HTTPClientTCPConnection {
 			//TODO fix			outputStream=new BufferedOutputStream(newOutputStream(channel));	//create a new output stream to the channel
 			inputStream = socket.getInputStream(); //get an input stream from the socket
 			outputStream = socket.getOutputStream(); //get an output stream from the socket
+			/*TODO bring back if transferred to Clogr
 			if(getClient().isLogged()) { //if we're using a logged client
 				inputStream = new LogInputStream(inputStream); //log all communication from the input stream
 				outputStream = new LogOutputStream(outputStream); //log all communication to the output stream
 			}
+			*/
 			inputStream = new BufferedInputStream(inputStream); //wrap the streams in buffered streams after adding logging, so larger chunks will be written to the log
 			outputStream = new BufferedOutputStream(outputStream);
 		}

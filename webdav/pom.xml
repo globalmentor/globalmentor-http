@@ -26,12 +26,7 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-w3c-spec</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-xml</artifactId>
+			<artifactId>globalmentor-xml-spec</artifactId>
 		</dependency>
 	</dependencies>
 </project>

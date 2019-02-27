@@ -21,12 +21,12 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-log</artifactId>
+			<artifactId>globalmentor-xml</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-xml</artifactId>
+			<groupId>io.clogr</groupId>
+			<artifactId>clogr</artifactId>
 		</dependency>
 	</dependencies>
 </project>
