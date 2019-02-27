@@ -27,8 +27,8 @@ import static com.globalmentor.net.http.HTTPParser.*;
 import com.globalmentor.text.SyntaxException;
 
 /**
- * The default implementation of an HTTP request as defined by <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,
- * "Hypertext Transfer Protocol -- HTTP/1.1".
+ * The default implementation of an HTTP request as defined by <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>, "Hypertext Transfer Protocol --
+ * HTTP/1.1".
  * @author Garret Wilson
  */
 public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPRequest {
@@ -64,7 +64,7 @@ public class DefaultHTTPRequest extends AbstractHTTPMessage implements HTTPReque
 	 */
 	public void setRequestURI(final String requestURI) {
 		final URI uri = URI.create(requestURI); //create a URI from the request URI TODO check for "*"
-		if(!uri.isAbsolute() && !isAbsolutePath(uri)) { //if the URI is not absolute, and it doesn't represent an absolute path
+		if(!uri.isAbsolute() && !hasAbsolutePath(uri)) { //if the URI is not absolute, and it doesn't represent an absolute path
 			throw new IllegalArgumentException("Request URI " + uri + " does represent neither an absolute URI nor an absolute path.");
 		}
 		this.requestURI = requestURI; //save the request URI
