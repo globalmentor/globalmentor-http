@@ -42,7 +42,7 @@ import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
-import static com.globalmentor.xml.XML.*;
+import static com.globalmentor.xml.XmlDom.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.fill;
 

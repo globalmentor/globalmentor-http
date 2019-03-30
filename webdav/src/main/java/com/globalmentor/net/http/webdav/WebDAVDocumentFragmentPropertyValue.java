@@ -17,7 +17,7 @@
 package com.globalmentor.net.http.webdav;
 
 import com.globalmentor.model.ObjectDecorator;
-import com.globalmentor.xml.XML;
+import com.globalmentor.xml.XmlDom;
 
 import org.w3c.dom.DocumentFragment;
 
@@ -48,6 +48,6 @@ public class WebDAVDocumentFragmentPropertyValue extends ObjectDecorator<Documen
 
 	/** @return A non-<code>null</code> literal representing plain text contained in this WebDAV value, which may be the empty string. */
 	public String getText() {
-		return XML.getText(getDocumentFragment());
+		return XmlDom.getText(getDocumentFragment());
 	}
 }

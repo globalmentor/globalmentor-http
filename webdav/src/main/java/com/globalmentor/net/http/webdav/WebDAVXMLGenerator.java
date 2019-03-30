@@ -22,7 +22,7 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 
 import static com.globalmentor.net.http.webdav.WebDAV.*;
-import static com.globalmentor.xml.XML.*;
+import static com.globalmentor.xml.XmlDom.*;
 import static com.globalmentor.xml.spec.XML.*;
 
 import com.globalmentor.model.ConfigurationException;

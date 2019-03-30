@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.*;
 
 import static com.globalmentor.net.http.webdav.WebDAVPropertyName.*;
-import static com.globalmentor.xml.XML.*;
+import static com.globalmentor.xml.XmlDom.*;
 
 import com.globalmentor.collections.DecoratorIDedMappedList;
 
