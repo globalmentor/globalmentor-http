@@ -19,7 +19,7 @@ package com.globalmentor.net.http;
 import java.io.*;
 import java.util.Arrays;
 
-import com.globalmentor.io.Streams;
+import com.globalmentor.io.IOStreams;
 
 import static junit.framework.Assert.*;
 
@@ -58,7 +58,7 @@ public class HTTPChunkedStreamTest {
 		outputStream.close();
 		final InputStream inputStream = new HTTPChunkedInputStream(new ByteArrayInputStream(temp.toByteArray())); //read the chunked data back back out
 		final ByteArrayOutputStream copy = new ByteArrayOutputStream();
-		Streams.copy(inputStream, copy);
+		IOStreams.copy(inputStream, copy);
 		inputStream.close();
 		assertTrue("HTTP chunked output stream did not correctly write data.", Arrays.equals(testData, copy.toByteArray()));
 	}

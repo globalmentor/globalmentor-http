@@ -217,7 +217,7 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 		if(digestURI == null) { //if no digest URI was given
 			throw new NullPointerException("Digest URI must be provided.");
 		}
-		if(!MD5_ALGORITHM.equals(algorithm)) { //currently, we only support MD5
+		if(!MD5.getName().equals(algorithm)) { //currently, we only support MD5
 			throw new NoSuchAlgorithmException("Algorithm " + algorithm + " not supported.");
 		}
 		this.username = username;
@@ -259,7 +259,7 @@ public class DigestAuthenticateCredentials extends AbstractHTTPAuthentication im
 	protected String getRequestDigest(final String method, final char[] password) {
 		final MessageDigest messageDigest = getMessageDigest(); //get the message digest
 		try {
-			assert MD5_ALGORITHM.equals(getMessageDigest().getAlgorithm()) : "Only the MD5 algorithm is supported."; //TODO complete for MD5-sess
+			assert MD5.getName().equals(getMessageDigest().getAlgorithm()) : "Only the MD5 algorithm is supported."; //TODO complete for MD5-sess
 			//H(A1)
 			messageDigest.reset(); //reset the message digest for calculating H(A1)
 			update(messageDigest, getUsername()); //username

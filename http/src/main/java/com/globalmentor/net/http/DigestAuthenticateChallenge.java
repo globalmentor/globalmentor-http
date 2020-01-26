@@ -124,7 +124,7 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge {
 	 * @throws NullPointerException if the realm or the nonce is <code>null</code>.
 	 */
 	public DigestAuthenticateChallenge(final String realm, final String nonce, final String opaque) throws NoSuchAlgorithmException {
-		this(realm, nonce, opaque, MD5_ALGORITHM); //construct the challenge with the MD5 algorithm
+		this(realm, nonce, opaque, MD5.getName()); //construct the challenge with the MD5 algorithm
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge {
 	 * @throws NullPointerException if the realm or the nonce is <code>null</code>.
 	 */
 	public DigestAuthenticateChallenge(final String realm, final String nonce, final String opaque, final boolean stale) throws NoSuchAlgorithmException {
-		this(realm, nonce, opaque, stale, MD5_ALGORITHM); //construct the challenge with the MD5 algorithm
+		this(realm, nonce, opaque, stale, MD5.getName()); //construct the challenge with the MD5 algorithm
 	}
 
 	/**

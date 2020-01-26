@@ -508,7 +508,7 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 						}
 						final long nonceCount = Long.parseLong(nonceCountString, 16); //parse the hex nonce count string to a long
 						return new DigestAuthenticateCredentials(username, realm, nonce, digestURIString, response, cnonce, opaque, messageQOP, nonceCount,
-								algorithm != null ? algorithm : MD5_ALGORITHM);
+								algorithm != null ? algorithm : MD5.getName());
 					}
 					default: //if we don't support this authentication scheme
 						return null; //show that we don't support this authentication scheme TODO fix for BASIC and other schemes
