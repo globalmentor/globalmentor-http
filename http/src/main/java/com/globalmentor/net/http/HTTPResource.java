@@ -366,11 +366,8 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @throws IOException if there is an error reading the data.
 	 */
 	public <T> T get(final IO<T> io) throws IOException {
-		final InputStream inputStream = getInputStream(); //get an input stream to the resource
-		try {
+		try (final InputStream inputStream = getInputStream()) { //get an input stream to the resource
 			return io.read(inputStream, getURI()); //read the object, using the resource reference URI as the base URI
-		} finally {
-			inputStream.close(); //always close the input stream
 		}
 	}
 
@@ -382,11 +379,8 @@ public class HTTPResource extends DefaultResource //TODO improve by having a per
 	 * @throws IOException if there is an error writing the data.
 	 */
 	public <T> void put(final T object, final IO<T> io) throws IOException {
-		final OutputStream outputStream = getOutputStream();//get an output stream to the resource
-		try {
+		try (final OutputStream outputStream = getOutputStream()) {//get an output stream to the resource
 			io.write(outputStream, getURI(), object); //write the object, using the resource reference URI as the base URI
-		} finally {
-			outputStream.close(); //always close the output stream
 		}
 	}
 

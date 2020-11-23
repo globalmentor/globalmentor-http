@@ -373,13 +373,10 @@ public class HTTPClientTCPConnection implements Clogged {
 	 */
 	public void writeRequest(final HTTPRequest request, final Document document) throws IOException {
 
-		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); //create a byte array output stream to hold our outgoing data
-		try {
+		try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) { //create a byte array output stream to hold our outgoing data
 			new XMLSerializer(true).serialize(document, byteArrayOutputStream, UTF_8); //serialize the document to the byte array with no byte order mark
 			final byte[] bytes = byteArrayOutputStream.toByteArray(); //get the bytes we serialized
 			writeRequest(request, bytes); //write the request; don't stream the body, because it should be so short that we can deliver it all in one go
-		} finally {
-			byteArrayOutputStream.close(); //always close the stream as good practice			
 		}
 		/*alternate method using chunks:
 				new XMLSerializer(true).serialize(document, writeRequest(request), UTF_8);	//serialize the document to the byte array with no byte order mark
@@ -682,13 +679,10 @@ public class HTTPClientTCPConnection implements Clogged {
 	 * @throws IOException if there is an error writing the request or reading the response.
 	 */
 	public HTTPResponse sendRequest(final HTTPRequest request, final Document document) throws IOException {
-		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); //create a byte array output stream to hold our outgoing data
-		try {
+		try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) { //create a byte array output stream to hold our outgoing data
 			new XMLSerializer(true).serialize(document, byteArrayOutputStream, UTF_8); //serialize the document to the byte array with no byte order mark
 			final byte[] bytes = byteArrayOutputStream.toByteArray(); //get the bytes we serialized
 			return sendRequest(request, bytes); //set the bytes of the XML document into the body of the message
-		} finally {
-			byteArrayOutputStream.close(); //always close the stream as good practice			
 		}
 	}
 
