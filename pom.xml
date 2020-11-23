@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>globalmentor-http-parent</artifactId>
-	<version>0.6.1</version>
+	<version>0.6.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>GlobalMentor HTTP Parent</name>
@@ -37,7 +37,7 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-http</artifactId>
-				<version>0.6.1</version>
+				<version>0.6.2-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
