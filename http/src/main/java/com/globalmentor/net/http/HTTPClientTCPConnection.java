@@ -539,7 +539,7 @@ public class HTTPClientTCPConnection implements Clogged {
 					}
 					if(contentLength >= 0) { //if there is a content length
 						assert contentLength <= Integer.MAX_VALUE : "Unsupported content length.";
-						final byte[] responseBody = InputStreams.getBytes(inputStream, (int)contentLength);
+						final byte[] responseBody = InputStreams.readBytes(inputStream, (int)contentLength);
 						afterReadBody(response); //clean up the connection
 						if(responseBody.length == contentLength) { //if we read all the response body
 							return responseBody; //return the response body

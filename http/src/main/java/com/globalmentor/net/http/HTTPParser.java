@@ -161,7 +161,7 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 			throw new ParseIOException(numberFormatException.toString());
 		}
 		if(chunkSize > 0) { //if a positive chunk size is given
-			final byte[] chunk = InputStreams.getBytes(inputStream, chunkSize); //read this chunk
+			final byte[] chunk = InputStreams.readBytes(inputStream, chunkSize); //read this chunk
 			parseCRLF(inputStream); //parse a CRLF, but ignore it
 			return chunk; //return the chunk
 		} else if(chunkSize == 0) { //if the chunk size is zero, there's nothing to read---not even a CRLF
