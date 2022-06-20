@@ -4,18 +4,26 @@
 
 	<parent>
 		<groupId>com.globalmentor</groupId>
-		<artifactId>globalmentor-opensource-parent</artifactId>
-		<version>8.6.0</version>
+		<artifactId>globalmentor-base</artifactId>
+		<version>0.7.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>globalmentor-http-parent</artifactId>
-	<version>0.6.2</version>
+	<version>0.6.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>GlobalMentor HTTP Parent</name>
 	<description>GlobalMentor HTTP aggregate parent POM.</description>
 	<url>http://www.globalmentor.com/software/</url>
 	<inceptionYear>1996</inceptionYear>
+
+	<licenses>
+		<license>
+			<name>Apache-2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<scm>
 		<connection>scm:git:https://bitbucket.org/globalmentor/globalmentor-http.git</connection>
@@ -36,8 +44,16 @@
 		<dependencies>
 			<dependency>
 				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-parent</artifactId>
+				<version>8.6.0</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-http</artifactId>
-				<version>0.6.2</version>
+				<version>0.6.3-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
