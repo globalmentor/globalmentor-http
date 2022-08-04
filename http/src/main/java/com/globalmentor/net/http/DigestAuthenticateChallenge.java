@@ -18,8 +18,8 @@ package com.globalmentor.net.http;
 
 import java.security.*;
 
+import static com.globalmentor.java.Bytes.*;
 import static com.globalmentor.security.MessageDigests.*;
-import static com.globalmentor.text.TextFormatter.*;
 
 import static java.util.Objects.*;
 
@@ -49,7 +49,7 @@ public class DigestAuthenticateChallenge extends AbstractAuthenticateChallenge {
 
 	/** @return The hashed nonce value. */
 	public String getNonceDigest() {
-		return formatHex(digest(getMessageDigest(), getNonce())); //calculate the nonce digest
+		return toHexString(digest(getMessageDigest(), getNonce())); //calculate the nonce digest
 	}
 
 	/** The opaque challenge data, or <code>null</code> for no opaque data. */
