@@ -16,14 +16,14 @@
 
 package com.globalmentor.net.http;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+
 import java.io.*;
-import java.util.Arrays;
+
+import org.junit.jupiter.api.Test;
 
 import com.globalmentor.io.IOStreams;
-
-import static junit.framework.Assert.*;
-
-import org.junit.Test;
 
 /**
  * Tests for streams processing HTTP chunked encoding.
@@ -60,7 +60,7 @@ public class HTTPChunkedStreamTest {
 		final ByteArrayOutputStream copy = new ByteArrayOutputStream();
 		IOStreams.copy(inputStream, copy);
 		inputStream.close();
-		assertTrue("HTTP chunked output stream did not correctly write data.", Arrays.equals(testData, copy.toByteArray()));
+		assertThat("HTTP chunked output stream did not correctly write data.", copy.toByteArray(), is(equalTo(testData)));
 	}
 
 }
