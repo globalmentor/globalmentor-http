@@ -218,7 +218,7 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 				}
 				lineBuilder.append(nextLineBuilder); //append the next line to the previous one
 			} else { //if the next line doesn't start with whitespace, it's a true new header (or the empty line); parse the last line 
-				final int delimiterIndex = charIndexOf(lineBuilder, DELIMITER_CHARACTERS); //get the index of the first delimiter
+				final int delimiterIndex = indexOf(lineBuilder, DELIMITER_CHARACTERS); //get the index of the first delimiter
 				if(delimiterIndex >= 0 && lineBuilder.charAt(delimiterIndex) == HEADER_SEPARATOR) { //if we found the separator
 					final String name = lineBuilder.substring(0, delimiterIndex); //find the name
 					lineBuilder.delete(0, delimiterIndex + 1); //remove everything up to and including the delimiter
