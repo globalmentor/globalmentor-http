@@ -4,7 +4,7 @@
 
 	<parent>
 		<groupId>com.globalmentor</groupId>
-		<artifactId>globalmentor-http-parent</artifactId>
+		<artifactId>globalmentor-http-bom</artifactId>
 		<version>0.6.3-SNAPSHOT</version>
 	</parent>
 

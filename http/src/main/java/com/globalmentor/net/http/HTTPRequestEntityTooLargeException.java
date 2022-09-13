@@ -52,6 +52,6 @@ public class HTTPRequestEntityTooLargeException extends HTTPClientErrorException
 	 * @param cause The cause, or <code>null</code> to indicate the cause is nonexistent or unknown.
 	 */
 	public HTTPRequestEntityTooLargeException(final String message, final Throwable cause) {
-		super(SC_REQUEST_ENTITY_TOO_LARGE, message, cause); //construct the parent class
+		super(SC_CONTENT_TOO_LARGE, message, cause); //construct the parent class
 	}
 }
