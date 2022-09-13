@@ -20,15 +20,15 @@ import java.net.URI;
 import java.util.*;
 
 import static com.globalmentor.net.http.webdav.WebDAVPropertyName.*;
-import static com.globalmentor.xml.XmlDom.*;
 
 import com.globalmentor.collections.DecoratorIDedMappedList;
 
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Constant values and utilities for WebDAV as defined by <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>,
- * "HTTP Extensions for Distributed Authoring -- WEBDAV".
+ * Constant values and utilities for WebDAV as defined by <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>, "HTTP Extensions for Distributed Authoring
+ * -- WEBDAV".
  * <p>
  * Status code declarations and comments used from Tomcat org.apache.catalina.servlets.WebdavServlet by Remy Maucherat Revision: 1.19 $ $Date: 2004/09/19
  * 01:20:10.
@@ -175,8 +175,11 @@ public class WebDAV {
 			final WebDAVPropertyValue resourceTypePropertyValue = resourceTypeProperty.getValue(); //get the value of the resource type property
 			if(resourceTypePropertyValue instanceof WebDAVDocumentFragmentPropertyValue) { //if the property value represents a document fragment
 				final NodeList valueNodes = ((WebDAVDocumentFragmentPropertyValue)resourceTypePropertyValue).getDocumentFragment().getChildNodes(); //get the children of the document fragment
-				if(valueNodes.getLength() == 1 && COLLECTION_TYPE.equals(createQualifiedName(valueNodes.item(0)).getURI())) { //if there is one child with a reference URI of D:collection
-					return true; //indicate that the resource is a collection
+				if(valueNodes.getLength() == 1) { //if there is one child with a reference URI of D:collection
+					final Node valueNode = valueNodes.item(0);
+					if(valueNode.getNamespaceURI() != null && COLLECTION_TYPE.equals(createPropertyURI(valueNode.getNamespaceURI(), valueNode.getLocalName()))) { //if there is one child with a reference URI of D:collection
+						return true; //indicate that the resource is a collection
+					}
 				}
 			}
 		}
