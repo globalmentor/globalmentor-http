@@ -25,7 +25,7 @@ import static com.globalmentor.net.http.webdav.WebDAV.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static com.globalmentor.xml.spec.XML.*;
 
-import com.globalmentor.model.ConfigurationException;
+import com.globalmentor.model.ConfiguredStateException;
 import com.globalmentor.xml.XMLNamespacePrefixManager;
 import com.globalmentor.xml.spec.XML;
 
@@ -41,7 +41,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	/**
 	 * Creates and returns a default document builder for WebDAV, with namespace awareness but no validation.
 	 * @return A new XML document builder for handling WebDAV XML content.
-	 * @throws ConfigurationException if a document builder cannot be created which satisfies the configuration requested.
+	 * @throws ConfiguredStateException if a document builder cannot be created which satisfies the configuration requested.
 	 */
 	private static DocumentBuilder createWebDAVDocumentBuilder() {
 		return createDocumentBuilder(true); //create a document builder with namespace awareness

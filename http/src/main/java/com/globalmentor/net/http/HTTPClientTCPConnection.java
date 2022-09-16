@@ -27,7 +27,7 @@ import javax.xml.parsers.DocumentBuilder;
 
 import com.globalmentor.io.*;
 import com.globalmentor.java.Bytes;
-import com.globalmentor.model.ConfigurationException;
+import com.globalmentor.model.ConfiguredStateException;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.*;
 import com.globalmentor.security.*;
@@ -564,11 +564,11 @@ public class HTTPClientTCPConnection implements Clogged {
 	 * @param namespaceAware <code>true</code> if the document should support for XML namespaces, else <code>false</code>.
 	 * @param validated <code>true</code> if the document should be validated as it is parsed, else <code>false</code>.
 	 * @return A document representing the XML information, or <code>null</code> if there is no content.
-	 * @throws ConfigurationException if a document builder cannot be created which satisfies the configuration requested.
+	 * @throws ConfiguredStateException if a document builder cannot be created which satisfies the configuration requested.
 	 * @throws IOException if there is an error reading the XML.
 	 */
 	public Document readResponseBodyXML(final HTTPRequest request, final HTTPResponse response, final boolean namespaceAware, final boolean validated)
-			throws ConfigurationException, IOException {
+			throws ConfiguredStateException, IOException {
 		final InputStream inputStream = getResponseBodyInputStream(request, response); //get an input stream to the body contents
 		final DocumentBuilder documentBuilder = createDocumentBuilder(namespaceAware, validated); //create a document builder
 		final Document document;
