@@ -44,7 +44,6 @@ import static com.globalmentor.net.http.HTTPFormatter.*;
 import static com.globalmentor.net.http.HTTPParser.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.nio.charset.StandardCharsets.*;
-import static java.util.Arrays.fill;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -690,7 +689,7 @@ public class HTTPClientTCPConnection implements Clogged {
 	 * Closes the connection.
 	 * @throws IOException if there is a problem closing the connection.
 	 */
-	/*TODO del
+	/*TODO delete; revisit now that finalize() has been removed
 		public void close() throws IOException
 		{
 			getChannel().close();	//close the channel
@@ -712,17 +711,6 @@ public class HTTPClientTCPConnection implements Clogged {
 		}
 		promptBuilder.append('.');
 		return getClient().getPasswordAuthentication(request.getURI(), promptBuilder.toString()); //ask the client to ask the user for a password
-	}
-
-	/**
-	 * Cleans up the object upon garbage collection. This version attempts to disconnect if the connection if open.
-	 */
-	protected void finalize() throws Throwable {
-		try {
-			disconnect(); //try to disconnect if we need to
-		} finally {
-			super.finalize();
-		}
 	}
 
 	/**
