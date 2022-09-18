@@ -17,6 +17,7 @@
 package com.globalmentor.net.http;
 
 import static com.globalmentor.java.Doubles.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
 
@@ -56,7 +57,7 @@ public class WeightedValue<V> implements Comparable<WeightedValue<V>> {
 
 	/** @return A hash code for the object. */
 	public int hashCode() {
-		return Objects.getHashCode(getValue(), getQValue());
+		return hash(getValue(), getQValue());
 	}
 
 	/** @return A string representation of the object in the form <code><var>value</var>;q=<var>qvalue</var></code>. */
