@@ -29,6 +29,8 @@ import static com.globalmentor.time.TimeZones.*;
  */
 public class HTTPDateFormat extends SimpleDateFormat {
 
+	private static final long serialVersionUID = 6637634745774656959L;
+
 	/** The specific style of HTTP date format. */
 	public enum Style {
 		/** Style for RFC 822, updated by RFC 1123: Sun, 06 Nov 1994 08:49:37 GMT */
@@ -72,7 +74,7 @@ public class HTTPDateFormat extends SimpleDateFormat {
 	}
 
 	/** The formatting patterns used, in order. */
-	private static final String[] patterns = { RFC1123_PATTERN, RFC850_PATTERN, ASCTIME_PATTERN };
+	private static final String[] patterns = {RFC1123_PATTERN, RFC850_PATTERN, ASCTIME_PATTERN};
 
 	/**
 	 * Determines a pattern to use for the given style. This pattern may be incomplete and the output may require more processing.

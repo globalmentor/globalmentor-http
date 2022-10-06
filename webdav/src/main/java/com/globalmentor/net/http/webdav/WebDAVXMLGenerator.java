@@ -27,7 +27,6 @@ import static com.globalmentor.xml.spec.XML.*;
 
 import com.globalmentor.model.ConfiguredStateException;
 import com.globalmentor.xml.XMLNamespacePrefixManager;
-import com.globalmentor.xml.spec.XML;
 
 import org.w3c.dom.*;
 
@@ -66,8 +65,8 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	 * @throws DOMException if there is an error creating the document.
 	 */
 	public Document createPropfindDocument() throws DOMException {
-		return getDocumentBuilder().getDOMImplementation().createDocument(WEBDAV_NAMESPACE, createQName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_PROPFIND),
-				null); //create a propfind document
+		return getDocumentBuilder().getDOMImplementation().createDocument(WEBDAV_NAMESPACE,
+				createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_PROPFIND), null); //create a propfind document
 	}
 
 	/**
@@ -77,7 +76,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	 */
 	public Document createPropertyupdateDocument() throws DOMException {
 		return getDocumentBuilder().getDOMImplementation().createDocument(WEBDAV_NAMESPACE,
-				createQName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_PROPERTYUPDATE), null); //create a propertyupdate document
+				createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_PROPERTYUPDATE), null); //create a propertyupdate document
 	}
 
 	/**
@@ -86,8 +85,8 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	 * @throws DOMException if there is an error creating the document.
 	 */
 	public Document createMultistatusDocument() throws DOMException {
-		return getDocumentBuilder().getDOMImplementation().createDocument(WEBDAV_NAMESPACE, createQName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_MULTISTATUS),
-				null); //create a multistatus document
+		return getDocumentBuilder().getDOMImplementation().createDocument(WEBDAV_NAMESPACE,
+				createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_MULTISTATUS), null); //create a multistatus document
 	}
 
 	/**
@@ -97,7 +96,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	 * @throws DOMException if there is an error creating the element.
 	 */
 	public Element addResponse(final Element element) throws DOMException {
-		return appendElementNS(element, WEBDAV_NAMESPACE, createQName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_RESPONSE)); //create a response element
+		return appendElementNS(element, WEBDAV_NAMESPACE, createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_RESPONSE)); //create a response element
 	}
 
 	/**
@@ -109,7 +108,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	 */
 	public Element addHref(final Element element, final URI uri) throws DOMException {
 		//create an href element with the URI as its content and append it to the given element
-		return appendElementNS(element, WEBDAV_NAMESPACE, createQName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_HREF), uri.toString());
+		return appendElementNS(element, WEBDAV_NAMESPACE, createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_HREF), uri.toString());
 	}
 
 	/**
@@ -120,7 +119,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	 */
 	public Element addPropstat(final Element element) throws DOMException {
 		//create a propstat element and append it to the given element
-		return appendElementNS(element, WEBDAV_NAMESPACE, createQName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_PROPSTAT));
+		return appendElementNS(element, WEBDAV_NAMESPACE, createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_PROPSTAT));
 	}
 
 	/**
@@ -130,7 +129,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	 * @throws DOMException if there is an error creating the element.
 	 */
 	public Element addProp(final Element element) throws DOMException {
-		return appendElementNS(element, WEBDAV_NAMESPACE, createQName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_PROP)); //create a prop element and append it to the given element
+		return appendElementNS(element, WEBDAV_NAMESPACE, createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_PROP)); //create a prop element and append it to the given element
 	}
 
 	/**
@@ -166,7 +165,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 		final String propertyNamespace = propertyName.getNamespace(); //get the property namespace
 		//create a property element and append it to the given prop element
 		final Element propertyElement = appendElementNS(propElement, propertyNamespace,
-				createQName(getNamespacePrefix(propertyNamespace), propertyName.getLocalName()));
+				createQualifiedName(getNamespacePrefix(propertyNamespace), propertyName.getLocalName()));
 		final WebDAVPropertyValue value = property.getValue(); //get the value of the property
 		if(value != null) { //if there is a value
 			if(value instanceof WebDAVDocumentFragmentPropertyValue) { //if this is a document fragment value
@@ -190,7 +189,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	public Element addPropertyName(final Element propElement, final WebDAVPropertyName propertyName) throws DOMException {
 		final String propertyNamespace = propertyName.getNamespace(); //get the property namespace
 		//create a property element and append it to the given prop element
-		return appendElementNS(propElement, propertyNamespace, createQName(getNamespacePrefix(propertyNamespace), propertyName.getLocalName()));
+		return appendElementNS(propElement, propertyNamespace, createQualifiedName(getNamespacePrefix(propertyNamespace), propertyName.getLocalName()));
 	}
 
 	/**
@@ -200,7 +199,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	 * @throws DOMException if there is an error creating the element.
 	 */
 	public Element addRemove(final Element element) throws DOMException {
-		return appendElementNS(element, WEBDAV_NAMESPACE, createQName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_REMOVE)); //create a remove element and append it to the given element
+		return appendElementNS(element, WEBDAV_NAMESPACE, createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_REMOVE)); //create a remove element and append it to the given element
 	}
 
 	/**
@@ -210,7 +209,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	 * @throws DOMException if there is an error creating the element.
 	 */
 	public Element addSet(final Element element) throws DOMException {
-		return appendElementNS(element, WEBDAV_NAMESPACE, createQName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_SET)); //create a set element and append it to the given element
+		return appendElementNS(element, WEBDAV_NAMESPACE, createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_SET)); //create a set element and append it to the given element
 	}
 
 	/**
@@ -222,7 +221,7 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	 */
 	public Element addStatus(final Element element, final String status) throws DOMException {
 		//create a status element with the status text as its content and append it to the given element
-		return appendElementNS(element, WEBDAV_NAMESPACE, createQName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_STATUS), status);
+		return appendElementNS(element, WEBDAV_NAMESPACE, createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), ELEMENT_STATUS), status);
 	}
 
 	/**
@@ -236,9 +235,9 @@ public class WebDAVXMLGenerator extends XMLNamespacePrefixManager {
 	public Element addResourceType(final Element element, final String typeNamespace, final String typeLocalName) throws DOMException {
 		//create and append a resource type element
 		final Element resourceTypeElement = appendElementNS(element, RESOURCE_TYPE_PROPERTY_NAME.getNamespace(),
-				createQName(getNamespacePrefix(WEBDAV_NAMESPACE), RESOURCE_TYPE_PROPERTY_NAME.getLocalName()));
+				createQualifiedName(getNamespacePrefix(WEBDAV_NAMESPACE), RESOURCE_TYPE_PROPERTY_NAME.getLocalName()));
 		if(typeNamespace != null && typeLocalName != null) { //if a type was given
-			appendElementNS(resourceTypeElement, typeNamespace, createQName(getNamespacePrefix(typeNamespace), typeLocalName)); //look up the prefix and create a subelement to represent the resource type
+			appendElementNS(resourceTypeElement, typeNamespace, createQualifiedName(getNamespacePrefix(typeNamespace), typeLocalName)); //look up the prefix and create a subelement to represent the resource type
 		}
 		return resourceTypeElement; //return the element we created
 	}

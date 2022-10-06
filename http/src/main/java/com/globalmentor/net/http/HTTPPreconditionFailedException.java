@@ -25,6 +25,8 @@ import static com.globalmentor.net.HTTP.*;
  */
 public class HTTPPreconditionFailedException extends HTTPClientErrorException {
 
+	private static final long serialVersionUID = 1L;
+
 	/** Constructs a new exception. */
 	public HTTPPreconditionFailedException() {
 		this((String)null); //construct the exception with no message

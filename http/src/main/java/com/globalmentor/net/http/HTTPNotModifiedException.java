@@ -25,6 +25,8 @@ import static com.globalmentor.net.HTTP.*;
  */
 public class HTTPNotModifiedException extends HTTPRedirectException {
 
+	private static final long serialVersionUID = 1L;
+
 	/** Default constructor. */
 	public HTTPNotModifiedException() {
 		super(SC_NOT_MODIFIED); //construct parent class

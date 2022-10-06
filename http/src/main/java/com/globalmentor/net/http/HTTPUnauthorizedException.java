@@ -24,6 +24,8 @@ import static com.globalmentor.net.HTTP.*;
  */
 public class HTTPUnauthorizedException extends HTTPClientErrorException {
 
+	private static final long serialVersionUID = 1L;
+
 	/** The authenticate challenge to issue to the client. */
 	private final AuthenticateChallenge challenge;
 

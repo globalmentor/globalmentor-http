@@ -337,7 +337,7 @@ public class HTTPParser //TODO convert to use new parsing routines and Character
 			}
 		}
 		sort(elementList); //sort the elements by natural order (weight)
-		return (WeightedValue<String>[])elementList.toArray(new WeightedValue[elementList.size()]); //return the list of elements we parsed
+		return (WeightedValue<String>[])elementList.toArray(new WeightedValue<?>[elementList.size()]); //return the list of elements we parsed
 	}
 
 	/**

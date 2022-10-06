@@ -26,6 +26,8 @@ import com.globalmentor.net.*;
  */
 public class HTTPException extends IOException {
 
+	private static final long serialVersionUID = 1L;
+
 	/** The HTTP status code to return in the request. */
 	private final int statusCode;
 

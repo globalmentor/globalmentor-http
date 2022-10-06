@@ -24,6 +24,8 @@ import static com.globalmentor.net.HTTP.*;
  */
 public class HTTPNotFoundException extends HTTPClientErrorException {
 
+	private static final long serialVersionUID = 1L;
+
 	/** Constructs a new exception. */
 	public HTTPNotFoundException() {
 		this((String)null); //construct the exception with no message

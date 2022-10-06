@@ -27,6 +27,8 @@ import static com.globalmentor.net.HTTP.*;
  */
 public class HTTPMethodNotAllowedException extends HTTPClientErrorException {
 
+	private static final long serialVersionUID = 1L;
+
 	/** The set of allowed methods, either strings or objects the strings of which represent HTTP methods. */
 	private final Set<String> allowedMethods;
 

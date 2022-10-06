@@ -145,7 +145,7 @@ public class HTTPFormatter {
 			unquotedWWWAuthenticateParameters.add(ALGORITHM_PARAMETER); //algorithm
 			unquotedWWWAuthenticateParameters.add(NONCE_COUNT_PARAMETER); //nonce-count
 			unquotedWWWAuthenticateParameters.add(QOP_PARAMETER); //qop
-			formatAttributeList(stringBuilder, unquotedWWWAuthenticateParameters, parameterList.toArray(new NameValuePair[parameterList.size()])); //parameters
+			formatAttributeList(stringBuilder, unquotedWWWAuthenticateParameters, parameterList.toArray(new NameValuePair<?, ?>[parameterList.size()])); //parameters
 		} else { //if this is an unsupported challenge
 			throw new IllegalArgumentException(scheme.toString());
 		}
@@ -183,7 +183,7 @@ public class HTTPFormatter {
 			final Set<String> unquotedAuthorizationParameters = new HashSet<String>(); //create a set of parameters that should not be quoted, as per RFC 2617
 			unquotedAuthorizationParameters.add(ALGORITHM_PARAMETER); //algorithm
 			unquotedAuthorizationParameters.add(STALE_PARAMETER); //stale
-			formatAttributeList(stringBuilder, unquotedAuthorizationParameters, parameterList.toArray(new NameValuePair[parameterList.size()])); //parameters
+			formatAttributeList(stringBuilder, unquotedAuthorizationParameters, parameterList.toArray(new NameValuePair<?, ?>[parameterList.size()])); //parameters
 		} else { //if this is an unsupported challenge TODO implement BASIC challenge
 			throw new IllegalArgumentException(scheme.toString());
 		}

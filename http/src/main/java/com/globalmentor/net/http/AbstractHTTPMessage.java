@@ -33,8 +33,8 @@ import com.globalmentor.text.SyntaxException;
 import com.globalmentor.util.*;
 
 /**
- * An abstract implementation of an HTTP request or response as defined by <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>,
- * "Hypertext Transfer Protocol -- HTTP/1.1".
+ * An abstract implementation of an HTTP request or response as defined by <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>, "Hypertext Transfer
+ * Protocol -- HTTP/1.1".
  * @author Garret Wilson
  */
 public class AbstractHTTPMessage implements HTTPMessage {
@@ -130,7 +130,7 @@ public class AbstractHTTPMessage implements HTTPMessage {
 				headerList.add(new NameValuePair<String, String>(headerNameListPair.getName(), headerValue)); //add a new name-value pair with the header name and value
 			}
 		}
-		return (NameValuePair<String, String>[])headerList.toArray(new NameValuePair[headerList.size()]); //return an array of headers from the list
+		return (NameValuePair<String, String>[])headerList.toArray(new NameValuePair<?, ?>[headerList.size()]); //return an array of headers from the list
 	}
 
 	/**

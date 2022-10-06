@@ -26,6 +26,8 @@ import static com.globalmentor.net.HTTP.*;
  */
 public class HTTPMovedPermanentlyException extends HTTPRedirectException {
 
+	private static final long serialVersionUID = 1L;
+
 	/** The location to which a redirect should occur, or <code>null</code> if the redirect location is not given. */
 	private final URI location;
 

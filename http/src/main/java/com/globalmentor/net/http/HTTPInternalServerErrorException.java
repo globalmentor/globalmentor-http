@@ -24,6 +24,8 @@ import static com.globalmentor.net.HTTP.*;
  */
 public class HTTPInternalServerErrorException extends HTTPServerErrorException {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Constructs a new exception with the specified status code.
 	 */

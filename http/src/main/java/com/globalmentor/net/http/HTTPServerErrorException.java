@@ -22,6 +22,8 @@ package com.globalmentor.net.http;
  */
 public abstract class HTTPServerErrorException extends HTTPException {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Constructs a new exception with the specified status code.
 	 * @param statusCode The HTTP status code to return in the request.
