@@ -1,11 +1,11 @@
 /*
- * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 1996-2008 GlobalMentor, Inc. <https://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,7 +31,7 @@ import com.globalmentor.xml.XMLNamespacePrefixManager;
 import org.w3c.dom.*;
 
 /**
- * Class to generate XML trees for WebDAV as defined by <a href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>, "HTTP Extensions for Distributed Authoring
+ * Class to generate XML trees for WebDAV as defined by <a href="https://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>, "HTTP Extensions for Distributed Authoring
  * -- WEBDAV". This class is not thread safe.
  * @author Garret Wilson
  */

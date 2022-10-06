@@ -1,11 +1,11 @@
 /*
- * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 1996-2008 GlobalMentor, Inc. <https://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,7 @@ import java.net.URI;
  * WebDAV constants used by South River Technologies, makers of WebDrive. Some information gathered from communication with WebDrive tech support
  * representative, e.g. 2007-03-01.
  * @author Garret Wilson
- * @see <a href="http://www.webdrive.com/">WebDrive</a>
+ * @see <a href="https://webdrive.com/">WebDrive</a>
  */
 public class SRTWebDAV {
 

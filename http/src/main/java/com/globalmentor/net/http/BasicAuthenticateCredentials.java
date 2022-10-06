@@ -1,11 +1,11 @@
 /*
- * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 1996-2008 GlobalMentor, Inc. <https://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,8 +19,8 @@ package com.globalmentor.net.http;
 import static java.util.Objects.*;
 
 /**
- * An encapsulation of basic authenticate credentials of HTTP Basic Access Authentication, <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,
- * "HTTP Authentication: Basic and Digest Access Authentication", which obsoletes <a href="http://www.ietf.org/rfc/rfc2069.txt">RFC 2069</a>,
+ * An encapsulation of basic authenticate credentials of HTTP Basic Access Authentication, <a href="https://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>,
+ * "HTTP Authentication: Basic and Digest Access Authentication", which obsoletes <a href="https://www.ietf.org/rfc/rfc2069.txt">RFC 2069</a>,
  * "An Extension to HTTP : Digest Access Authentication".
  * @author Garret Wilson
  */

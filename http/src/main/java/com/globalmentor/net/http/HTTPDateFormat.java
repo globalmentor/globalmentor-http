@@ -1,11 +1,11 @@
 /*
- * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 1996-2008 GlobalMentor, Inc. <https://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,7 @@ import java.util.TimeZone;
 import static com.globalmentor.time.TimeZones.*;
 
 /**
- * Class for formatting dates and times according to one of the HTTP styles indicated in "3.3.1 Full Date" of <a href="http://www.ietf.org/rfc/rfc2068.txt">RFC
+ * Class for formatting dates and times according to one of the HTTP styles indicated in "3.3.1 Full Date" of <a href="https://www.ietf.org/rfc/rfc2068.txt">RFC
  * 2068</a>, "Hypertext Transfer Protocol -- HTTP/1.1".
  * @author Garret Wilson
  */
