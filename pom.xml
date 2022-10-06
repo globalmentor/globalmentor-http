@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>globalmentor-http-bom</artifactId>
-	<version>0.6.3-SNAPSHOT</version>
+	<version>0.6.3</version>
 	<packaging>pom</packaging>
 
 	<name>GlobalMentor HTTP BOM</name>
@@ -41,13 +41,13 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-http</artifactId>
-				<version>0.6.3-SNAPSHOT</version>
+				<version>0.6.3</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-webdav</artifactId>
-				<version>0.6.3-SNAPSHOT</version>
+				<version>0.6.3</version>
 			</dependency>
 
 			<dependency>
