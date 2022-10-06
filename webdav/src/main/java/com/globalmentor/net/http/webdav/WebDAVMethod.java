@@ -21,7 +21,35 @@ package com.globalmentor.net.http.webdav;
  * @author Garret Wilson
  */
 public enum WebDAVMethod {
+
+	/** <code>COPY</code> */
 	COPY,
 	/*TODO decide if this is properly a WebDAV method CONNECT,*/
-	DELETE, GET, HEAD, LOCK, MKCOL, MOVE, OPTIONS, PUT, POST, PROPFIND, PROPPATCH, TRACE, UNLOCK
+	/** <code>DELETE</code> */
+	DELETE,
+	/** <code>GET</code> */
+	GET,
+	/** <code>HEAD</code> */
+	HEAD,
+	/** <code>LOCK</code> */
+	LOCK,
+	/** <code>MKCOL</code> */
+	MKCOL,
+	/** <code>MOVE</code> */
+	MOVE,
+	/** <code>OPTIONS</code> */
+	OPTIONS,
+	/** <code>PUT</code> */
+	PUT,
+	/** <code>POST</code> */
+	POST,
+	/** <code>PROPFIND</code> */
+	PROPFIND,
+	/** <code>PROPPATCH</code> */
+	PROPPATCH,
+	/** <code>TRACE</code> */
+	TRACE,
+	/** <code>UNLOCK</code> */
+	UNLOCK
+
 }

@@ -21,5 +21,14 @@ package com.globalmentor.net.http;
  * @author Garret Wilson
  */
 public enum AuthenticationScheme {
-	BASIC, CLIENT_CERT, DIGEST, FORM
+
+	/** Basic authentication. */
+	BASIC,
+	/** Client certificate authentication. */
+	CLIENT_CERT,
+	/** Digest authentication. */
+	DIGEST,
+	/** Form authentication. */
+	FORM
+
 }

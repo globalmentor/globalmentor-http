@@ -81,14 +81,23 @@ public class WebDAV {
 	public static final String OVERWRITE_TRUE = "T";
 
 	//property names
+	/** <code>DAV:creationdate</code> */
 	public static final WebDAVPropertyName CREATION_DATE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "creationdate");
+	/** <code>DAV:displayname</code> */
 	public static final WebDAVPropertyName DISPLAY_NAME_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "displayname");
+	/** <code>DAV:getcontentlanguage</code> */
 	public static final WebDAVPropertyName GET_CONTENT_LANGUAGE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontentlanguage");
+	/** <code>DAV:getcontentlength</code> */
 	public static final WebDAVPropertyName GET_CONTENT_LENGTH_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontentlength");
+	/** <code>DAV:getcontenttype</code> */
 	public static final WebDAVPropertyName GET_CONTENT_TYPE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getcontenttype");
+	/** <code>DAV:getetag</code> */
 	public static final WebDAVPropertyName GET_ETAG_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getetag");
+	/** <code>DAV:getlastmodified</code> */
 	public static final WebDAVPropertyName GET_LAST_MODIFIED_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "getlastmodified");
+	/** <code>DAV:lockdiscovery</code> */
 	public static final WebDAVPropertyName LOCK_DISCOVERY_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "lockdiscovery");
+	/** <code>DAV:resourcetype</code> */
 	public static final WebDAVPropertyName RESOURCE_TYPE_PROPERTY_NAME = new WebDAVPropertyName(WEBDAV_NAMESPACE, "resourcetype");
 
 	/** The constant property list indicating all properties. */
@@ -100,9 +109,11 @@ public class WebDAV {
 			new HashMap<URI, WebDAVPropertyName>(), new ArrayList<WebDAVPropertyName>());
 
 	//resource type names
+	/** The name of the collection resource type. */
 	public static final String COLLECTION_TYPE_NAME = "collection";
 
 	//resource types
+	/** The URI of the collection resource type. */
 	public static final URI COLLECTION_TYPE = createPropertyURI(WEBDAV_NAMESPACE, COLLECTION_TYPE_NAME);
 
 	//XML names

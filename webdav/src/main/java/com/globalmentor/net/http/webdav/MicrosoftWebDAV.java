@@ -21,7 +21,8 @@ import java.net.URI;
 /**
  * WebDAV constants used by Microsoft to mount drives on WebDAV in Windows Vista.
  * @author Garret Wilson
- * @see <a href="http://msdn.microsoft.com/en-us/library/cc250176.aspx">WebDAV Microsoft Extensions Server Details: Server Properties</a>
+ * @see <a href="https://learn.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-wdvme/b24bb05a-b847-483b-b0b2-ea34435a0c9b">MS-WDVME: 3.2.5.6 Server
+ *      Properties</a>
  */
 public class MicrosoftWebDAV {
 
@@ -34,6 +35,7 @@ public class MicrosoftWebDAV {
 	public static final WebDAVPropertyName WIN32_LAST_ACCESS_TIME = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32LastAccessTime");
 	/** The last modified timestamp in the format specified by RFC 1123. */
 	public static final WebDAVPropertyName WIN32_LAST_MODIFIED_TIME = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32LastModifiedTime");
+	/** Windows file attributes. */
 	public static final WebDAVPropertyName WIN32_FILE_ATTRIBUTES = new WebDAVPropertyName(MICROSOFT_WEBDAV_PROPERTY_NAMESPACE_URI, "Win32FileAttributes");
 
 }

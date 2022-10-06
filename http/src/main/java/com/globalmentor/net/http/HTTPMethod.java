@@ -21,5 +21,22 @@ package com.globalmentor.net.http;
  * @author Garret Wilson
  */
 public enum HTTPMethod {
-	CONNECT, DELETE, GET, HEAD, POST, PUT, OPTIONS, TRACE
+
+	/** <code>CONNECT</code> */
+	CONNECT,
+	/** <code>DELETE</code> */
+	DELETE,
+	/** <code>GET</code> */
+	GET,
+	/** <code>HEAD</code> */
+	HEAD,
+	/** <code>POST</code> */
+	POST,
+	/** <code>PUT</code> */
+	PUT,
+	/** <code>OPTIONS</code> */
+	OPTIONS,
+	/** <code>TRACE</code> */
+	TRACE
+
 }
